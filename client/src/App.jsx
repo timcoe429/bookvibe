@@ -146,6 +146,7 @@ function App() {
 
   const handlePhotoUploadClose = () => {
     setShowPhotoUpload(false);
+    setCurrentTab('home'); // Reset to home when closing
   };
 
   useEffect(() => {
@@ -170,25 +171,82 @@ function App() {
            <div className="subtitle">What should you read next?</div>
          </div>
 
-         {showPhotoUpload && (
-           <PhotoUpload 
-             onBooksDetected={handleBooksDetected}
-             onClose={handlePhotoUploadClose}
-           />
-         )}
+                   {showPhotoUpload && (
+            <div className="photo-upload-container">
+              <div className="photo-upload-fallback">
+                <div className="upload-header">
+                  <h2>Add Books 📚</h2>
+                  <button 
+                    onClick={handlePhotoUploadClose}
+                    className="close-btn"
+                  >
+                    ✕
+                  </button>
+                </div>
+                <div className="upload-content">
+                  <div className="feature-coming-soon">
+                    <div className="coming-soon-icon">🚧</div>
+                    <h3>Photo Upload Coming Soon!</h3>
+                    <p>We're working on the AI book detection feature.</p>
+                    <p>For now, enjoy the sample books in your recommendations!</p>
+                    <button 
+                      onClick={() => {
+                        // Add some sample books for testing
+                        const sampleBooks = [
+                          { title: "Dune", author: "Frank Herbert", mood: "fantasy" },
+                          { title: "The Martian", author: "Andy Weir", mood: "thriller" },
+                          { title: "Pride and Prejudice", author: "Jane Austen", mood: "romance" }
+                        ];
+                        setUserBooks(prev => [...prev, ...sampleBooks]);
+                        handlePhotoUploadClose();
+                      }}
+                      className="add-sample-btn"
+                    >
+                      Add Sample Books
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
 
-                                   <div className="main-content">
-                         {!showVibes && !isSpinning && !currentBook ? (
-               <div className="magic-start">
-                 <div className="magic-circle" onClick={startMagic}>
-                   <div className="magic-text">✨</div>
-                   <div className="magic-text">Ready for your next adventure?</div>
-                   <div className="magic-text">Tap to start!</div>
-                 </div>
-                 
-                 
-               </div>
-            ) : showVibes && !isSpinning ? (
+                                                                       <div className="main-content">
+                          {currentTab === 'library' ? (
+                <div className="library-view">
+                  <h2 className="section-title">Your Library 📚</h2>
+                  {userBooks.length > 0 ? (
+                    <div className="books-grid">
+                      {userBooks.map((book, index) => (
+                        <div key={book.id || index} className="book-item">
+                          <div className="book-cover-small">
+                            {book.title.slice(0, 2)}
+                          </div>
+                          <div className="book-details">
+                            <h4 className="book-title-small">{book.title}</h4>
+                            <p className="book-author-small">by {book.author}</p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="empty-library">
+                      <div className="empty-icon">📖</div>
+                      <h3>Your library is empty!</h3>
+                      <p>Add some books by clicking the "Add Books" tab below.</p>
+                    </div>
+                  )}
+                </div>
+              ) : !showVibes && !isSpinning && !currentBook ? (
+                <div className="magic-start">
+                  <div className="magic-circle" onClick={startMagic}>
+                    <div className="magic-text">✨</div>
+                    <div className="magic-text">Ready for your next adventure?</div>
+                    <div className="magic-text">Tap to start!</div>
+                  </div>
+                  
+                  
+                </div>
+             ) : showVibes && !isSpinning ? (
               <div className="vibe-selection">
                 <h2 className="section-title">Choose your adventure! ✨</h2>
                 <div className="vibe-buttons">
@@ -245,13 +303,19 @@ function App() {
 
          {/* Bottom Navigation */}
          <div className="bottom-nav">
-           <button 
-             className={`nav-tab ${currentTab === 'home' ? 'active' : ''}`}
-             onClick={() => setCurrentTab('home')}
-           >
-             <span className="nav-icon">🏠</span>
-             <span className="nav-label">Home</span>
-           </button>
+                       <button 
+              className={`nav-tab ${currentTab === 'home' ? 'active' : ''}`}
+              onClick={() => {
+                setCurrentTab('home');
+                setShowPhotoUpload(false);
+                setCurrentBook(null);
+                setShowVibes(false);
+                setIsSpinning(false);
+              }}
+            >
+              <span className="nav-icon">🏠</span>
+              <span className="nav-label">Home</span>
+            </button>
            
            <button 
              className={`nav-tab ${currentTab === 'library' ? 'active' : ''}`}
