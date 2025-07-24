@@ -20,6 +20,16 @@ const PhotoUpload = ({ onBooksDetected, onClose }) => {
         setUploadInfo(info);
       } catch (err) {
         console.error('Failed to load upload info:', err);
+        // Set fallback upload info
+        setUploadInfo({
+          recommendations: [
+            "Good lighting helps text recognition",
+            "Keep book spines straight and readable", 
+            "Take photo from directly in front of books",
+            "Avoid glare and shadows",
+            "Make sure text is clear and in focus"
+          ]
+        });
       }
     };
     loadUploadInfo();
@@ -169,7 +179,7 @@ const PhotoUpload = ({ onBooksDetected, onClose }) => {
       </div>
 
       {/* Tips */}
-      {uploadInfo && (
+      {uploadInfo && uploadInfo.recommendations && (
         <div className="bg-white rounded-2xl p-6 shadow-sm">
           <h4 className="font-semibold mb-3 text-gray-800">📸 Photo Tips</h4>
           <ul className="space-y-2 text-sm text-gray-600">
