@@ -5,6 +5,8 @@ function App() {
      const [selectedMood, setSelectedMood] = useState('pink');
   const [currentBook, setCurrentBook] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [isSpinning, setIsSpinning] = useState(false);
+  const [spinningText, setSpinningText] = useState('');
 
            const books = [
       { title: "The Seven Husbands of Evelyn Hugo", author: "Taylor Jenkins Reid", mood: "pink" },
@@ -33,11 +35,38 @@ function App() {
   };
 
   const surprise = () => {
-    const moodBooks = getBooksForMood(selectedMood);
-    if (moodBooks.length > 0) {
-      const randomIndex = Math.floor(Math.random() * moodBooks.length);
-      setCurrentBook(moodBooks[randomIndex]);
-    }
+    setIsSpinning(true);
+    setSpinningText('🧙‍♀️ Mixing magical potions...');
+    
+    const journeySteps = [
+      '🧙‍♀️ Mixing magical potions...',
+      '🏔️ Climbing the mountains of Mordor...',
+      '🌊 Sailing through the seven seas...',
+      '🔮 Consulting the ancient oracles...',
+      '✨ Channeling bookish energy...',
+      '📚 Searching through enchanted libraries...',
+      '🌟 Following the North Star...',
+      '🎭 Consulting the muses...'
+    ];
+    
+    let stepIndex = 0;
+    const interval = setInterval(() => {
+      setSpinningText(journeySteps[stepIndex]);
+      stepIndex++;
+      
+      if (stepIndex >= journeySteps.length) {
+        clearInterval(interval);
+        setTimeout(() => {
+          const moodBooks = getBooksForMood(selectedMood);
+          if (moodBooks.length > 0) {
+            const randomIndex = Math.floor(Math.random() * moodBooks.length);
+            setCurrentBook(moodBooks[randomIndex]);
+          }
+          setIsSpinning(false);
+          setSpinningText('');
+        }, 1000);
+      }
+    }, 300);
   };
 
   const handleMoodChange = (mood) => {
@@ -114,23 +143,30 @@ function App() {
               </div>
            </div>
 
-          {currentBook && (
-            <div className="book-card" key={currentBook.title}>
-              <div className="book-cover">
-                BOOK<br/>COVER
-              </div>
-              <div className="book-title">{currentBook.title}</div>
-              <div className="book-author">by {currentBook.author}</div>
-                                                           <div className="action-buttons">
-                  <button className="btn btn-primary" onClick={nextBook}>
-                    Show me another! ✨
-                  </button>
-                  <button className="btn btn-surprise" onClick={surprise}>
-                    🎲 Pick for me!
-                  </button>
-                </div>
+                     {isSpinning ? (
+             <div className="book-card spinning">
+               <div className="spinning-wheel">
+                 <div className="wheel-text">{spinningText}</div>
+                 <div className="spinner">🎲</div>
+               </div>
              </div>
-           )}
+           ) : currentBook ? (
+             <div className="book-card" key={currentBook.title}>
+               <div className="book-cover">
+                 BOOK<br/>COVER
+               </div>
+               <div className="book-title">{currentBook.title}</div>
+               <div className="book-author">by {currentBook.author}</div>
+               <div className="action-buttons">
+                 <button className="btn btn-primary" onClick={nextBook}>
+                   Show me another! ✨
+                 </button>
+                 <button className="btn btn-surprise" onClick={surprise}>
+                   🎲 Pick for me!
+                 </button>
+               </div>
+             </div>
+           ) : null}
 
                                              <div className="stats">
               <div className="stat">
