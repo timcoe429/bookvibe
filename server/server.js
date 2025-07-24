@@ -5,10 +5,14 @@ require('dotenv').config();
 const app = require('./app');
 const { sequelize } = require('./config/database');
 
-// Add health check endpoints - Railway might be hitting root or /health
-app.get('/', (req, res) => {
-  console.log('🏥 ROOT HEALTH CHECK HIT!');
-  res.status(200).json({ status: 'OK', message: 'BookVibe server running' });
+// Simple test endpoints
+app.get('/api/test', (req, res) => {
+  console.log('🧪 API TEST HIT!');
+  res.json({ 
+    message: 'BookVibe API is working!', 
+    timestamp: new Date().toISOString(),
+    environment: process.env.NODE_ENV 
+  });
 });
 
 app.get('/health', (req, res) => {
@@ -32,7 +36,15 @@ if (process.env.NODE_ENV === 'production') {
   // Catch-all for React routing - LAST
   app.get('*', (req, res) => {
     console.log(`📋 Serving React app for: ${req.url}`);
-    res.sendFile(path.join(__dirname, 'public', 'index.html'));
+    const indexPath = path.join(__dirname, 'public', 'index.html');
+    console.log(`📂 Looking for index.html at: ${indexPath}`);
+    res.sendFile(indexPath);
+  });
+} else {
+  // Development fallback
+  app.get('*', (req, res) => {
+    console.log(`📋 Development mode - no React build`);
+    res.json({ message: 'API server running', path: req.url });
   });
 }
 
