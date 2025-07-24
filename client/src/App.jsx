@@ -10,6 +10,7 @@ function App() {
   const [showVibes, setShowVibes] = useState(false);
   const [showPhotoUpload, setShowPhotoUpload] = useState(false);
   const [userBooks, setUserBooks] = useState([]);
+  const [currentTab, setCurrentTab] = useState('home'); // home, library, add
 
                                                const books = [
         // Romance & Love
@@ -162,14 +163,7 @@ function App() {
                    <div className="magic-text">Tap to start!</div>
                  </div>
                  
-                 {userBooks.length === 0 && (
-                   <div className="add-books-section">
-                     <div className="add-books-text">📚 Add your books to get personalized recommendations!</div>
-                     <button className="add-books-btn" onClick={() => setShowPhotoUpload(true)}>
-                       📸 Take Photo of Your Books
-                     </button>
-                   </div>
-                 )}
+                 
                </div>
             ) : showVibes && !isSpinning ? (
               <div className="vibe-selection">
@@ -223,17 +217,34 @@ function App() {
               </div>
             ) : null}
 
-                                                              <div className="stats">
-                   <div className="stat">
-                     <div className="stat-number">{userBooks.length > 0 ? userBooks.length : books.length}</div>
-                     <div className="stat-label">Books on your shelf</div>
-                   </div>
-                   {userBooks.length > 0 && (
-                     <button className="add-more-btn" onClick={() => setShowPhotoUpload(true)}>
-                       📸 Add More Books
-                     </button>
-                   )}
-                 </div>
+                                             
+         </div>
+
+         {/* Bottom Navigation */}
+         <div className="bottom-nav">
+           <button 
+             className={`nav-tab ${currentTab === 'home' ? 'active' : ''}`}
+             onClick={() => setCurrentTab('home')}
+           >
+             <span className="nav-icon">🏠</span>
+             <span className="nav-label">Home</span>
+           </button>
+           
+           <button 
+             className={`nav-tab ${currentTab === 'library' ? 'active' : ''}`}
+             onClick={() => setCurrentTab('library')}
+           >
+             <span className="nav-icon">📚</span>
+             <span className="nav-label">Library</span>
+           </button>
+           
+           <button 
+             className={`nav-tab ${currentTab === 'add' ? 'active' : ''}`}
+             onClick={() => setCurrentTab('add')}
+           >
+             <span className="nav-icon">➕</span>
+             <span className="nav-label">Add Books</span>
+           </button>
          </div>
        </div>
     </div>
