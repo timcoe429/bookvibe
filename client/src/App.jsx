@@ -80,16 +80,16 @@ function App() {
     setIsSpinning(true);
     setSpinningText('📚 Scanning your bookshelf...');
     
-    const journeySteps = [
-      '📚 Scanning your bookshelf...',
-      '🔍 Looking for hidden gems...',
-      '✨ Finding the perfect story...',
-      '🌟 Discovering your next adventure...',
-      '📖 Reading between the lines...',
-      '🎯 Zeroing in on your match...',
-      '💫 Almost there...',
-      '🎉 Found it!'
-    ];
+          const journeySteps = [
+        '📚 Scanning your bookshelf...',
+        '🏔️ Climbing the mountain of Mordor...',
+        '🐉 Fighting dragons in Westeros...',
+        '🚀 Exploring the depths of space...',
+        '🏰 Crawling through dungeons with Carl...',
+        '🌊 Sailing the seven seas...',
+        '🔮 Consulting the ancient scrolls...',
+        '🎉 Found your next adventure!'
+      ];
     
     let stepIndex = 0;
     const interval = setInterval(() => {
