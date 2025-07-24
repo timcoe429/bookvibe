@@ -76,14 +76,8 @@ function App() {
 
   return (
     <div className="app-container">
-      <div className="phone-container">
-        <div className="status-bar">
-          <span>9:41</span>
-          <span>📚 BookVibe</span>
-          <span>100%</span>
-        </div>
-
-        <div className="header">
+             <div className="phone-container">
+         <div className="header">
           <h1>BookVibe</h1>
           <div className="subtitle">What should you read next?</div>
         </div>
@@ -126,37 +120,30 @@ function App() {
               </div>
               <div className="book-title">{currentBook.title}</div>
               <div className="book-author">by {currentBook.author}</div>
-              <div className="action-buttons">
-                <button className="btn btn-primary" onClick={nextBook}>
-                  Read This! 📖
-                </button>
-                <button className="btn btn-secondary" onClick={nextBook}>
-                  Skip ➡️
-                </button>
-              </div>
-            </div>
-          )}
+                             <div className="action-buttons">
+                 <button className="btn btn-primary" onClick={nextBook}>
+                   Read This! 📖
+                 </button>
+                 <button className="btn btn-secondary" onClick={nextBook}>
+                   Skip ➡️
+                 </button>
+               </div>
+               <div className="surprise-button">
+                 <button className="btn btn-surprise" onClick={surprise}>
+                   🎲 Surprise Me!
+                 </button>
+               </div>
+             </div>
+           )}
 
-          <div className="stats">
-            <div className="stat">
-              <div className="stat-number">47</div>
-              <div className="stat-label">Books This Year</div>
-            </div>
-            <div className="stat">
-              <div className="stat-number">12</div>
-              <div className="stat-label">In Queue</div>
-            </div>
-            <div className="stat">
-              <div className="stat-number">5</div>
-              <div className="stat-label">Reading Streak</div>
-            </div>
-          </div>
-        </div>
-
-        <div className="floating-action" onClick={surprise}>
-          🎲
-        </div>
-      </div>
+                      <div className="stats">
+             <div className="stat">
+               <div className="stat-number">12</div>
+               <div className="stat-label">In Queue</div>
+             </div>
+           </div>
+         </div>
+       </div>
     </div>
   );
 }

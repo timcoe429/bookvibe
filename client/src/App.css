@@ -30,18 +30,7 @@ body {
   flex-direction: column;
 }
 
-.status-bar {
-  height: 44px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0 20px;
-  color: white;
-  font-size: 14px;
-  font-weight: 600;
-  flex-shrink: 0;
-}
+
 
 .header {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -187,9 +176,23 @@ body {
   box-shadow: 0 8px 20px rgba(0,0,0,0.2);
 }
 
+.surprise-button {
+  margin-top: 12px;
+  display: flex;
+  justify-content: center;
+}
+
+.btn-surprise {
+  background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+  color: white;
+  border: none;
+  width: 100%;
+  max-width: 200px;
+}
+
 .stats {
   display: flex;
-  justify-content: space-around;
+  justify-content: center;
   padding-top: 15px;
   border-top: 1px solid #f0f0f0;
   flex-shrink: 0;
@@ -211,27 +214,7 @@ body {
   margin-top: 4px;
 }
 
-.floating-action {
-  position: absolute;
-  bottom: 20px;
-  right: 20px;
-  width: 50px;
-  height: 50px;
-  background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
-  font-size: 20px;
-  box-shadow: 0 10px 30px rgba(255, 154, 158, 0.4);
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
 
-.floating-action:hover {
-  transform: scale(1.1);
-}
 
 .loading {
   display: flex;
