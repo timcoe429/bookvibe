@@ -82,12 +82,12 @@ function App() {
     
           const journeySteps = [
         '📚 Scanning your bookshelf...',
-        '🏔️ Climbing the mountain of Mordor...',
-        '🐉 Fighting dragons in Westeros...',
-        '🚀 Exploring the depths of space...',
-        '🏰 Crawling through dungeons with Carl...',
-        '🌊 Sailing the seven seas...',
-        '🔮 Consulting the ancient scrolls...',
+        '🏰 Sneaking through Hogwarts after curfew...',
+        '🚀 Waking up alone on the Hail Mary...',
+        '🚪 Opening doors across infinite worlds...',
+        '🏔️ Destroying the One Ring in Mount Doom...',
+        '🪐 Walking the desert of Arrakis...',
+        '🔮 Consulting the ancient tomes...',
         '🎉 Found your next adventure!'
       ];
     
