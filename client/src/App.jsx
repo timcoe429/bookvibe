@@ -80,16 +80,39 @@ function App() {
     setIsSpinning(true);
     setSpinningText('📚 Scanning your bookshelf...');
     
-          const journeySteps = [
-        '📚 Scanning your bookshelf...',
-        '🏰 Sneaking through Hogwarts after curfew...',
-        '🚀 Waking up alone on the Hail Mary...',
-        '🚪 Opening doors across infinite worlds...',
-        '🏔️ Destroying the One Ring in Mount Doom...',
-        '🪐 Walking the desert of Arrakis...',
-        '🔮 Consulting the ancient tomes...',
-        '🎉 Found your next adventure!'
-      ];
+    const bookReferences = [
+      '🏰 Sneaking through Hogwarts after curfew...',
+      '🚀 Waking up alone on the Hail Mary...',
+      '🚪 Opening doors across infinite worlds...',
+      '🏔️ Destroying the One Ring in Mount Doom...',
+      '🪐 Walking the desert of Arrakis...',
+      '🥔 Growing potatoes on Mars...',
+      '🕹️ Logging into the OASIS...',
+      '🐋 Don\'t panic! Consulting the Guide...',
+      '👁️ Big Brother is watching you...',
+      '👩‍🦳 Under His Eye in Gilead...',
+      '🐉 Winter is coming to Westeros...',
+      '🎵 Calling the Name of the Wind...',
+      '⚡ Life before death, Radiant...',
+      '🚀 Holden, the Rocinante needs you...',
+      '🤖 Psychohistory predicts the future...',
+      '👦 The enemy\'s gate is down...',
+      '❄️ The left hand of darkness...',
+      '🧠 Jacking into the matrix...',
+      '⏰ The Time Machine is ready...',
+      '🔥 It was a pleasure to burn...',
+      '🌙 Following the Moonbeam Roads...',
+      '🗡️ Fear is the mind-killer...'
+    ];
+    
+    // Pick 2 random book references
+    const shuffled = [...bookReferences].sort(() => 0.5 - Math.random());
+    const journeySteps = [
+      '📚 Scanning your bookshelf...',
+      shuffled[0],
+      shuffled[1],
+      '🎉 Found your next adventure!'
+    ];
     
     let stepIndex = 0;
     const interval = setInterval(() => {
@@ -109,7 +132,7 @@ function App() {
           setShowVibes(false);
         }, 1500);
       }
-    }, 3000);
+    }, 2000);
   };
 
   const handleMoodChange = (mood) => {
