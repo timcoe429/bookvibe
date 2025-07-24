@@ -172,42 +172,10 @@ function App() {
          </div>
 
                    {showPhotoUpload && (
-            <div className="photo-upload-container">
-              <div className="photo-upload-fallback">
-                <div className="upload-header">
-                  <h2>Add Books 📚</h2>
-                  <button 
-                    onClick={handlePhotoUploadClose}
-                    className="close-btn"
-                  >
-                    ✕
-                  </button>
-                </div>
-                <div className="upload-content">
-                  <div className="feature-coming-soon">
-                    <div className="coming-soon-icon">🚧</div>
-                    <h3>Photo Upload Coming Soon!</h3>
-                    <p>We're working on the AI book detection feature.</p>
-                    <p>For now, enjoy the sample books in your recommendations!</p>
-                    <button 
-                      onClick={() => {
-                        // Add some sample books for testing
-                        const sampleBooks = [
-                          { title: "Dune", author: "Frank Herbert", mood: "fantasy" },
-                          { title: "The Martian", author: "Andy Weir", mood: "thriller" },
-                          { title: "Pride and Prejudice", author: "Jane Austen", mood: "romance" }
-                        ];
-                        setUserBooks(prev => [...prev, ...sampleBooks]);
-                        handlePhotoUploadClose();
-                      }}
-                      className="add-sample-btn"
-                    >
-                      Add Sample Books
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
+            <PhotoUpload 
+              onBooksDetected={handleBooksDetected}
+              onClose={handlePhotoUploadClose}
+            />
           )}
 
                                                                        <div className="main-content">
