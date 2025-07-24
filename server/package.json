@@ -4,7 +4,7 @@
   "description": "BookVibe API server",
   "main": "server.js",
   "scripts": {
-    "start": "node simple-server.js",
+    "start": "node minimal-server.js",
     "dev": "nodemon simple-server.js",
     "migrate": "node scripts/migrate.js"
   },
