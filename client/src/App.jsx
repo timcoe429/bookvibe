@@ -43,18 +43,17 @@ function App() {
 
   const surprise = (mood) => {
     setIsSpinning(true);
-    setSpinningText('🧙‍♀️ Mixing magical potions...');
+    setSpinningText('📚 Scanning your bookshelf...');
     
     const journeySteps = [
-      '🧙‍♀️ Mixing magical potions...',
-      '🏔️ Climbing the mountains of Mordor...',
-      '🌊 Sailing through the seven seas...',
-      '🔮 Consulting the ancient oracles...',
-      '✨ Channeling bookish energy...',
-      '📚 Searching through enchanted libraries...',
-      '🌟 Following the North Star...',
-      '🎭 Consulting the muses...',
-      '🌈 Finding your perfect book...'
+      '📚 Scanning your bookshelf...',
+      '🔍 Looking for hidden gems...',
+      '✨ Finding the perfect story...',
+      '🌟 Discovering your next adventure...',
+      '📖 Reading between the lines...',
+      '🎯 Zeroing in on your match...',
+      '💫 Almost there...',
+      '🎉 Found it!'
     ];
     
     let stepIndex = 0;
@@ -75,7 +74,7 @@ function App() {
           setShowVibes(false);
         }, 1000);
       }
-    }, 1200);
+    }, 1500);
   };
 
   const handleMoodChange = (mood) => {
@@ -106,15 +105,13 @@ function App() {
 
                                    <div className="main-content">
             {!showVibes && !isSpinning && !currentBook ? (
-              <div className="magic-start">
-                <div className="magic-circle">
-                  <div className="magic-text">✨</div>
-                  <div className="magic-text">Ready for your next adventure?</div>
-                  <button className="magic-btn" onClick={startMagic}>
-                    🎲 Start the Magic!
-                  </button>
-                </div>
-              </div>
+                             <div className="magic-start">
+                 <div className="magic-circle" onClick={startMagic}>
+                   <div className="magic-text">✨</div>
+                   <div className="magic-text">Ready for your next adventure?</div>
+                   <div className="magic-text">Tap to start!</div>
+                 </div>
+               </div>
             ) : showVibes && !isSpinning ? (
               <div className="vibe-selection">
                 <h2 className="section-title">Choose your adventure! ✨</h2>
@@ -145,13 +142,13 @@ function App() {
                   </button>
                 </div>
               </div>
-            ) : isSpinning ? (
-              <div className="book-card spinning">
-                <div className="spinning-wheel">
-                  <div className="wheel-text">{spinningText}</div>
-                  <div className="spinner">🎲</div>
-                </div>
-              </div>
+                         ) : isSpinning ? (
+               <div className="book-card spinning">
+                 <div className="spinning-wheel">
+                   <div className="wheel-text">{spinningText}</div>
+                   <div className="book-icon">📚</div>
+                 </div>
+               </div>
             ) : currentBook ? (
               <div className="book-card" key={currentBook.title}>
                 <div className="book-cover">
