@@ -107,9 +107,9 @@ function App() {
           setIsSpinning(false);
           setSpinningText('');
           setShowVibes(false);
-        }, 1000);
+        }, 1500);
       }
-    }, 1500);
+    }, 3000);
   };
 
   const handleMoodChange = (mood) => {
