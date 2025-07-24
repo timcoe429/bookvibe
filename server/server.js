@@ -5,21 +5,16 @@ require('dotenv').config();
 const app = require('./app');
 const { sequelize } = require('./config/database');
 
-// Serve uploaded files
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+// Debug: Log ALL incoming requests FIRST
+app.use((req, res, next) => {
+  console.log(`📋 REQUEST: ${req.method} ${req.url} from ${req.ip}`);
+  console.log(`📋 Headers:`, req.headers);
+  next();
+});
 
-// Serve React build files in production
-if (process.env.NODE_ENV === 'production') {
-  app.use(express.static(path.join(__dirname, 'public')));
-  
-  app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'index.html'));
-  });
-}
-
-// Health check endpoint (in addition to the one in app.js)
+// Health check endpoint - BEFORE other routes
 app.get('/health', (req, res) => {
-  console.log('🏥 Health check requested');
+  console.log('🏥 Health check endpoint HIT! Responding with 200');
   res.status(200).json({ 
     status: 'OK', 
     message: 'BookVibe server is running',
@@ -28,6 +23,20 @@ app.get('/health', (req, res) => {
     port: PORT
   });
 });
+
+// Serve uploaded files
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
+// Serve React build files in production
+if (process.env.NODE_ENV === 'production') {
+  app.use(express.static(path.join(__dirname, 'public')));
+  
+  // Catch-all for React routing - LAST
+  app.get('*', (req, res) => {
+    console.log(`📋 Serving React app for: ${req.url}`);
+    res.sendFile(path.join(__dirname, 'public', 'index.html'));
+  });
+}
 
 // Database connection and server start
 const PORT = process.env.PORT || 5000;

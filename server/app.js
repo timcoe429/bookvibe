@@ -35,6 +35,7 @@ app.use('/api/photos', photoRoutes);
 
 // Health check
 app.get('/api/health', (req, res) => {
+  console.log('🏥 API Health check endpoint HIT! Responding with 200');
   res.json({ status: 'OK', timestamp: new Date().toISOString() });
 });
 
