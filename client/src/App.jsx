@@ -35,7 +35,10 @@ function App() {
   };
 
   const startMagic = () => {
-    setShowVibes(true);
+    // Skip the vibe selection and go straight to magic
+    const moods = ['romance', 'thriller', 'cozy', 'fantasy'];
+    const randomMood = moods[Math.floor(Math.random() * moods.length)];
+    surprise(randomMood);
   };
 
   const surprise = (mood) => {
@@ -72,7 +75,7 @@ function App() {
           setShowVibes(false);
         }, 1000);
       }
-    }, 500);
+    }, 1200);
   };
 
   const handleMoodChange = (mood) => {
