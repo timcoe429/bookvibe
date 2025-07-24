@@ -21,7 +21,8 @@ const Book = sequelize.define('Book', {
   },
   goodreadsId: {
     type: DataTypes.STRING,
-    unique: true
+    unique: true,
+    field: 'goodreads_id'
   },
   pages: {
     type: DataTypes.INTEGER
@@ -30,7 +31,8 @@ const Book = sequelize.define('Book', {
     type: DataTypes.TEXT
   },
   coverUrl: {
-    type: DataTypes.STRING
+    type: DataTypes.STRING,
+    field: 'cover_url'
   },
   genre: {
     type: DataTypes.STRING
@@ -40,17 +42,21 @@ const Book = sequelize.define('Book', {
     defaultValue: 'escapist'
   },
   averageRating: {
-    type: DataTypes.DECIMAL(3, 2)
+    type: DataTypes.DECIMAL(3, 2),
+    field: 'average_rating'
   },
   publicationYear: {
-    type: DataTypes.INTEGER
+    type: DataTypes.INTEGER,
+    field: 'publication_year'
   }
 }, {
+  tableName: 'books',
+  underscored: true,
   indexes: [
     { fields: ['title'] },
     { fields: ['author'] },
     { fields: ['mood'] },
-    { fields: ['goodreadsId'] }
+    { fields: ['goodreads_id'] }
   ]
 });
 

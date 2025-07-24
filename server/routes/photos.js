@@ -133,23 +133,18 @@ router.post('/confirm-books', async (req, res) => {
       return res.status(400).json({ error: 'Selected books not found in original list' });
     }
 
-    // Import books using the bulk import endpoint
-    const importResponse = await fetch(`${req.protocol}://${req.get('host')}/api/books/bulk-import`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        books: booksToImport,
-        sessionId
-      })
+    // Import books using the bulk import endpoint - use axios instead of fetch
+    const axios = require('axios');
+    const importResponse = await axios.post(`${req.protocol}://${req.get('host')}/api/books/bulk-import`, {
+      books: booksToImport,
+      sessionId
     });
 
-    if (!importResponse.ok) {
+    if (importResponse.status !== 200) {
       throw new Error('Failed to import books');
     }
 
-    const importResult = await importResponse.json();
+    const importResult = importResponse.data;
 
     res.json({
       success: true,

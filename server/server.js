@@ -1,30 +1,12 @@
-const express = require('express');
-const cors = require('cors');
 const path = require('path');
+const express = require('express');
 require('dotenv').config();
 
-// Import database connection
+const app = require('./app');
 const { sequelize } = require('./config/database');
-
-// Import routes
-const userRoutes = require('./routes/users');
-const bookRoutes = require('./routes/books');
-const photoRoutes = require('./routes/photos');
-
-const app = express();
-
-// Middleware
-app.use(cors());
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
 
 // Serve uploaded files
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
-
-// API Routes
-app.use('/api/users', userRoutes);
-app.use('/api/books', bookRoutes);
-app.use('/api/photos', photoRoutes);
 
 // Serve React build files in production
 if (process.env.NODE_ENV === 'production') {
@@ -35,7 +17,7 @@ if (process.env.NODE_ENV === 'production') {
   });
 }
 
-// Health check endpoint
+// Health check endpoint (in addition to the one in app.js)
 app.get('/health', (req, res) => {
   res.status(200).json({ status: 'OK', message: 'Server is running' });
 });
@@ -45,21 +27,29 @@ const PORT = process.env.PORT || 5000;
 
 async function startServer() {
   try {
+    console.log('🔌 Connecting to database...');
+    console.log('📍 Database URL:', process.env.DATABASE_URL ? 'Set' : 'Not set');
+    
     // Test database connection
     await sequelize.authenticate();
     console.log('✅ Database connected successfully');
     
-    // Sync database models
-    await sequelize.sync({ alter: true });
+    // Sync database models (use force: false to preserve existing data)
+    await sequelize.sync({ force: false, alter: false });
     console.log('✅ Database models synchronized');
     
     // Start server
     app.listen(PORT, '0.0.0.0', () => {
       console.log(`🚀 Server running on port ${PORT}`);
-      console.log(`📊 Environment: ${process.env.NODE_ENV}`);
+      console.log(`📊 Environment: ${process.env.NODE_ENV || 'development'}`);
+      console.log(`🏥 Health check available at: http://localhost:${PORT}/health`);
     });
   } catch (error) {
     console.error('❌ Unable to start server:', error);
+    console.error('📋 Error details:', error.message);
+    if (error.original) {
+      console.error('🔍 Original error:', error.original.message);
+    }
     process.exit(1);
   }
 }

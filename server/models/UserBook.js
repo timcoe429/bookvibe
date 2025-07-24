@@ -14,14 +14,16 @@ const UserBook = sequelize.define('UserBook', {
     references: {
       model: User,
       key: 'id'
-    }
+    },
+    field: 'user_id'
   },
   bookId: {
     type: DataTypes.INTEGER,
     references: {
       model: Book,
       key: 'id'
-    }
+    },
+    field: 'book_id'
   },
   status: {
     type: DataTypes.ENUM('to-read', 'reading', 'read', 'dnf'),
@@ -33,18 +35,24 @@ const UserBook = sequelize.define('UserBook', {
   },
   dateAdded: {
     type: DataTypes.DATE,
-    defaultValue: DataTypes.NOW
+    defaultValue: DataTypes.NOW,
+    field: 'date_added'
   },
   dateStarted: {
-    type: DataTypes.DATE
+    type: DataTypes.DATE,
+    field: 'date_started'
   },
   dateFinished: {
-    type: DataTypes.DATE
+    type: DataTypes.DATE,
+    field: 'date_finished'
   },
   source: {
     type: DataTypes.ENUM('goodreads', 'photo', 'manual'),
     defaultValue: 'manual'
   }
+}, {
+  tableName: 'user_books',
+  underscored: true
 });
 
 // Associations

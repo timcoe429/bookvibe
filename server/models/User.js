@@ -10,11 +10,13 @@ const User = sequelize.define('User', {
   sessionId: {
     type: DataTypes.STRING,
     unique: true,
-    allowNull: false
+    allowNull: false,
+    field: 'session_id'
   },
   goodreadsUserId: {
     type: DataTypes.STRING,
-    unique: true
+    unique: true,
+    field: 'goodreads_user_id'
   },
   preferences: {
     type: DataTypes.JSONB,
@@ -33,6 +35,9 @@ const User = sequelize.define('User', {
       longestStreak: 0
     }
   }
+}, {
+  tableName: 'users',
+  underscored: true
 });
 
 module.exports = User;
