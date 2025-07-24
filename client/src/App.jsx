@@ -26,11 +26,11 @@ function App() {
   };
 
   const nextBook = () => {
-    const moodBooks = getBooksForMood(selectedMood);
-    if (moodBooks.length > 0) {
-      const currentIndex = moodBooks.findIndex(book => book.title === currentBook?.title);
-      const nextIndex = (currentIndex + 1) % moodBooks.length;
-      setCurrentBook(moodBooks[nextIndex]);
+    // Get all books and pick a random one
+    const allBooks = books;
+    if (allBooks.length > 0) {
+      const randomIndex = Math.floor(Math.random() * allBooks.length);
+      setCurrentBook(allBooks[randomIndex]);
     }
   };
 
