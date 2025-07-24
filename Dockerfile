@@ -40,7 +40,7 @@ COPY --from=client-build /app/client/build ./public
 RUN mkdir -p uploads
 
 # Expose port
-EXPOSE 8080
+EXPOSE 3000
 
 # Set environment to production
 ENV NODE_ENV=production
