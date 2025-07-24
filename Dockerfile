@@ -45,5 +45,5 @@ EXPOSE 5000
 # Set environment to production
 ENV NODE_ENV=production
 
-# Run migration and start the server
-CMD ["sh", "-c", "npm run migrate || true && npm start"] 
+# Start the simple server
+CMD ["npm", "start"] 
