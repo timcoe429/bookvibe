@@ -138,3 +138,26 @@ class GoogleVisionService {
       if (textResult.status === 'fulfilled') {
         analysis.text = textResult.value.text;
         analysis.blocks = textResult.value.blocks;
+        
+        // Calculate overall confidence from blocks
+        const confidences = textResult.value.blocks.map(block => block.confidence || 0);
+        analysis.confidence = confidences.length > 0 
+          ? confidences.reduce((a, b) => a + b, 0) / confidences.length 
+          : 0;
+      }
+
+      if (objectResult.status === 'fulfilled') {
+        analysis.objects = objectResult.value;
+      }
+
+      console.log(`Analysis complete - Text: ${analysis.text.length} chars, Objects: ${analysis.objects.length}, Confidence: ${analysis.confidence.toFixed(2)}`);
+      
+      return analysis;
+    } catch (error) {
+      console.error('Comprehensive analysis error:', error);
+      throw error;
+    }
+  }
+}
+
+module.exports = new GoogleVisionService();
