@@ -261,13 +261,16 @@ function App() {
              <span className="nav-label">Library</span>
            </button>
            
-           <button 
-             className={`nav-tab ${currentTab === 'add' ? 'active' : ''}`}
-             onClick={() => setCurrentTab('add')}
-           >
-             <span className="nav-icon">➕</span>
-             <span className="nav-label">Add Books</span>
-           </button>
+                       <button 
+              className={`nav-tab ${currentTab === 'add' ? 'active' : ''}`}
+              onClick={() => {
+                setCurrentTab('add');
+                setShowPhotoUpload(true);
+              }}
+            >
+              <span className="nav-icon">➕</span>
+              <span className="nav-label">Add Books</span>
+            </button>
          </div>
        </div>
     </div>
