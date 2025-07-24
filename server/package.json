@@ -5,7 +5,7 @@
   "main": "server.js",
   "scripts": {
     "start": "node minimal-server.js",
-    "dev": "nodemon simple-server.js",
+    "dev": "nodemon minimal-server.js",
     "migrate": "node scripts/migrate.js"
   },
   "dependencies": {
