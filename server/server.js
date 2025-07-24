@@ -5,7 +5,12 @@ require('dotenv').config();
 const app = require('./app');
 const { sequelize } = require('./config/database');
 
-// Add health check endpoint IMMEDIATELY - before any other middleware
+// Add health check endpoints - Railway might be hitting root or /health
+app.get('/', (req, res) => {
+  console.log('🏥 ROOT HEALTH CHECK HIT!');
+  res.status(200).json({ status: 'OK', message: 'BookVibe server running' });
+});
+
 app.get('/health', (req, res) => {
   console.log('🏥 HEALTH CHECK HIT!');
   res.status(200).json({ status: 'OK', message: 'Server running' });
