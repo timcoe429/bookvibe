@@ -19,7 +19,14 @@ if (process.env.NODE_ENV === 'production') {
 
 // Health check endpoint (in addition to the one in app.js)
 app.get('/health', (req, res) => {
-  res.status(200).json({ status: 'OK', message: 'Server is running' });
+  console.log('🏥 Health check requested');
+  res.status(200).json({ 
+    status: 'OK', 
+    message: 'BookVibe server is running',
+    timestamp: new Date().toISOString(),
+    environment: process.env.NODE_ENV,
+    port: PORT
+  });
 });
 
 // Database connection and server start
