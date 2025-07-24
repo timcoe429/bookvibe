@@ -71,7 +71,6 @@ async function startServer() {
     const server = app.listen(PORT, '0.0.0.0', () => {
       console.log(`🚀 Server running on port ${PORT}`);
       console.log(`🏥 Health check available at: http://localhost:${PORT}/health`);
-      console.log(`🏥 API Health check available at: http://localhost:${PORT}/api/health`);
       console.log('✅ ========== SERVER STARTED SUCCESSFULLY ==========');
     });
     

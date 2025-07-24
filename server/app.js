@@ -33,11 +33,7 @@ app.use('/api/books', bookRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/photos', photoRoutes);
 
-// Health check
-app.get('/api/health', (req, res) => {
-  console.log('🏥 API Health check endpoint HIT! Responding with 200');
-  res.json({ status: 'OK', timestamp: new Date().toISOString() });
-});
+// Health check removed - using /health in server.js instead
 
 // Error handling middleware
 app.use((err, req, res, next) => {
@@ -50,6 +46,7 @@ app.use((err, req, res, next) => {
 
 // 404 handler
 app.use('*', (req, res) => {
+  console.log(`❌ 404 - Route not found: ${req.method} ${req.url}`);
   res.status(404).json({ error: 'Route not found' });
 });
 
