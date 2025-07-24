@@ -5,23 +5,16 @@ require('dotenv').config();
 const app = require('./app');
 const { sequelize } = require('./config/database');
 
-// Debug: Log ALL incoming requests FIRST
-app.use((req, res, next) => {
-  console.log(`📋 REQUEST: ${req.method} ${req.url} from ${req.ip}`);
-  console.log(`📋 Headers:`, req.headers);
-  next();
+// Add health check endpoint IMMEDIATELY - before any other middleware
+app.get('/health', (req, res) => {
+  console.log('🏥 HEALTH CHECK HIT!');
+  res.status(200).json({ status: 'OK', message: 'Server running' });
 });
 
-// Health check endpoint - BEFORE other routes
-app.get('/health', (req, res) => {
-  console.log('🏥 Health check endpoint HIT! Responding with 200');
-  res.status(200).json({ 
-    status: 'OK', 
-    message: 'BookVibe server is running',
-    timestamp: new Date().toISOString(),
-    environment: process.env.NODE_ENV,
-    port: PORT
-  });
+// Add a catch-all to see ALL requests
+app.use('*', (req, res, next) => {
+  console.log(`📋 INCOMING: ${req.method} ${req.originalUrl}`);
+  next();
 });
 
 // Serve uploaded files
