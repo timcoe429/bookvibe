@@ -11,6 +11,22 @@ console.log('All environment variables:');
 console.log('PORT:', process.env.PORT);
 console.log('HOST:', process.env.HOST);
 
+// Serve static files from the React build
+const publicPath = path.join(__dirname, 'public');
+console.log('📁 Public directory path:', publicPath);
+console.log('📁 Checking if public directory exists...');
+
+const fs = require('fs');
+if (fs.existsSync(publicPath)) {
+  console.log('✅ Public directory exists');
+  const files = fs.readdirSync(publicPath);
+  console.log('📄 Files in public directory:', files);
+} else {
+  console.log('❌ Public directory does not exist!');
+}
+
+app.use(express.static(publicPath));
+
 // Book recommendations API
 app.get('/api/books/recommendations', (req, res) => {
   console.log(`📚 Book recommendations requested`);
@@ -43,20 +59,10 @@ app.get('/health', (req, res) => {
   res.json({ status: 'OK' });
 });
 
-// Default React app serving
-app.use('*', (req, res) => {
+// Serve React app for all non-API routes
+app.get('*', (req, res) => {
   console.log(`📋 Serving React for: ${req.originalUrl}`);
-  if (process.env.NODE_ENV === 'production') {
-    res.sendFile(path.join(__dirname, 'public', 'index.html'));
-  } else {
-    res.json({ 
-      message: 'BookVibe Development Server',
-      availableEndpoints: [
-        'GET /api/books/recommendations?mood=escapist&limit=3',
-        'GET /health'
-      ]
-    });
-  }
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
 const server = app.listen(PORT, '0.0.0.0', () => {

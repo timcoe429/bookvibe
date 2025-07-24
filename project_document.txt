@@ -1,197 +1,66 @@
-# BookVibe Project Documentation
+# BookVibe Project Document
 
 ## Project Overview
-BookVibe is an AI-powered book recommendation app for avid readers that allows users to:
-- Upload photos of their bookshelves to automatically detect and catalog books
-- Get personalized book recommendations based on mood and reading preferences
-- Track reading progress and statistics
-- Connect with Goodreads for additional data
+BookVibe is an AI-powered book recommendation app that suggests books based on user mood. The app uses photo analysis to detect books from bookshelf images and provides personalized reading recommendations.
 
 ## Tech Stack
-- **Frontend**: React 18, Tailwind CSS, React Router, Axios
-- **Backend**: Node.js, Express, Sequelize ORM
-- **Database**: PostgreSQL (hosted on Railway)
+- **Frontend**: React 18, Tailwind CSS
+- **Backend**: Node.js, Express.js
+- **Database**: PostgreSQL with Sequelize ORM
+- **Deployment**: Railway with Docker
 - **APIs**: Google Vision API, Goodreads API, Google Books API, Open Library API
-- **Deployment**: Railway (containerized with Docker)
 
-## Current Database Info
-```
-postgresql://postgres:ytxhlODolZJKemBrAonuwpymtgPQnoZQ@turntable.proxy.rlwy.net:33827/railway
-```
+## Recent Work (July 24, 2025)
 
-## Project Structure
-```
-bookvibe/
-├── client/                 # React frontend
-│   ├── src/
-│   │   ├── components/     # BookCard, MoodSelector, PhotoUpload
-│   │   ├── pages/         # Home, PhotoCapture, Settings
-│   │   └── services/      # API client, book service
-│   └── package.json
-├── server/                # Node.js backend
-│   ├── config/           # Database and environment config
-│   ├── controllers/      # Route handlers
-│   ├── middleware/       # Auth and upload middleware
-│   ├── models/          # Sequelize models (User, Book, UserBook)
-│   ├── routes/          # API routes (books, users, photos)
-│   ├── services/        # External API integrations
-│   ├── migrations/      # Database schema
-│   └── scripts/         # Migration and utility scripts
-├── Dockerfile           # Multi-stage Docker build
-├── railway.json         # Railway deployment config
-└── .dockerignore       # Docker build optimization
-```
+### ✅ COMPLETED
+1. **Docker Build Issues Fixed**
+   - Resolved `exit code: 127` error by adding missing `@tailwindcss/forms` dependency
+   - Created multi-stage Dockerfile for client and server builds
+   - Fixed port configuration issues (Railway PORT vs Dockerfile EXPOSE)
 
-## Recent Work Completed (Latest Session)
+2. **Server Startup Issues Resolved**
+   - Fixed database model mismatches (camelCase vs snake_case)
+   - Resolved duplicate Express app setup
+   - Added automated database migration script
+   - Fixed API calls using axios instead of fetch
 
-### Issues Identified and Fixed:
-1. **Docker Build Failure**: 
-   - Error: `npm run build` failing with exit code 127
-   - Root cause: Missing `@tailwindcss/forms` dependency
-   - ✅ FIXED: Added missing dependency to client/package.json
+3. **Railway Deployment Working**
+   - Server successfully starts and responds to health checks
+   - API endpoints returning proper JSON data
+   - Port configuration aligned (Railway PORT: 8080, Dockerfile EXPOSE: 3000)
 
-2. **Health Check Failures**:
-   - Service repeatedly failing health checks on Railway
-   - Root cause: Multiple server setup issues
-   - ✅ FIXED: Resolved database model mapping and server configuration
+4. **React Frontend Created**
+   - Beautiful mood selector with emojis and colors
+   - Book cards with covers, ratings, and descriptions
+   - Responsive design with loading states
+   - API integration for book recommendations
 
-3. **Database Model Issues**:
-   - Models not matching database schema (camelCase vs snake_case)
-   - ✅ FIXED: Updated all models with proper field mappings:
-     - User.js: Added field mappings for session_id, goodreads_user_id
-     - Book.js: Added field mappings for goodreads_id, cover_url, etc.
-     - UserBook.js: Added field mappings for user_id, book_id, date fields
+### 🔧 CURRENT ISSUE: React Frontend Not Loading
+**Problem**: White page after loading screen, console shows JavaScript files being served as HTML
+**Root Cause**: Server not properly serving static React build files
+**Debugging Steps**:
+1. Added static file serving middleware to minimal-server.js
+2. Removed proxy configuration from client/package.json
+3. Added debugging logs to check if public directory exists and contains files
+4. Updated catch-all route to properly serve React app
 
-4. **Server Configuration**:
-   - Duplicate Express app setup causing conflicts
-   - ✅ FIXED: Made server.js use existing app.js properly
+### 📋 NEXT STEPS
+1. **Deploy current changes** and check server logs for public directory debugging
+2. **Verify React build** is being created and copied correctly
+3. **Test frontend functionality** once static files are served properly
+4. **Add more features** once basic app is working
 
-5. **Database Migration**:
-   - No automated way to set up database schema
-   - ✅ FIXED: Created migration script that runs before server start
+## Important Notes
+- **DOES NOT RUN LOCALLY** - This is a Railway-only deployment
+- Database URL: postgresql://postgres:ytxhlODolZJKemBrAonuwpymtgPQnoZQ@turntable.proxy.rlwy.net:33827/railway
+- Railway automatically sets PORT environment variable (currently 8080)
+- Dockerfile uses multi-stage build: client build → server setup → copy built client to public/
 
-6. **Missing Dependencies**:
-   - API calls using unavailable `fetch` instead of `axios`
-   - ✅ FIXED: Updated photo routes to use axios consistently
+## API Endpoints
+- `GET /api/books/recommendations?mood=escapist&limit=3` - Get book recommendations
+- `GET /health` - Health check endpoint
+- All other routes serve React app
 
-### Files Modified:
-- `client/package.json`: Added @tailwindcss/forms dependency
-- `Dockerfile`: Updated to run migration before server start
-- `server/models/User.js`: Added field mappings and table configuration
-- `server/models/Book.js`: Added field mappings and table configuration  
-- `server/models/UserBook.js`: Added field mappings and table configuration
-- `server/server.js`: Fixed to use existing app.js properly
-- `server/scripts/migrate.js`: Created database migration script
-- `server/routes/photos.js`: Fixed axios usage instead of fetch
-- `railway.json`: Added Railway deployment configuration
-- `.dockerignore`: Created for optimized builds
-
-## Current Status: ✅ READY FOR DEPLOYMENT
-
-### What's Working:
-- ✅ Docker build process (fixed Tailwind dependency)
-- ✅ Database models properly mapped to schema
-- ✅ Server startup and health check endpoints
-- ✅ Database migration automation
-- ✅ Multi-stage Docker build for client + server
-- ✅ Railway deployment configuration
-
-### Environment Variables Required:
-```
-# Required for basic functionality
-DATABASE_URL=postgresql://postgres:ytxhlODolZJKemBrAonuwpymtgPQnoZQ@turntable.proxy.rlwy.net:33827/railway
-NODE_ENV=production
-PORT=5000
-
-# Optional (for full feature functionality)
-GOOGLE_VISION_API_KEY=your_key_here
-GOODREADS_API_KEY=your_key_here
-JWT_SECRET=your_secure_random_string_here
-```
-
-## Next Steps / TODO:
-
-### Immediate (Deployment):
-1. **Deploy to Railway**: Push current changes to trigger deployment
-2. **Verify Health**: Confirm health checks pass and app starts successfully
-3. **Test Basic Endpoints**: Verify API endpoints respond correctly
-
-### Short Term (Core Features):
-1. **API Keys Setup**: Get and configure Google Vision API key for photo processing
-2. **Frontend Testing**: Test React app functionality once backend is live
-3. **Database Population**: Add sample books for testing recommendations
-4. **Error Handling**: Improve error messages and fallback behaviors
-
-### Medium Term (Feature Completion):
-1. **Authentication**: Implement proper user authentication (currently uses session IDs)
-2. **Goodreads Integration**: Complete Goodreads API integration for book imports
-3. **Photo Processing**: Test and refine book detection from photos
-4. **Recommendation Engine**: Enhance mood-based recommendation algorithm
-5. **User Experience**: Polish frontend UI/UX
-
-### Long Term (Polish & Scale):
-1. **Performance**: Optimize API response times and database queries
-2. **Testing**: Add comprehensive test suite
-3. **Monitoring**: Add logging and error tracking
-4. **Mobile**: Consider responsive design improvements
-5. **Features**: Reading streaks, social features, book clubs
-
-## Database Schema Overview:
-- **users**: User sessions, preferences, and reading stats
-- **books**: Master catalog with titles, authors, metadata, and mood classifications
-- **user_books**: Junction table linking users to books with reading status and dates
-
-## API Endpoints Available:
-- `GET /health`: Health check
-- `GET /api/users/session/:sessionId`: Get/create user
-- `GET /api/books/recommendations`: Get mood-based recommendations  
-- `POST /api/photos/upload`: Process bookshelf photos
-- `POST /api/books/bulk-import`: Import multiple books to user library
-
-## Known Limitations:
-1. **Google Vision API**: Requires API key for photo processing
-2. **Goodreads API**: Limited due to API restrictions (may need alternatives)
-3. **Rate Limiting**: External API calls may need additional throttling
-4. **Mobile Support**: Not optimized for mobile photo capture yet
-
-## Deployment Commands:
-```bash
-# To deploy to Railway:
-git add .
-git commit -m "Deploy fixes and improvements"
-git push origin main
-```
-
-## Important Notes:
-- **This project does NOT run locally** - it's designed specifically for Railway deployment
-- All development and testing happens through Railway's cloud environment
-- The database is hosted on Railway and not accessible for local development
-- Use Railway's deployment logs and live environment for debugging and testing
-
-## Last Updated: July 24, 2024
-
-### Latest Issues Fixed:
-- **Syntax Error in GoogleVisionService**: 
-  - Error: `SyntaxError: Unexpected end of input` at line 141
-  - Root cause: Incomplete/corrupted googleVisionService.js file
-  - ✅ FIXED: Completed the missing code and proper module export
-
-- **Health Check 404 Errors**: 
-  - Error: Health checks failing with "Route not found" 404s
-  - Root cause: Duplicate health check endpoints causing routing conflicts
-  - ✅ FIXED: Simplified to single /health endpoint, added request logging
-
-## BREAKTHROUGH - Basic App Working! ✅
-
-### Port Configuration Issue SOLVED:
-- **Problem**: Railway was setting PORT to 8080 internally, but our configs were mismatched
-- **Solution**: Set Railway PORT environment variable to 8080, use process.env.PORT in server
-- ✅ **RESULT**: Minimal server now responds successfully with JSON!
-
-### Current Status:
-- ✅ **Server deployed and working** - Returns JSON responses
-- ✅ **Basic API endpoint functional** - `/` returns success message  
-- ✅ **Railway deployment process working** - No more crashes or 502 errors
-- 🚧 **Next**: Build out the actual BookVibe features on this working foundation
-
-Status: **BASIC APP WORKING** - Ready to build BookVibe features on working server! 
+## Current Status
+🚧 **DEBUGGING**: React frontend static file serving issue
+✅ **WORKING**: Backend API, database, Railway deployment 
