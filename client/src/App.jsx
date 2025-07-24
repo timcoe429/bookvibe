@@ -2,20 +2,22 @@ import React, { useState, useEffect } from 'react';
 import './App.css';
 
 function App() {
-     const [selectedMood, setSelectedMood] = useState('romance');
+     const [selectedMood, setSelectedMood] = useState('pink');
   const [currentBook, setCurrentBook] = useState(null);
   const [loading, setLoading] = useState(true);
 
-     const books = [
-     { title: "The Seven Husbands of Evelyn Hugo", author: "Taylor Jenkins Reid", mood: "romance" },
-     { title: "Beach Read", author: "Emily Henry", mood: "romance" },
-     { title: "Gone Girl", author: "Gillian Flynn", mood: "thriller" },
-     { title: "Mexican Gothic", author: "Silvia Moreno-Garcia", mood: "thriller" },
-     { title: "The Thursday Murder Club", author: "Richard Osman", mood: "mystery" },
-     { title: "The Maid", author: "Nita Prose", mood: "mystery" },
-     { title: "Lessons in Chemistry", author: "Bonnie Garmus", mood: "comedy" },
-     { title: "The Midnight Library", author: "Matt Haig", mood: "comedy" }
-   ];
+           const books = [
+      { title: "The Seven Husbands of Evelyn Hugo", author: "Taylor Jenkins Reid", mood: "pink" },
+      { title: "Beach Read", author: "Emily Henry", mood: "pink" },
+      { title: "Lessons in Chemistry", author: "Bonnie Garmus", mood: "pink" },
+      { title: "Mexican Gothic", author: "Silvia Moreno-Garcia", mood: "mysterious" },
+      { title: "Gone Girl", author: "Gillian Flynn", mood: "mysterious" },
+      { title: "The Maid", author: "Nita Prose", mood: "mysterious" },
+      { title: "The Midnight Library", author: "Matt Haig", mood: "cozy" },
+      { title: "The Thursday Murder Club", author: "Richard Osman", mood: "cozy" },
+      { title: "Circe", author: "Madeline Miller", mood: "wild" },
+      { title: "The Invisible Life of Addie LaRue", author: "V.E. Schwab", mood: "wild" }
+    ];
 
   const getBooksForMood = (mood) => {
     return books.filter(book => book.mood === mood);
@@ -81,36 +83,36 @@ function App() {
           <div className="subtitle">What should you read next?</div>
         </div>
 
-        <div className="main-content">
-          <div className="mood-section">
-            <h2 className="section-title">How are you feeling?</h2>
-                         <div className="mood-buttons">
-               <button 
-                 className={`mood-btn ${selectedMood === 'romance' ? 'active' : ''}`}
-                 onClick={() => handleMoodChange('romance')}
-               >
-                 💕 Romance
-               </button>
-               <button 
-                 className={`mood-btn ${selectedMood === 'thriller' ? 'active' : ''}`}
-                 onClick={() => handleMoodChange('thriller')}
-               >
-                 🔥 Thriller
-               </button>
-               <button 
-                 className={`mood-btn ${selectedMood === 'mystery' ? 'active' : ''}`}
-                 onClick={() => handleMoodChange('mystery')}
-               >
-                 🔍 Mystery
-               </button>
-               <button 
-                 className={`mood-btn ${selectedMood === 'comedy' ? 'active' : ''}`}
-                 onClick={() => handleMoodChange('comedy')}
-               >
-                 😄 Comedy
-               </button>
-             </div>
-          </div>
+                 <div className="main-content">
+           <div className="mood-section">
+             <h2 className="section-title">Pick your vibe! ✨</h2>
+                          <div className="mood-buttons">
+                <button 
+                  className={`mood-btn ${selectedMood === 'pink' ? 'active' : ''}`}
+                  onClick={() => handleMoodChange('pink')}
+                >
+                  💅 Pink vibes
+                </button>
+                <button 
+                  className={`mood-btn ${selectedMood === 'mysterious' ? 'active' : ''}`}
+                  onClick={() => handleMoodChange('mysterious')}
+                >
+                  🌙 Dark & mysterious
+                </button>
+                <button 
+                  className={`mood-btn ${selectedMood === 'cozy' ? 'active' : ''}`}
+                  onClick={() => handleMoodChange('cozy')}
+                >
+                  ☕ Cozy & warm
+                </button>
+                <button 
+                  className={`mood-btn ${selectedMood === 'wild' ? 'active' : ''}`}
+                  onClick={() => handleMoodChange('wild')}
+                >
+                  🌈 Something wild!
+                </button>
+              </div>
+           </div>
 
           {currentBook && (
             <div className="book-card" key={currentBook.title}>
@@ -119,23 +121,23 @@ function App() {
               </div>
               <div className="book-title">{currentBook.title}</div>
               <div className="book-author">by {currentBook.author}</div>
-                             <div className="action-buttons">
-                 <button className="btn btn-primary" onClick={nextBook}>
-                   Next Book ➡️
-                 </button>
-                 <button className="btn btn-surprise" onClick={surprise}>
-                   🎲 Surprise Me!
-                 </button>
-               </div>
+                                                           <div className="action-buttons">
+                  <button className="btn btn-primary" onClick={nextBook}>
+                    Show me another! ✨
+                  </button>
+                  <button className="btn btn-surprise" onClick={surprise}>
+                    🎲 Pick for me!
+                  </button>
+                </div>
              </div>
            )}
 
-                      <div className="stats">
-             <div className="stat">
-               <div className="stat-number">12</div>
-               <div className="stat-label">In Queue</div>
-             </div>
-           </div>
+                                             <div className="stats">
+              <div className="stat">
+                <div className="stat-number">📚</div>
+                <div className="stat-label">Books on your shelf</div>
+              </div>
+            </div>
          </div>
        </div>
     </div>
