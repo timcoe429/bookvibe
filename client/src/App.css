@@ -247,12 +247,101 @@ body {
    50% { opacity: 0.7; }
  }
 
- .book-card.spinning {
-   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-   color: white;
-   border: none;
-   box-shadow: 0 15px 40px rgba(102, 126, 234, 0.4);
- }
+   .book-card.spinning {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    box-shadow: 0 15px 40px rgba(102, 126, 234, 0.4);
+  }
+
+  .magic-start {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    flex: 1;
+  }
+
+  .magic-circle {
+    text-align: center;
+    padding: 40px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 50%;
+    width: 250px;
+    height: 250px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    box-shadow: 0 20px 60px rgba(102, 126, 234, 0.4);
+    animation: float 3s ease-in-out infinite;
+  }
+
+  .magic-text {
+    font-size: 18px;
+    margin-bottom: 20px;
+    font-weight: 600;
+  }
+
+  .magic-text:first-child {
+    font-size: 40px;
+    margin-bottom: 10px;
+  }
+
+  .magic-btn {
+    background: rgba(255, 255, 255, 0.2);
+    border: 2px solid white;
+    color: white;
+    padding: 15px 30px;
+    border-radius: 25px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+  }
+
+  .magic-btn:hover {
+    background: white;
+    color: #667eea;
+    transform: scale(1.05);
+  }
+
+  .vibe-selection {
+    text-align: center;
+    padding: 20px;
+  }
+
+  .vibe-buttons {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+    margin-top: 20px;
+  }
+
+  .vibe-btn {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    padding: 20px;
+    border-radius: 20px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+  }
+
+  .vibe-btn:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 40px rgba(102, 126, 234, 0.4);
+  }
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
+  }
 
 /* Mobile responsiveness */
 @media (max-width: 480px) {
