@@ -452,16 +452,65 @@ body {
     to { transform: rotate(360deg); }
   }
 
-  @keyframes sparkle {
-    0%, 100% { 
-      transform: scale(1) rotate(0deg);
-      filter: brightness(1);
-    }
-    50% { 
-      transform: scale(1.1) rotate(5deg);
-      filter: brightness(1.3);
-    }
-  }
+     @keyframes sparkle {
+     0%, 100% { 
+       transform: scale(1) rotate(0deg);
+       filter: brightness(1);
+     }
+     50% { 
+       transform: scale(1.1) rotate(5deg);
+       filter: brightness(1.3);
+     }
+   }
+
+   .add-books-section {
+     text-align: center;
+     margin-top: 30px;
+     padding: 20px;
+   }
+
+   .add-books-text {
+     font-size: 16px;
+     color: #666;
+     margin-bottom: 15px;
+     font-weight: 500;
+   }
+
+   .add-books-btn {
+     background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+     color: white;
+     border: none;
+     padding: 15px 25px;
+     border-radius: 25px;
+     font-size: 16px;
+     font-weight: 600;
+     cursor: pointer;
+     transition: all 0.3s ease;
+     box-shadow: 0 8px 25px rgba(16, 185, 129, 0.3);
+   }
+
+   .add-books-btn:hover {
+     transform: translateY(-2px);
+     box-shadow: 0 12px 35px rgba(16, 185, 129, 0.4);
+   }
+
+   .add-more-btn {
+     background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+     color: white;
+     border: none;
+     padding: 8px 16px;
+     border-radius: 20px;
+     font-size: 12px;
+     font-weight: 600;
+     cursor: pointer;
+     transition: all 0.3s ease;
+     margin-left: 15px;
+   }
+
+   .add-more-btn:hover {
+     transform: translateY(-1px);
+     box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
+   }
 
 /* Mobile responsiveness */
 @media (max-width: 480px) {
