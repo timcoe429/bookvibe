@@ -2,21 +2,20 @@ import React, { useState, useEffect } from 'react';
 import './App.css';
 
 function App() {
-  const [selectedMood, setSelectedMood] = useState('escapist');
+     const [selectedMood, setSelectedMood] = useState('romance');
   const [currentBook, setCurrentBook] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  const books = [
-    { title: "The Seven Husbands of Evelyn Hugo", author: "Taylor Jenkins Reid", mood: "escapist" },
-    { title: "Circe", author: "Madeline Miller", mood: "thoughtful" },
-    { title: "The Invisible Life of Addie LaRue", author: "V.E. Schwab", mood: "escapist" },
-    { title: "Klara and the Sun", author: "Kazuo Ishiguro", mood: "thoughtful" },
-    { title: "The Midnight Library", author: "Matt Haig", mood: "thoughtful" },
-    { title: "Mexican Gothic", author: "Silvia Moreno-Garcia", mood: "intense" },
-    { title: "Gone Girl", author: "Gillian Flynn", mood: "intense" },
-    { title: "Beach Read", author: "Emily Henry", mood: "light" },
-    { title: "The Thursday Murder Club", author: "Richard Osman", mood: "light" }
-  ];
+     const books = [
+     { title: "The Seven Husbands of Evelyn Hugo", author: "Taylor Jenkins Reid", mood: "romance" },
+     { title: "Beach Read", author: "Emily Henry", mood: "romance" },
+     { title: "Gone Girl", author: "Gillian Flynn", mood: "thriller" },
+     { title: "Mexican Gothic", author: "Silvia Moreno-Garcia", mood: "thriller" },
+     { title: "The Thursday Murder Club", author: "Richard Osman", mood: "mystery" },
+     { title: "The Maid", author: "Nita Prose", mood: "mystery" },
+     { title: "Lessons in Chemistry", author: "Bonnie Garmus", mood: "comedy" },
+     { title: "The Midnight Library", author: "Matt Haig", mood: "comedy" }
+   ];
 
   const getBooksForMood = (mood) => {
     return books.filter(book => book.mood === mood);
@@ -85,32 +84,32 @@ function App() {
         <div className="main-content">
           <div className="mood-section">
             <h2 className="section-title">How are you feeling?</h2>
-            <div className="mood-buttons">
-              <button 
-                className={`mood-btn ${selectedMood === 'escapist' ? 'active' : ''}`}
-                onClick={() => handleMoodChange('escapist')}
-              >
-                ✨ Escapist
-              </button>
-              <button 
-                className={`mood-btn ${selectedMood === 'intense' ? 'active' : ''}`}
-                onClick={() => handleMoodChange('intense')}
-              >
-                🔥 Intense
-              </button>
-              <button 
-                className={`mood-btn ${selectedMood === 'thoughtful' ? 'active' : ''}`}
-                onClick={() => handleMoodChange('thoughtful')}
-              >
-                💭 Thoughtful
-              </button>
-              <button 
-                className={`mood-btn ${selectedMood === 'light' ? 'active' : ''}`}
-                onClick={() => handleMoodChange('light')}
-              >
-                😊 Light & Fun
-              </button>
-            </div>
+                         <div className="mood-buttons">
+               <button 
+                 className={`mood-btn ${selectedMood === 'romance' ? 'active' : ''}`}
+                 onClick={() => handleMoodChange('romance')}
+               >
+                 💕 Romance
+               </button>
+               <button 
+                 className={`mood-btn ${selectedMood === 'thriller' ? 'active' : ''}`}
+                 onClick={() => handleMoodChange('thriller')}
+               >
+                 🔥 Thriller
+               </button>
+               <button 
+                 className={`mood-btn ${selectedMood === 'mystery' ? 'active' : ''}`}
+                 onClick={() => handleMoodChange('mystery')}
+               >
+                 🔍 Mystery
+               </button>
+               <button 
+                 className={`mood-btn ${selectedMood === 'comedy' ? 'active' : ''}`}
+                 onClick={() => handleMoodChange('comedy')}
+               >
+                 😄 Comedy
+               </button>
+             </div>
           </div>
 
           {currentBook && (
@@ -122,13 +121,8 @@ function App() {
               <div className="book-author">by {currentBook.author}</div>
                              <div className="action-buttons">
                  <button className="btn btn-primary" onClick={nextBook}>
-                   Read This! 📖
+                   Next Book ➡️
                  </button>
-                 <button className="btn btn-secondary" onClick={nextBook}>
-                   Skip ➡️
-                 </button>
-               </div>
-               <div className="surprise-button">
                  <button className="btn btn-surprise" onClick={surprise}>
                    🎲 Surprise Me!
                  </button>

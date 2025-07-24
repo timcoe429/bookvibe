@@ -101,7 +101,8 @@ body {
 }
 
 .book-card {
-  background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+  background: white;
+  border: 2px solid #f0f0f0;
   border-radius: 20px;
   padding: 20px;
   margin-bottom: 15px;
@@ -131,16 +132,16 @@ body {
 }
 
 .book-title {
-  font-size: 16px;
+  font-size: 18px;
   font-weight: bold;
-  color: #333;
-  margin-bottom: 4px;
+  color: #1a1a1a;
+  margin-bottom: 6px;
 }
 
 .book-author {
-  color: #666;
-  font-size: 14px;
-  margin-bottom: 12px;
+  color: #444;
+  font-size: 16px;
+  margin-bottom: 20px;
 }
 
 .action-buttons {
@@ -165,29 +166,17 @@ body {
   color: white;
 }
 
-.btn-secondary {
-  background: white;
-  color: #667eea;
-  border: 2px solid #667eea;
-}
+
 
 .btn:hover {
   transform: translateY(-2px);
   box-shadow: 0 8px 20px rgba(0,0,0,0.2);
 }
 
-.surprise-button {
-  margin-top: 12px;
-  display: flex;
-  justify-content: center;
-}
-
 .btn-surprise {
-  background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+  background: linear-gradient(135deg, #ff6b6b 0%, #ff8e8e 100%);
   color: white;
   border: none;
-  width: 100%;
-  max-width: 200px;
 }
 
 .stats {
