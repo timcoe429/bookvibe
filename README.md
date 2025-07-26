@@ -16,7 +16,7 @@ BookVibe is a mobile-first web application designed for avid readers who consume
 
 - Node.js 18+ 
 - PostgreSQL 12+
-- Google Cloud Vision API key (for photo book detection)
+- Google Cloud Vision API access
 
 ### Installation
 
@@ -31,7 +31,23 @@ BookVibe is a mobile-first web application designed for avid readers who consume
    npm run install-all
    ```
 
-3. **Set up environment variables**
+3. **Set up Google Cloud Vision API**
+   
+   **Option A: Using API Key (Recommended for development)**
+   1. Go to [Google Cloud Console](https://console.cloud.google.com/)
+   2. Create a new project or select existing project
+   3. Enable the Vision API
+   4. Go to "Credentials" → "Create Credentials" → "API Key"
+   5. Restrict the API key to Vision API only
+   6. Add the key to your environment variables
+   
+   **Option B: Using Service Account (Recommended for production)**
+   1. Go to [Google Cloud Console](https://console.cloud.google.com/)
+   2. Create a service account with Vision API permissions
+   3. Download the JSON credentials file
+   4. Convert to base64 or use as environment variable (see below)
+
+4. **Set up environment variables**
    ```bash
    cp .env.example .env
    ```
@@ -45,9 +61,23 @@ BookVibe is a mobile-first web application designed for avid readers who consume
    PORT=5000
    NODE_ENV=development
    
-   # API Keys
-   GOOGLE_CLOUD_VISION_API_KEY=your_google_vision_api_key
+   # Google Vision API - Choose ONE option:
+   
+   # Option A: API Key (simpler)
+   GOOGLE_CLOUD_VISION_API_KEY=your_api_key_here
+   
+   # Option B: Service Account JSON (more secure)
+   GOOGLE_APPLICATION_CREDENTIALS_JSON={"type":"service_account","project_id":"..."}
+   
+   # Option C: Project ID only (for GCP environments)
+   GOOGLE_CLOUD_PROJECT=your_project_id
    ```
+
+5. **SECURITY WARNING** ⚠️
+   - **NEVER commit API keys or service account files to git**
+   - **NEVER include credentials in your code**
+   - Use environment variables for all sensitive data
+   - The `.gitignore` file is configured to prevent credential leaks
 
 4. **Set up the database**
    ```bash

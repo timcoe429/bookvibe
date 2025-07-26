@@ -2,14 +2,29 @@ const vision = require('@google-cloud/vision');
 
 class GoogleVisionService {
   constructor() {
-    // Initialize the client with API key or service account
+    // Initialize the client with environment-based authentication
+    // Option 1: Use API key (simpler for development)
     if (process.env.GOOGLE_CLOUD_VISION_API_KEY) {
       this.client = new vision.ImageAnnotatorClient({
         apiKey: process.env.GOOGLE_CLOUD_VISION_API_KEY
       });
-    } else {
-      // Fallback to service account authentication
-      this.client = new vision.ImageAnnotatorClient();
+    } 
+    // Option 2: Use service account credentials from environment variables
+    else if (process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON) {
+      const credentials = JSON.parse(process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON);
+      this.client = new vision.ImageAnnotatorClient({
+        credentials: credentials,
+        projectId: credentials.project_id
+      });
+    }
+    // Option 3: Use default Google Cloud authentication (for GCP environments)
+    else if (process.env.GOOGLE_CLOUD_PROJECT) {
+      this.client = new vision.ImageAnnotatorClient({
+        projectId: process.env.GOOGLE_CLOUD_PROJECT
+      });
+    }
+    else {
+      throw new Error('Google Vision API authentication not configured. Please set GOOGLE_CLOUD_VISION_API_KEY, GOOGLE_APPLICATION_CREDENTIALS_JSON, or GOOGLE_CLOUD_PROJECT environment variable.');
     }
   }
 
