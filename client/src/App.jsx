@@ -201,130 +201,213 @@ function App() {
   }
 
      return (
-    <div className="max-w-md mx-auto min-h-screen relative overflow-hidden">
+    <div style={{
+      maxWidth: '28rem',
+      margin: '0 auto',
+      minHeight: '100vh',
+      position: 'relative',
+      overflow: 'hidden'
+    }}>
       {/* Water Background Pattern */}
-      <div 
-        className="absolute inset-0 bg-cover bg-center opacity-30"
-        style={{
-          backgroundImage: `url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23dbeafe' fill-opacity='0.4'%3E%3Cpath d='M20 20c0-5.5-4.5-10-10-10s-10 4.5-10 10 4.5 10 10 10 10-4.5 10-10zm10 0c0-5.5-4.5-10-10-10s-10 4.5-10 10 4.5 10 10 10 10-4.5 10-10z'/%3E%3C/g%3E%3C/svg%3E")`
-        }}
-      />
+      <div style={{
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        opacity: 0.3,
+        backgroundImage: `url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23dbeafe' fill-opacity='0.4'%3E%3Cpath d='M20 20c0-5.5-4.5-10-10-10s-10 4.5-10 10 4.5 10 10 10 10-4.5 10-10zm10 0c0-5.5-4.5-10-10-10s-10 4.5-10 10 4.5 10 10 10 10-4.5 10-10z'/%3E%3C/g%3E%3C/svg%3E")`
+      }} />
 
       {/* Content Overlay */}
-      <div className="relative z-10 bg-gradient-to-b from-blue-50/80 via-cyan-50/60 to-blue-50/80 min-h-screen backdrop-blur-sm">
+      <div style={{
+        position: 'relative',
+        zIndex: 10,
+        background: 'linear-gradient(to bottom, rgba(239, 246, 255, 0.8), rgba(207, 250, 254, 0.6), rgba(239, 246, 255, 0.8))',
+        minHeight: '100vh',
+        backdropFilter: 'blur(4px)'
+      }}>
         
         {/* Simple Header */}
-        <div className="bg-white/90 backdrop-blur-md border-b border-blue-200 py-4 px-6">
-          <h1 className="text-2xl font-semibold text-gray-800 text-center">BookVibe</h1>
-          <div className="text-center text-sm text-gray-600">What should you read next?</div>
+        <div style={{
+          background: 'rgba(255, 255, 255, 0.9)',
+          backdropFilter: 'blur(16px)',
+          borderBottom: '1px solid rgb(191, 219, 254)',
+          padding: '1rem 1.5rem',
+          textAlign: 'center'
+        }}>
+          <h1 style={{
+            fontSize: '1.5rem',
+            fontWeight: '600',
+            color: 'rgb(31, 41, 55)',
+            margin: '0 0 0.25rem 0'
+          }}>BookVibe</h1>
+          <div style={{
+            fontSize: '0.875rem',
+            color: 'rgb(75, 85, 99)',
+            margin: 0
+          }}>What should you read next?</div>
         </div>
 
         {/* Main Content */}
-        <div className="px-6 py-8 pb-24">
-          {currentTab === 'library' ? (
-            /* Library View */
-            <div className="pt-4">
-              <h2 className="text-2xl font-serif text-gray-800 mb-6 text-center">Your Library 📚</h2>
-              {userBooks.length > 0 ? (
-                <div className="space-y-4">
-                  {userBooks.map((book, index) => (
-                    <div key={book.id || index} className="bg-white/90 backdrop-blur-md rounded-2xl p-4 shadow-lg border border-blue-200">
-                      <div className="flex items-center">
-                        <div className="w-12 h-16 bg-gradient-to-br from-blue-600 to-cyan-500 rounded-lg flex items-center justify-center text-white text-xs font-bold mr-4">
-                          {book.title.slice(0, 2)}
-                        </div>
-                        <div className="flex-1">
-                          <h4 className="font-semibold text-gray-800 mb-1">{book.title}</h4>
-                          <p className="text-blue-600 text-sm">by {book.author}</p>
-                          {book.vibe && <p className="text-cyan-600 text-xs italic mt-1">{book.vibe}</p>}
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <div className="text-center pt-16">
-                  <div className="text-6xl mb-4">📖</div>
-                  <h3 className="text-xl font-serif text-gray-800 mb-2">Your library is empty!</h3>
-                  <p className="text-gray-600 mb-8">Add some books by taking photos of your bookshelf.</p>
-                  <button 
-                    onClick={() => {
-                      setCurrentTab('add');
-                      setShowPhotoUpload(true);
-                    }}
-                    className="bg-gradient-to-r from-blue-500 to-cyan-500 text-white px-6 py-3 rounded-full font-medium hover:scale-105 transition-all duration-200 shadow-lg"
-                  >
-                    📸 Add Books
-                  </button>
-                </div>
-              )}
-            </div>
-          ) : !showVibes && !isSpinning && !currentBook ? (
-            /* Water Magic Button */
-            <div className="flex flex-col items-center justify-center pt-16 relative">
-              
-              <div 
-                onClick={handleWaterClick}
-                className={`group cursor-pointer relative ${isExploding ? 'pointer-events-none' : ''}`}
-              >
-                {/* Water ripple rings that appear on press */}
-                {isExploding && (
-                  <>
-                    <div className="absolute w-96 h-96 border-2 border-blue-300 rounded-full animate-water-ripple" style={{left: '50%', top: '50%', transform: 'translate(-50%, -50%)'}} />
-                    <div className="absolute w-96 h-96 border-2 border-cyan-300 rounded-full animate-water-ripple" style={{left: '50%', top: '50%', transform: 'translate(-50%, -50%)', animationDelay: '0.1s'}} />
-                    <div className="absolute w-96 h-96 border-2 border-blue-400 rounded-full animate-water-ripple" style={{left: '50%', top: '50%', transform: 'translate(-50%, -50%)', animationDelay: '0.2s'}} />
-                  </>
-                )}
-                
-                {/* Magical glow behind button */}
-                <div className="absolute inset-0 bg-gradient-to-r from-blue-300/30 via-cyan-300/40 to-blue-400/30 rounded-full blur-3xl animate-pulse opacity-60"></div>
-                
-                {/* Round Water Button with floating effect */}
-                <div className={`relative w-72 h-72 rounded-full border-4 border-blue-400 bg-gradient-to-br from-blue-50 via-cyan-50 to-blue-100 shadow-2xl transform transition-all duration-300 backdrop-blur-md animate-gentle-float ${
-                  isExploding ? 'scale-85 shadow-none brightness-125 border-cyan-300' : 'group-hover:scale-110 group-hover:shadow-3xl group-active:scale-95'
-                }`}>
-                  
-                  {/* Multiple water surface layers for depth */}
-                  <div className={`absolute inset-3 rounded-full bg-gradient-to-br from-blue-100/80 to-cyan-100/80 transition-all duration-300 ${
-                    isExploding ? 'animate-pulse scale-110' : 'group-hover:scale-105'
-                  }`}></div>
-                  
-                  <div className={`absolute inset-6 rounded-full bg-gradient-to-br from-blue-200/60 to-cyan-200/60 transition-all duration-300 ${
-                    isExploding ? 'animate-pulse scale-110' : 'group-hover:scale-105'
-                  }`}></div>
-                  
-                  {/* Inner magical water glow */}
-                  <div className={`absolute inset-0 rounded-full bg-gradient-to-br from-blue-300/30 to-cyan-300/30 transition-all duration-300 ${
-                    isExploding ? 'blur-2xl opacity-100 scale-150' : 'blur-xl group-hover:blur-2xl opacity-70'
-                  }`}></div>
-                  
-                  {/* Sparkle effects around the edge */}
-                  <div className="absolute inset-0 rounded-full">
-                    <div className="absolute top-4 left-1/2 transform -translate-x-1/2 text-cyan-300 animate-twinkle text-lg">✨</div>
-                    <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 text-blue-300 animate-twinkle text-lg" style={{animationDelay: '1s'}}>✨</div>
-                    <div className="absolute top-1/2 left-4 transform -translate-y-1/2 text-cyan-400 animate-twinkle text-lg" style={{animationDelay: '2s'}}>✨</div>
-                    <div className="absolute top-1/2 right-4 transform -translate-y-1/2 text-blue-400 animate-twinkle text-lg" style={{animationDelay: '0.5s'}}>✨</div>
-                  </div>
-                  
-                  <div className={`relative z-10 flex flex-col items-center justify-center h-full text-center transition-all duration-300 ${
-                    isExploding ? 'scale-110 brightness-125' : ''
-                  }`}>
-                    <div className="mb-6 relative">
-                      <div className={`text-6xl ${isExploding ? 'animate-spin' : 'animate-gentle-bounce'}`}>
-                        💧
-                      </div>
-                      {/* Tiny sparkles around the water drop */}
-                      <div className="absolute -top-2 -right-2 text-cyan-300 animate-twinkle text-sm">✨</div>
-                      <div className="absolute -bottom-1 -left-2 text-blue-300 animate-twinkle text-sm" style={{animationDelay: '0.7s'}}>✨</div>
-                    </div>
-                    <h2 className="text-2xl font-serif text-gray-800 mb-3 px-6 leading-tight">Ready for your next adventure?</h2>
-                    <div className="text-blue-600 font-semibold tracking-wide text-lg animate-gentle-pulse">
-                      🌊 Dive in ✨ 
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
+        <div style={{
+          padding: '2rem 1.5rem 6rem 1.5rem'
+        }}>
+                     {currentTab === 'library' ? (
+             /* Library View */
+             <div style={{paddingTop: '1rem'}}>
+               <h2 style={{
+                 fontSize: '1.5rem',
+                 fontFamily: 'serif',
+                 color: 'rgb(31, 41, 55)',
+                 marginBottom: '1.5rem',
+                 textAlign: 'center'
+               }}>Your Library 📚</h2>
+               {userBooks.length > 0 ? (
+                 <div style={{display: 'flex', flexDirection: 'column', gap: '1rem'}}>
+                   {userBooks.map((book, index) => (
+                     <div key={book.id || index} style={{
+                       background: 'rgba(255, 255, 255, 0.9)',
+                       backdropFilter: 'blur(16px)',
+                       borderRadius: '1rem',
+                       padding: '1rem',
+                       boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)',
+                       border: '1px solid rgb(191, 219, 254)'
+                     }}>
+                       <div style={{display: 'flex', alignItems: 'center'}}>
+                         <div style={{
+                           width: '3rem',
+                           height: '4rem',
+                           background: 'linear-gradient(to bottom right, rgb(37, 99, 235), rgb(14, 165, 233))',
+                           borderRadius: '0.5rem',
+                           display: 'flex',
+                           alignItems: 'center',
+                           justifyContent: 'center',
+                           color: 'white',
+                           fontSize: '0.75rem',
+                           fontWeight: 'bold',
+                           marginRight: '1rem'
+                         }}>
+                           {book.title.slice(0, 2)}
+                         </div>
+                         <div style={{flex: 1}}>
+                           <h4 style={{
+                             fontWeight: '600',
+                             color: 'rgb(31, 41, 55)',
+                             marginBottom: '0.25rem',
+                             fontSize: '1rem'
+                           }}>{book.title}</h4>
+                           <p style={{
+                             color: 'rgb(37, 99, 235)',
+                             fontSize: '0.875rem',
+                             margin: '0'
+                           }}>by {book.author}</p>
+                           {book.vibe && <p style={{
+                             color: 'rgb(14, 165, 233)',
+                             fontSize: '0.75rem',
+                             fontStyle: 'italic',
+                             marginTop: '0.25rem',
+                             margin: '0.25rem 0 0 0'
+                           }}>{book.vibe}</p>}
+                         </div>
+                       </div>
+                     </div>
+                   ))}
+                 </div>
+               ) : (
+                 <div style={{textAlign: 'center', paddingTop: '4rem'}}>
+                   <div style={{fontSize: '4rem', marginBottom: '1rem'}}>📖</div>
+                   <h3 style={{
+                     fontSize: '1.25rem',
+                     fontFamily: 'serif',
+                     color: 'rgb(31, 41, 55)',
+                     marginBottom: '0.5rem'
+                   }}>Your library is empty!</h3>
+                   <p style={{
+                     color: 'rgb(75, 85, 99)',
+                     marginBottom: '2rem'
+                   }}>Add some books by taking photos of your bookshelf.</p>
+                   <button 
+                     onClick={() => {
+                       setCurrentTab('add');
+                       setShowPhotoUpload(true);
+                     }}
+                     style={{
+                       background: 'linear-gradient(to right, rgb(59, 130, 246), rgb(14, 165, 233))',
+                       color: 'white',
+                       padding: '0.75rem 1.5rem',
+                       borderRadius: '9999px',
+                       fontWeight: '500',
+                       border: 'none',
+                       cursor: 'pointer',
+                       transition: 'all 0.2s',
+                       boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)'
+                     }}
+                     onMouseEnter={(e) => e.target.style.transform = 'scale(1.05)'}
+                     onMouseLeave={(e) => e.target.style.transform = 'scale(1)'}
+                   >
+                     📸 Add Books
+                   </button>
+                 </div>
+               )}
+             </div>
+                     ) : !showVibes && !isSpinning && !currentBook ? (
+             /* Water Magic Button */
+             <div style={{display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', paddingTop: '4rem', position: 'relative'}}>
+               
+               <div 
+                 onClick={handleWaterClick}
+                 className={`water-button-container ${isExploding ? 'exploding' : ''}`}
+               >
+                 {/* Water ripple rings that appear on press */}
+                 {isExploding && (
+                   <>
+                     <div className="water-ripple water-ripple-1" />
+                     <div className="water-ripple water-ripple-2" />
+                     <div className="water-ripple water-ripple-3" />
+                   </>
+                 )}
+                 
+                 {/* Magical glow behind button */}
+                 <div className="water-magical-glow"></div>
+                 
+                 {/* Round Water Button with floating effect */}
+                 <div className={`water-button animate-gentle-float ${isExploding ? 'exploding' : ''}`}>
+                   
+                   {/* Multiple water surface layers for depth */}
+                   <div className={`water-surface-layer-1 ${isExploding ? 'exploding' : ''}`}></div>
+                   <div className={`water-surface-layer-2 ${isExploding ? 'exploding' : ''}`}></div>
+                   
+                   {/* Inner magical water glow */}
+                   <div className={`water-inner-glow ${isExploding ? 'exploding' : ''}`}></div>
+                   
+                   {/* Sparkle effects around the edge */}
+                   <div className="water-sparkles">
+                     <div className="sparkle-top animate-twinkle">✨</div>
+                     <div className="sparkle-bottom animate-twinkle">✨</div>
+                     <div className="sparkle-left animate-twinkle">✨</div>
+                     <div className="sparkle-right animate-twinkle">✨</div>
+                   </div>
+                   
+                   <div className={`water-content ${isExploding ? 'exploding' : ''}`}>
+                     <div className="water-drop-container">
+                       <div className={`water-drop ${isExploding ? 'exploding' : 'animate-gentle-bounce'}`}>
+                         💧
+                       </div>
+                       {/* Tiny sparkles around the water drop */}
+                       <div className="tiny-sparkle-1 animate-twinkle">✨</div>
+                       <div className="tiny-sparkle-2 animate-twinkle">✨</div>
+                     </div>
+                     <h2 className="water-adventure-text">Ready for your next adventure?</h2>
+                     <div className="water-dive-text animate-gentle-pulse">
+                       🌊 Dive in ✨ 
+                     </div>
+                   </div>
+                 </div>
+               </div>
+             </div>
           ) : showVibes && !isSpinning ? (
             /* Mood Selection with Water Theme */
             <div className="pt-4">
@@ -423,99 +506,86 @@ function App() {
           ) : null}
         </div>
 
-        {/* Water-themed Bottom Navigation */}
-        <div className="fixed bottom-0 left-1/2 transform -translate-x-1/2 w-full max-w-md bg-white/90 backdrop-blur-md border-t border-blue-200 px-6 py-4">
-          <div className="flex justify-around items-center">
-            <button 
-              onClick={resetToHome}
-              className={`p-4 rounded-full transition-colors ${currentTab === 'home' ? 'bg-blue-100 text-blue-600' : 'text-blue-500 hover:bg-blue-100'}`}
-            >
-              <Home size={22} />
-            </button>
-            <button 
-              onClick={() => setCurrentTab('library')}
-              className={`p-4 rounded-full transition-colors ${currentTab === 'library' ? 'bg-blue-100 text-blue-600' : 'text-blue-500 hover:bg-blue-100'}`}
-            >
-              <Library size={22} />
-            </button>
-            <button 
-              onClick={() => {
-                setCurrentTab('add');
-                setShowPhotoUpload(true);
-              }}
-              className="p-5 bg-gradient-to-r from-blue-500 to-cyan-500 text-white rounded-full shadow-lg hover:scale-110 transition-transform"
-            >
-              <Plus size={22} />
-            </button>
-          </div>
-        </div>
+                 {/* Water-themed Bottom Navigation */}
+         <div style={{
+           position: 'fixed',
+           bottom: 0,
+           left: '50%',
+           transform: 'translateX(-50%)',
+           width: '100%',
+           maxWidth: '28rem',
+           background: 'rgba(255, 255, 255, 0.9)',
+           backdropFilter: 'blur(16px)',
+           borderTop: '1px solid rgb(191, 219, 254)',
+           padding: '1rem 1.5rem'
+         }}>
+           <div style={{
+             display: 'flex',
+             justifyContent: 'space-around',
+             alignItems: 'center'
+           }}>
+             <button 
+               onClick={resetToHome}
+               style={{
+                 padding: '1rem',
+                 borderRadius: '50%',
+                 border: 'none',
+                 background: currentTab === 'home' ? 'rgb(219, 234, 254)' : 'transparent',
+                 color: currentTab === 'home' ? 'rgb(37, 99, 235)' : 'rgb(59, 130, 246)',
+                 transition: 'all 0.2s',
+                 cursor: 'pointer',
+                 display: 'flex',
+                 alignItems: 'center',
+                 justifyContent: 'center'
+               }}
+             >
+               <Home size={22} />
+             </button>
+             <button 
+               onClick={() => setCurrentTab('library')}
+               style={{
+                 padding: '1rem',
+                 borderRadius: '50%',
+                 border: 'none',
+                 background: currentTab === 'library' ? 'rgb(219, 234, 254)' : 'transparent',
+                 color: currentTab === 'library' ? 'rgb(37, 99, 235)' : 'rgb(59, 130, 246)',
+                 transition: 'all 0.2s',
+                 cursor: 'pointer',
+                 display: 'flex',
+                 alignItems: 'center',
+                 justifyContent: 'center'
+               }}
+             >
+               <Library size={22} />
+             </button>
+             <button 
+               onClick={() => {
+                 setCurrentTab('add');
+                 setShowPhotoUpload(true);
+               }}
+               style={{
+                 padding: '1.25rem',
+                 background: 'linear-gradient(to right, rgb(59, 130, 246), rgb(14, 165, 233))',
+                 color: 'white',
+                 borderRadius: '50%',
+                 border: 'none',
+                 boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)',
+                 cursor: 'pointer',
+                 transition: 'transform 0.2s',
+                 display: 'flex',
+                 alignItems: 'center',
+                 justifyContent: 'center'
+               }}
+               onMouseEnter={(e) => e.target.style.transform = 'scale(1.1)'}
+               onMouseLeave={(e) => e.target.style.transform = 'scale(1)'}
+             >
+               <Plus size={22} />
+             </button>
+           </div>
+         </div>
       </div>
 
-      <style jsx>{`
-        /* FLOATING AND MAGICAL ANIMATIONS */
-        @keyframes gentle-float {
-          0%, 100% { transform: translateY(0px) rotate(0deg); }
-          33% { transform: translateY(-8px) rotate(1deg); }
-          66% { transform: translateY(-4px) rotate(-0.5deg); }
-        }
-        .animate-gentle-float {
-          animation: gentle-float 4s ease-in-out infinite;
-        }
-        
-        @keyframes float {
-          0%, 100% { transform: translateY(0px); }
-          50% { transform: translateY(-15px); }
-        }
-        .animate-float {
-          animation: float 3s ease-in-out infinite;
-        }
-        
-        @keyframes gentle-bounce {
-          0%, 100% { transform: translateY(0px) scale(1); }
-          50% { transform: translateY(-5px) scale(1.05); }
-        }
-        .animate-gentle-bounce {
-          animation: gentle-bounce 2s ease-in-out infinite;
-        }
-        
-        @keyframes gentle-pulse {
-          0%, 100% { opacity: 1; transform: scale(1); }
-          50% { opacity: 0.8; transform: scale(1.02); }
-        }
-        .animate-gentle-pulse {
-          animation: gentle-pulse 2s ease-in-out infinite;
-        }
-        
-        @keyframes twinkle {
-          0%, 100% { opacity: 0.4; transform: scale(0.8); }
-          50% { opacity: 1; transform: scale(1.2); }
-        }
-        .animate-twinkle {
-          animation: twinkle 1.5s ease-in-out infinite;
-        }
-        
-        @keyframes water-ripple {
-          0% { transform: translate(-50%, -50%) scale(0.2); opacity: 0.8; }
-          100% { transform: translate(-50%, -50%) scale(2); opacity: 0; }
-        }
-        .animate-water-ripple {
-          animation: water-ripple 0.8s ease-out forwards;
-        }
-        
-        /* Book materialization */
-        @keyframes book-materialize {
-          0% { opacity: 0; transform: scale(0.3) translateY(100px); }
-          50% { opacity: 0.7; transform: scale(1.1) translateY(-20px); }
-          100% { opacity: 1; transform: scale(1) translateY(0); }
-        }
-        .animate-book-materialize {
-          animation: book-materialize 1s ease-out;
-        }
-        
-        .shadow-3xl {
-          box-shadow: 0 35px 60px -12px rgba(0, 0, 0, 0.25);
-        }
-      `}</style>
+
     </div>
   );
 }

@@ -844,3 +844,319 @@ body {
     font-size: 48px;
   }
 }
+
+/* FLOATING AND MAGICAL ANIMATIONS */
+@keyframes gentle-float {
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  33% { transform: translateY(-8px) rotate(1deg); }
+  66% { transform: translateY(-4px) rotate(-0.5deg); }
+}
+.animate-gentle-float {
+  animation: gentle-float 4s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-15px); }
+}
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+@keyframes gentle-bounce {
+  0%, 100% { transform: translateY(0px) scale(1); }
+  50% { transform: translateY(-5px) scale(1.05); }
+}
+.animate-gentle-bounce {
+  animation: gentle-bounce 2s ease-in-out infinite;
+}
+
+@keyframes gentle-pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.8; transform: scale(1.02); }
+}
+.animate-gentle-pulse {
+  animation: gentle-pulse 2s ease-in-out infinite;
+}
+
+@keyframes twinkle {
+  0%, 100% { opacity: 0.4; transform: scale(0.8); }
+  50% { opacity: 1; transform: scale(1.2); }
+}
+.animate-twinkle {
+  animation: twinkle 1.5s ease-in-out infinite;
+}
+
+@keyframes water-ripple {
+  0% { transform: translate(-50%, -50%) scale(0.2); opacity: 0.8; }
+  100% { transform: translate(-50%, -50%) scale(2); opacity: 0; }
+}
+.animate-water-ripple {
+  animation: water-ripple 0.8s ease-out forwards;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Book materialization */
+@keyframes book-materialize {
+  0% { opacity: 0; transform: scale(0.3) translateY(100px); }
+  50% { opacity: 0.7; transform: scale(1.1) translateY(-20px); }
+  100% { opacity: 1; transform: scale(1) translateY(0); }
+}
+.animate-book-materialize {
+  animation: book-materialize 1s ease-out;
+}
+
+.shadow-3xl {
+  box-shadow: 0 35px 60px -12px rgba(0, 0, 0, 0.25);
+}
+
+/* Water themed styles */
+.water-button-container {
+  position: relative;
+  cursor: pointer;
+}
+
+.water-button-container.exploding {
+  pointer-events: none;
+}
+
+.water-magical-glow {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to right, rgba(147, 197, 253, 0.3), rgba(103, 232, 249, 0.4), rgba(96, 165, 250, 0.3));
+  border-radius: 50%;
+  filter: blur(48px);
+  animation: pulse 2s infinite;
+  opacity: 0.6;
+}
+
+.water-button {
+  position: relative;
+  width: 18rem;
+  height: 18rem;
+  border-radius: 50%;
+  border: 4px solid rgb(96 165 250);
+  background: linear-gradient(to bottom right, rgb(239 246 255), rgb(207 250 254), rgb(219 234 254));
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  transform: translateY(0);
+  transition: all 0.3s ease;
+  backdrop-filter: blur(16px);
+  backdrop-filter: blur(8px);
+}
+
+.water-button.exploding {
+  transform: scale(0.85);
+  box-shadow: none;
+  filter: brightness(1.25);
+  border-color: rgb(103 232 249);
+}
+
+.water-button:hover {
+  transform: scale(1.1);
+  box-shadow: 0 35px 60px -12px rgba(0, 0, 0, 0.25);
+}
+
+.water-button:active {
+  transform: scale(0.95);
+}
+
+.water-surface-layer-1 {
+  position: absolute;
+  inset: 0.75rem;
+  border-radius: 50%;
+  background: linear-gradient(to bottom right, rgba(219, 234, 254, 0.8), rgba(207, 250, 254, 0.8));
+  transition: all 0.3s ease;
+}
+
+.water-surface-layer-1.exploding {
+  animation: pulse 1s infinite;
+  transform: scale(1.1);
+}
+
+.water-surface-layer-1:hover {
+  transform: scale(1.05);
+}
+
+.water-surface-layer-2 {
+  position: absolute;
+  inset: 1.5rem;
+  border-radius: 50%;
+  background: linear-gradient(to bottom right, rgba(191, 219, 254, 0.6), rgba(186, 230, 253, 0.6));
+  transition: all 0.3s ease;
+}
+
+.water-surface-layer-2.exploding {
+  animation: pulse 1s infinite;
+  transform: scale(1.1);
+}
+
+.water-surface-layer-2:hover {
+  transform: scale(1.05);
+}
+
+.water-inner-glow {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: linear-gradient(to bottom right, rgba(147, 197, 253, 0.3), rgba(103, 232, 249, 0.3));
+  transition: all 0.3s ease;
+  filter: blur(12px);
+  opacity: 0.7;
+}
+
+.water-inner-glow.exploding {
+  filter: blur(32px);
+  opacity: 1;
+  transform: scale(1.5);
+}
+
+.water-inner-glow:hover {
+  filter: blur(32px);
+}
+
+.water-sparkles {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+}
+
+.water-content {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  text-align: center;
+  transition: all 0.3s ease;
+}
+
+.water-content.exploding {
+  transform: scale(1.1);
+  filter: brightness(1.25);
+}
+
+.water-drop-container {
+  margin-bottom: 1.5rem;
+  position: relative;
+}
+
+.water-drop {
+  font-size: 4rem;
+  line-height: 1;
+}
+
+.water-drop.exploding {
+  animation: spin 1s linear infinite;
+}
+
+.water-adventure-text {
+  font-size: 1.5rem;
+  line-height: 1.2;
+  font-family: serif;
+  color: rgb(31, 41, 55);
+  margin-bottom: 0.75rem;
+  padding: 0 1.5rem;
+}
+
+.water-dive-text {
+  color: rgb(37, 99, 235);
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  font-size: 1.125rem;
+}
+
+/* Ripple animation elements */
+.water-ripple {
+  position: absolute;
+  width: 24rem;
+  height: 24rem;
+  border: 2px solid;
+  border-radius: 50%;
+  animation: water-ripple 0.8s ease-out forwards;
+}
+
+.water-ripple-1 {
+  border-color: rgb(147 197 253);
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.water-ripple-2 {
+  border-color: rgb(103 232 249);
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  animation-delay: 0.1s;
+}
+
+.water-ripple-3 {
+  border-color: rgb(96 165 250);
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  animation-delay: 0.2s;
+}
+
+/* Sparkle positioning */
+.sparkle-top {
+  position: absolute;
+  top: 1rem;
+  left: 50%;
+  transform: translateX(-50%);
+  color: rgb(103 232 249);
+  font-size: 1.125rem;
+}
+
+.sparkle-bottom {
+  position: absolute;
+  bottom: 1rem;
+  left: 50%;
+  transform: translateX(-50%);
+  color: rgb(147 197 253);
+  font-size: 1.125rem;
+  animation-delay: 1s;
+}
+
+.sparkle-left {
+  position: absolute;
+  top: 50%;
+  left: 1rem;
+  transform: translateY(-50%);
+  color: rgb(14 165 233);
+  font-size: 1.125rem;
+  animation-delay: 2s;
+}
+
+.sparkle-right {
+  position: absolute;
+  top: 50%;
+  right: 1rem;
+  transform: translateY(-50%);
+  color: rgb(59 130 246);
+  font-size: 1.125rem;
+  animation-delay: 0.5s;
+}
+
+.tiny-sparkle-1 {
+  position: absolute;
+  top: -0.5rem;
+  right: -0.5rem;
+  color: rgb(103 232 249);
+  font-size: 0.875rem;
+}
+
+.tiny-sparkle-2 {
+  position: absolute;
+  bottom: -0.25rem;
+  left: -0.5rem;
+  color: rgb(147 197 253);
+  font-size: 0.875rem;
+  animation-delay: 0.7s;
+}
