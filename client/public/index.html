@@ -4,28 +4,28 @@
     <meta charset="utf-8" />
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📚</text></svg>" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#667eea" />
-    <meta name="description" content="BookVibe - AI-powered book recommendations for avid readers" />
-    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="theme-color" content="#8b5cf6" />
+    <meta name="description" content="BookVibe - Discover your next great read with mood-based recommendations" />
+    <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
     <meta name="apple-mobile-web-app-title" content="BookVibe" />
     
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://bookvibe.app/" />
-    <meta property="og:title" content="BookVibe - Find Your Next Great Read" />
-    <meta property="og:description" content="Mood-based book recommendations for readers who devour 5+ books per month" />
+    <meta property="og:title" content="BookVibe - Pick from your TBR pile" />
+    <meta property="og:description" content="Swipe through your book library with mood-based filtering. Find your perfect next read!" />
     <meta property="og:image" content="https://bookvibe.app/og-image.jpg" />
 
     <!-- Twitter -->
     <meta property="twitter:card" content="summary_large_image" />
     <meta property="twitter:url" content="https://bookvibe.app/" />
-    <meta property="twitter:title" content="BookVibe - Find Your Next Great Read" />
-    <meta property="twitter:description" content="Mood-based book recommendations for readers who devour 5+ books per month" />
+    <meta property="twitter:title" content="BookVibe - Pick from your TBR pile" />
+    <meta property="twitter:description" content="Swipe through your book library with mood-based filtering. Find your perfect next read!" />
     <meta property="twitter:image" content="https://bookvibe.app/og-image.jpg" />
 
     <!-- PWA manifest -->
-    <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
+    <link rel="manifest" href="/manifest.json" />
     
     <!-- Preconnect to external services -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -34,7 +34,7 @@
     <link rel="preconnect" href="https://covers.openlibrary.org" />
     <link rel="preconnect" href="https://www.googleapis.com" />
     
-    <title>BookVibe - Find Your Next Great Read</title>
+    <title>BookVibe - Pick from your TBR pile</title>
     
     <style>
       /* Loading screen styles */
@@ -44,7 +44,7 @@
         left: 0;
         width: 100%;
         height: 100vh;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: linear-gradient(135deg, #8b5cf6 0%, #ec4899 100%);
         display: flex;
         flex-direction: column;
         align-items: center;
@@ -138,18 +138,18 @@
         }, 500); // Show for at least 500ms
       });
       
-      // Service worker registration for PWA
-      if ('serviceWorker' in navigator) {
-        window.addEventListener('load', function() {
-          navigator.serviceWorker.register('%PUBLIC_URL%/sw.js')
-            .then(function(registration) {
-              console.log('SW registered: ', registration);
-            })
-            .catch(function(registrationError) {
-              console.log('SW registration failed: ', registrationError);
-            });
-        });
-      }
+      // Service worker registration for PWA (disabled for now)
+      // if ('serviceWorker' in navigator) {
+      //   window.addEventListener('load', function() {
+      //     navigator.serviceWorker.register('/sw.js')
+      //       .then(function(registration) {
+      //         console.log('SW registered: ', registration);
+      //       })
+      //       .catch(function(registrationError) {
+      //         console.log('SW registration failed: ', registrationError);
+      //       });
+      //   });
+      // }
     </script>
   </body>
 </html>
