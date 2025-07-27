@@ -221,7 +221,7 @@ function App() {
       <div style={{
         background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 250, 252, 0.95) 100%)',
         backdropFilter: 'blur(20px)',
-        borderBottom: '1px solid rgba(99, 102, 241, 0.1)',
+        borderBottom: '1px solid rgba(14, 165, 233, 0.1)',
         padding: '2rem 1.5rem 1.5rem 1.5rem',
         textAlign: 'center',
         boxShadow: '0 4px 20px rgba(0, 0, 0, 0.03)'
@@ -232,20 +232,16 @@ function App() {
           justifyContent: 'center',
           marginBottom: '0.5rem'
         }}>
-          <Sparkles size={28} style={{
-            color: '#6366f1',
-            marginRight: '0.75rem'
-          }} />
           <h1 style={{
             fontSize: '2rem',
             fontWeight: '700',
-            background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)',
+            background: 'linear-gradient(135deg, #0ea5e9 0%, #06b6d4 100%)',
             backgroundClip: 'text',
             WebkitBackgroundClip: 'text',
             WebkitTextFillColor: 'transparent',
             margin: 0,
             letterSpacing: '-0.02em'
-          }}>BookVibe</h1>
+          }}>💧 BookVibe</h1>
         </div>
         <p style={{
           fontSize: '1rem',
@@ -306,7 +302,7 @@ function App() {
                          <div style={{
                            width: '3.5rem',
                            height: '4.5rem',
-                           background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)',
+                           background: 'linear-gradient(135deg, #0ea5e9 0%, #06b6d4 100%)',
                            borderRadius: '0.75rem',
                            display: 'flex',
                            alignItems: 'center',
@@ -315,7 +311,7 @@ function App() {
                            fontSize: '0.875rem',
                            fontWeight: '600',
                            marginRight: '1rem',
-                           boxShadow: '0 4px 12px rgba(99, 102, 241, 0.3)'
+                           boxShadow: '0 4px 12px rgba(14, 165, 233, 0.3)'
                          }}>
                            <BookOpen size={20} />
                          </div>
@@ -328,7 +324,7 @@ function App() {
                              lineHeight: '1.4'
                            }}>{book.title}</h4>
                            <p style={{
-                             color: '#6366f1',
+                             color: '#0ea5e9',
                              fontSize: '0.875rem',
                              margin: '0 0 0.25rem 0',
                              fontWeight: '500'
@@ -373,7 +369,7 @@ function App() {
                        setShowPhotoUpload(true);
                      }}
                      style={{
-                       background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)',
+                       background: 'linear-gradient(135deg, #0ea5e9 0%, #06b6d4 100%)',
                        color: 'white',
                        padding: '1rem 2rem',
                        borderRadius: '9999px',
@@ -381,7 +377,7 @@ function App() {
                        border: 'none',
                        cursor: 'pointer',
                        transition: 'all 0.3s ease',
-                       boxShadow: '0 8px 20px rgba(99, 102, 241, 0.3)',
+                       boxShadow: '0 8px 20px rgba(14, 165, 233, 0.3)',
                        fontSize: '1rem',
                        display: 'flex',
                        alignItems: 'center',
@@ -390,11 +386,11 @@ function App() {
                      }}
                      onMouseEnter={(e) => {
                        e.target.style.transform = 'translateY(-2px) scale(1.02)';
-                       e.target.style.boxShadow = '0 12px 30px rgba(99, 102, 241, 0.4)';
+                       e.target.style.boxShadow = '0 12px 30px rgba(14, 165, 233, 0.4)';
                      }}
                      onMouseLeave={(e) => {
                        e.target.style.transform = 'translateY(0) scale(1)';
-                       e.target.style.boxShadow = '0 8px 20px rgba(99, 102, 241, 0.3)';
+                       e.target.style.boxShadow = '0 8px 20px rgba(14, 165, 233, 0.3)';
                      }}
                    >
                      <Plus size={20} />
@@ -473,7 +469,7 @@ function App() {
                 marginBottom: '2rem'
               }}>
                 <Sparkles size={24} style={{
-                  color: '#6366f1',
+                  color: '#0ea5e9',
                   marginBottom: '0.5rem'
                 }} />
                 <h2 style={{
@@ -611,7 +607,6 @@ function App() {
               </div>
             </div>
           ) : isSpinning ? (
-            /* Premium Spinning Animation */
             <div style={{
               paddingTop: '4rem',
               textAlign: 'center'
@@ -625,7 +620,7 @@ function App() {
                 <div style={{
                   position: 'absolute',
                   inset: 0,
-                  background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)',
+                  background: 'linear-gradient(135deg, #0ea5e9 0%, #06b6d4 100%)',
                   borderRadius: '50%',
                   animation: 'spin 2s linear infinite',
                   opacity: 0.8
@@ -641,12 +636,13 @@ function App() {
                   backdropFilter: 'blur(8px)'
                 }}>
                   <div style={{textAlign: 'center', padding: '1rem'}}>
-                    <Sparkles size={40} style={{
-                      color: '#6366f1',
-                      marginBottom: '1rem'
-                    }} className="animate-gentle-pulse" />
                     <div style={{
-                      color: '#6366f1',
+                      fontSize: '3rem',
+                      marginBottom: '1rem',
+                      color: '#0ea5e9'
+                    }} className="animate-gentle-pulse">💧</div>
+                    <div style={{
+                      color: '#0ea5e9',
                       fontWeight: '600',
                       fontSize: '0.875rem',
                       lineHeight: '1.4'
@@ -677,14 +673,14 @@ function App() {
                     <div style={{
                       width: '10rem',
                       height: '14rem',
-                      background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #6366f1 100%)',
+                      background: 'linear-gradient(135deg, #0ea5e9 0%, #06b6d4 50%, #0ea5e9 100%)',
                       borderRadius: '1.25rem',
                       margin: '0 auto',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
                       color: 'white',
-                      boxShadow: '0 20px 40px rgba(99, 102, 241, 0.3)',
+                      boxShadow: '0 20px 40px rgba(14, 165, 233, 0.3)',
                       transform: 'rotate(2deg)',
                       transition: 'all 0.5s cubic-bezier(0.4, 0, 0.2, 1)',
                       cursor: 'pointer',
@@ -693,11 +689,11 @@ function App() {
                     }}
                     onMouseEnter={(e) => {
                       e.target.style.transform = 'rotate(0deg) scale(1.05)';
-                      e.target.style.boxShadow = '0 30px 60px rgba(99, 102, 241, 0.4)';
+                      e.target.style.boxShadow = '0 30px 60px rgba(14, 165, 233, 0.4)';
                     }}
                     onMouseLeave={(e) => {
                       e.target.style.transform = 'rotate(2deg) scale(1)';
-                      e.target.style.boxShadow = '0 20px 40px rgba(99, 102, 241, 0.3)';
+                      e.target.style.boxShadow = '0 20px 40px rgba(14, 165, 233, 0.3)';
                     }}
                     >
                       {/* Shimmer effect */}
@@ -770,12 +766,12 @@ function App() {
                   }}>{currentBook?.title}</h3>
                   <p style={{
                     fontSize: '1.25rem',
-                    color: '#6366f1',
+                    color: '#0ea5e9',
                     marginBottom: '0.75rem',
                     fontWeight: '600'
                   }}>by {currentBook?.author}</p>
                   <p style={{
-                    color: '#8b5cf6',
+                    color: '#0ea5e9',
                     fontSize: '1rem',
                     marginBottom: '0.75rem',
                     fontStyle: 'italic'
@@ -797,7 +793,7 @@ function App() {
                   }}>
                     <button 
                       style={{
-                        background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)',
+                        background: 'linear-gradient(135deg, #0ea5e9 0%, #06b6d4 100%)',
                         color: 'white',
                         padding: '1rem 2rem',
                         borderRadius: '9999px',
@@ -805,7 +801,7 @@ function App() {
                         border: 'none',
                         cursor: 'pointer',
                         transition: 'all 0.3s ease',
-                        boxShadow: '0 8px 20px rgba(99, 102, 241, 0.3)',
+                        boxShadow: '0 8px 20px rgba(14, 165, 233, 0.3)',
                         fontSize: '1rem',
                         display: 'flex',
                         alignItems: 'center',
@@ -813,11 +809,11 @@ function App() {
                       }}
                       onMouseEnter={(e) => {
                         e.target.style.transform = 'translateY(-2px) scale(1.02)';
-                        e.target.style.boxShadow = '0 12px 30px rgba(99, 102, 241, 0.4)';
+                        e.target.style.boxShadow = '0 12px 30px rgba(14, 165, 233, 0.4)';
                       }}
                       onMouseLeave={(e) => {
                         e.target.style.transform = 'translateY(0) scale(1)';
-                        e.target.style.boxShadow = '0 8px 20px rgba(99, 102, 241, 0.3)';
+                        e.target.style.boxShadow = '0 8px 20px rgba(14, 165, 233, 0.3)';
                       }}
                     >
                       <Sparkles size={18} />
@@ -827,8 +823,8 @@ function App() {
                       onClick={handleWaterClick}
                       style={{
                         background: 'rgba(255, 255, 255, 0.9)',
-                        color: '#6366f1',
-                        border: '2px solid rgba(99, 102, 241, 0.2)',
+                        color: '#0ea5e9',
+                        border: '2px solid rgba(14, 165, 233, 0.2)',
                         padding: '1rem 2rem',
                         borderRadius: '9999px',
                         fontWeight: '600',
@@ -841,13 +837,13 @@ function App() {
                       }}
                       onMouseEnter={(e) => {
                         e.target.style.transform = 'translateY(-2px) scale(1.02)';
-                        e.target.style.background = 'rgba(99, 102, 241, 0.05)';
-                        e.target.style.borderColor = 'rgba(99, 102, 241, 0.3)';
+                        e.target.style.background = 'rgba(14, 165, 233, 0.05)';
+                        e.target.style.borderColor = 'rgba(14, 165, 233, 0.3)';
                       }}
                       onMouseLeave={(e) => {
                         e.target.style.transform = 'translateY(0) scale(1)';
                         e.target.style.background = 'rgba(255, 255, 255, 0.9)';
-                        e.target.style.borderColor = 'rgba(99, 102, 241, 0.2)';
+                        e.target.style.borderColor = 'rgba(14, 165, 233, 0.2)';
                       }}
                     >
                       ✨
@@ -885,7 +881,7 @@ function App() {
                  padding: '1rem',
                  borderRadius: '1rem',
                  border: 'none',
-                 background: currentTab === 'home' ? 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)' : 'transparent',
+                 background: currentTab === 'home' ? 'linear-gradient(135deg, #0ea5e9 0%, #06b6d4 100%)' : 'transparent',
                  color: currentTab === 'home' ? 'white' : '#64748b',
                  transition: 'all 0.3s ease',
                  cursor: 'pointer',
@@ -899,8 +895,8 @@ function App() {
                }}
                onMouseEnter={(e) => {
                  if (currentTab !== 'home') {
-                   e.target.style.background = 'rgba(99, 102, 241, 0.1)';
-                   e.target.style.color = '#6366f1';
+                   e.target.style.background = 'rgba(14, 165, 233, 0.1)';
+                   e.target.style.color = '#0ea5e9';
                  }
                }}
                onMouseLeave={(e) => {
@@ -919,7 +915,7 @@ function App() {
                  padding: '1rem',
                  borderRadius: '1rem',
                  border: 'none',
-                 background: currentTab === 'library' ? 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)' : 'transparent',
+                 background: currentTab === 'library' ? 'linear-gradient(135deg, #0ea5e9 0%, #06b6d4 100%)' : 'transparent',
                  color: currentTab === 'library' ? 'white' : '#64748b',
                  transition: 'all 0.3s ease',
                  cursor: 'pointer',
@@ -933,8 +929,8 @@ function App() {
                }}
                onMouseEnter={(e) => {
                  if (currentTab !== 'library') {
-                   e.target.style.background = 'rgba(99, 102, 241, 0.1)';
-                   e.target.style.color = '#6366f1';
+                   e.target.style.background = 'rgba(14, 165, 233, 0.1)';
+                   e.target.style.color = '#0ea5e9';
                  }
                }}
                onMouseLeave={(e) => {
@@ -954,11 +950,11 @@ function App() {
                }}
                style={{
                  padding: '1.25rem',
-                 background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)',
+                 background: 'linear-gradient(135deg, #0ea5e9 0%, #06b6d4 100%)',
                  color: 'white',
                  borderRadius: '50%',
                  border: 'none',
-                 boxShadow: '0 8px 20px rgba(99, 102, 241, 0.3)',
+                 boxShadow: '0 8px 20px rgba(14, 165, 233, 0.3)',
                  cursor: 'pointer',
                  transition: 'all 0.3s ease',
                  display: 'flex',
@@ -967,11 +963,11 @@ function App() {
                }}
                onMouseEnter={(e) => {
                  e.target.style.transform = 'scale(1.1) translateY(-2px)';
-                 e.target.style.boxShadow = '0 12px 30px rgba(99, 102, 241, 0.4)';
+                 e.target.style.boxShadow = '0 12px 30px rgba(14, 165, 233, 0.4)';
                }}
                onMouseLeave={(e) => {
                  e.target.style.transform = 'scale(1) translateY(0)';
-                 e.target.style.boxShadow = '0 8px 20px rgba(99, 102, 241, 0.3)';
+                 e.target.style.boxShadow = '0 8px 20px rgba(14, 165, 233, 0.3)';
                }}
              >
                <Plus size={24} />
