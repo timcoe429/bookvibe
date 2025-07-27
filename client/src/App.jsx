@@ -410,30 +410,92 @@ function App() {
              </div>
           ) : showVibes && !isSpinning ? (
             /* Mood Selection with Water Theme */
-            <div className="pt-4">
-              <h2 className="text-2xl font-serif text-gray-800 mb-8 text-center">Choose your adventure! ✨</h2>
-              <div className="space-y-4">
+            <div style={{paddingTop: '1rem'}}>
+              <h2 style={{
+                fontSize: '1.5rem',
+                fontFamily: 'serif',
+                color: 'rgb(31, 41, 55)',
+                marginBottom: '2rem',
+                textAlign: 'center'
+              }}>Choose your adventure! ✨</h2>
+              <div style={{display: 'flex', flexDirection: 'column', gap: '1rem'}}>
                 <button 
-                  className="w-full bg-gradient-to-r from-pink-400 to-rose-400 text-white py-4 rounded-2xl font-semibold shadow-lg hover:scale-105 transition-all duration-200"
+                  style={{
+                    width: '100%',
+                    background: 'linear-gradient(to right, rgb(244, 114, 182), rgb(251, 113, 133))',
+                    color: 'white',
+                    padding: '1rem',
+                    borderRadius: '1rem',
+                    fontWeight: '600',
+                    boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)',
+                    border: 'none',
+                    cursor: 'pointer',
+                    transition: 'transform 0.2s',
+                    fontSize: '1rem'
+                  }}
                   onClick={() => handleMoodChange('romance')}
+                  onMouseEnter={(e) => e.target.style.transform = 'scale(1.05)'}
+                  onMouseLeave={(e) => e.target.style.transform = 'scale(1)'}
                 >
                   💕 Romance & Love
                 </button>
                 <button 
-                  className="w-full bg-gradient-to-r from-red-500 to-orange-500 text-white py-4 rounded-2xl font-semibold shadow-lg hover:scale-105 transition-all duration-200"
+                  style={{
+                    width: '100%',
+                    background: 'linear-gradient(to right, rgb(239, 68, 68), rgb(249, 115, 22))',
+                    color: 'white',
+                    padding: '1rem',
+                    borderRadius: '1rem',
+                    fontWeight: '600',
+                    boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)',
+                    border: 'none',
+                    cursor: 'pointer',
+                    transition: 'transform 0.2s',
+                    fontSize: '1rem'
+                  }}
                   onClick={() => handleMoodChange('thriller')}
+                  onMouseEnter={(e) => e.target.style.transform = 'scale(1.05)'}
+                  onMouseLeave={(e) => e.target.style.transform = 'scale(1)'}
                 >
                   🔥 Thrills & Chills
                 </button>
                 <button 
-                  className="w-full bg-gradient-to-r from-amber-400 to-yellow-400 text-white py-4 rounded-2xl font-semibold shadow-lg hover:scale-105 transition-all duration-200"
+                  style={{
+                    width: '100%',
+                    background: 'linear-gradient(to right, rgb(251, 191, 36), rgb(245, 158, 11))',
+                    color: 'white',
+                    padding: '1rem',
+                    borderRadius: '1rem',
+                    fontWeight: '600',
+                    boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)',
+                    border: 'none',
+                    cursor: 'pointer',
+                    transition: 'transform 0.2s',
+                    fontSize: '1rem'
+                  }}
                   onClick={() => handleMoodChange('cozy')}
+                  onMouseEnter={(e) => e.target.style.transform = 'scale(1.05)'}
+                  onMouseLeave={(e) => e.target.style.transform = 'scale(1)'}
                 >
                   ☕ Cozy & Warm
                 </button>
                 <button 
-                  className="w-full bg-gradient-to-r from-purple-500 to-indigo-500 text-white py-4 rounded-2xl font-semibold shadow-lg hover:scale-105 transition-all duration-200"
+                  style={{
+                    width: '100%',
+                    background: 'linear-gradient(to right, rgb(168, 85, 247), rgb(99, 102, 241))',
+                    color: 'white',
+                    padding: '1rem',
+                    borderRadius: '1rem',
+                    fontWeight: '600',
+                    boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)',
+                    border: 'none',
+                    cursor: 'pointer',
+                    transition: 'transform 0.2s',
+                    fontSize: '1rem'
+                  }}
                   onClick={() => handleMoodChange('fantasy')}
+                  onMouseEnter={(e) => e.target.style.transform = 'scale(1.05)'}
+                  onMouseLeave={(e) => e.target.style.transform = 'scale(1)'}
                 >
                   🐉 Fantasy & Magic
                 </button>
@@ -441,61 +503,189 @@ function App() {
             </div>
           ) : isSpinning ? (
             /* Spinning Animation with Water Theme */
-            <div className="pt-16 text-center">
-              <div className="relative w-64 h-64 mx-auto mb-8">
-                <div className="absolute inset-0 bg-gradient-to-r from-blue-400 to-cyan-400 rounded-full animate-spin"></div>
-                <div className="absolute inset-2 bg-gradient-to-br from-blue-50 to-cyan-50 rounded-full flex items-center justify-center">
-                  <div className="text-center">
-                    <div className="text-4xl mb-2">📚</div>
-                    <div className="text-blue-600 font-medium text-sm px-4">{spinningText}</div>
+            <div style={{paddingTop: '4rem', textAlign: 'center'}}>
+              <div style={{
+                position: 'relative',
+                width: '16rem',
+                height: '16rem',
+                margin: '0 auto 2rem auto'
+              }}>
+                <div style={{
+                  position: 'absolute',
+                  inset: 0,
+                  background: 'linear-gradient(to right, rgb(96, 165, 250), rgb(103, 232, 249))',
+                  borderRadius: '50%',
+                  animation: 'spin 2s linear infinite'
+                }}></div>
+                <div style={{
+                  position: 'absolute',
+                  inset: '0.5rem',
+                  background: 'linear-gradient(to bottom right, rgb(239, 246, 255), rgb(207, 250, 254))',
+                  borderRadius: '50%',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center'
+                }}>
+                  <div style={{textAlign: 'center'}}>
+                    <div style={{fontSize: '2.5rem', marginBottom: '0.5rem'}}>📚</div>
+                    <div style={{
+                      color: 'rgb(37, 99, 235)',
+                      fontWeight: '500',
+                      fontSize: '0.875rem',
+                      padding: '0 1rem'
+                    }}>{spinningText}</div>
                   </div>
                 </div>
               </div>
             </div>
           ) : currentBook ? (
             /* Book Display with Water Theme */
-            <div className="pt-4 animate-book-materialize">
-              <div className="bg-white/90 backdrop-blur-md rounded-3xl p-8 shadow-2xl border border-blue-200 mb-6 relative">
-                <div className="text-center">
+            <div style={{paddingTop: '1rem'}} className="animate-book-materialize">
+              <div style={{
+                background: 'rgba(255, 255, 255, 0.9)',
+                backdropFilter: 'blur(16px)',
+                borderRadius: '1.5rem',
+                padding: '2rem',
+                boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
+                border: '1px solid rgb(191, 219, 254)',
+                marginBottom: '1.5rem',
+                position: 'relative'
+              }}>
+                <div style={{textAlign: 'center'}}>
                   {/* Water-themed Book Cover */}
-                  <div className="relative mb-8">
-                    <div className="w-36 h-52 bg-gradient-to-br from-blue-600 via-cyan-500 to-blue-500 rounded-2xl mx-auto flex items-center justify-center text-white shadow-2xl transform rotate-3 hover:rotate-0 transition-transform duration-500">
-                      <div className="text-center">
-                        <Book size={40} className="mx-auto mb-3" />
-                        <div className="text-xs font-serif tracking-wider">YOUR NEXT</div>
-                        <div className="text-xs font-serif tracking-wider">ADVENTURE</div>
+                  <div style={{
+                    position: 'relative',
+                    marginBottom: '2rem'
+                  }}>
+                    <div style={{
+                      width: '9rem',
+                      height: '13rem',
+                      background: 'linear-gradient(to bottom right, rgb(37, 99, 235), rgb(14, 165, 233), rgb(37, 99, 235))',
+                      borderRadius: '1rem',
+                      margin: '0 auto',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      color: 'white',
+                      boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
+                      transform: 'rotate(3deg)',
+                      transition: 'transform 0.5s',
+                      cursor: 'pointer'
+                    }}
+                    onMouseEnter={(e) => e.target.style.transform = 'rotate(0deg)'}
+                    onMouseLeave={(e) => e.target.style.transform = 'rotate(3deg)'}
+                    >
+                      <div style={{textAlign: 'center'}}>
+                        <Book size={40} style={{margin: '0 auto 0.75rem auto'}} />
+                        <div style={{fontSize: '0.75rem', fontFamily: 'serif', letterSpacing: '0.1em'}}>YOUR NEXT</div>
+                        <div style={{fontSize: '0.75rem', fontFamily: 'serif', letterSpacing: '0.1em'}}>ADVENTURE</div>
                       </div>
                     </div>
                     {/* Floating water elements around book */}
-                    <div className="absolute -top-2 -left-2 text-cyan-400 animate-bounce text-xl">
+                    <div style={{
+                      position: 'absolute',
+                      top: '-0.5rem',
+                      left: '-0.5rem',
+                      color: 'rgb(103, 232, 249)',
+                      fontSize: '1.25rem'
+                    }} className="animate-gentle-bounce">
                       💧
                     </div>
-                    <div className="absolute -top-1 -right-3 text-blue-400 animate-pulse text-lg">
+                    <div style={{
+                      position: 'absolute',
+                      top: '-0.25rem',
+                      right: '-0.75rem',
+                      color: 'rgb(96, 165, 250)',
+                      fontSize: '1.125rem'
+                    }} className="animate-gentle-pulse">
                       ✨
                     </div>
-                    <div className="absolute -bottom-2 left-2 text-cyan-400 animate-bounce text-xl" style={{animationDelay: '0.5s'}}>
+                    <div style={{
+                      position: 'absolute',
+                      bottom: '-0.5rem',
+                      left: '0.5rem',
+                      color: 'rgb(103, 232, 249)',
+                      fontSize: '1.25rem',
+                      animationDelay: '0.5s'
+                    }} className="animate-gentle-bounce">
                       💧
                     </div>
                   </div>
                   
                   {/* Book Details */}
-                  <h3 className="text-2xl font-serif text-gray-800 mb-3 leading-tight">{currentBook?.title}</h3>
-                  <p className="text-lg text-blue-600 mb-2 font-medium">by {currentBook?.author}</p>
-                  <p className="text-cyan-600 text-sm mb-2 italic">{currentBook?.vibe}</p>
+                  <h3 style={{
+                    fontSize: '1.5rem',
+                    fontFamily: 'serif',
+                    color: 'rgb(31, 41, 55)',
+                    marginBottom: '0.75rem',
+                    lineHeight: '1.2'
+                  }}>{currentBook?.title}</h3>
+                  <p style={{
+                    fontSize: '1.125rem',
+                    color: 'rgb(37, 99, 235)',
+                    marginBottom: '0.5rem',
+                    fontWeight: '500'
+                  }}>by {currentBook?.author}</p>
+                  <p style={{
+                    color: 'rgb(14, 165, 233)',
+                    fontSize: '0.875rem',
+                    marginBottom: '0.5rem',
+                    fontStyle: 'italic'
+                  }}>{currentBook?.vibe}</p>
                   {currentBook?.pages && (
-                    <p className="text-gray-500 text-sm mb-8">{currentBook.pages} pages of adventure</p>
+                    <p style={{
+                      color: 'rgb(75, 85, 99)',
+                      fontSize: '0.875rem',
+                      marginBottom: '2rem'
+                    }}>{currentBook.pages} pages of adventure</p>
                   )}
                   
                   {/* Water-themed Action Buttons */}
-                  <div className="flex gap-4 justify-center">
+                  <div style={{
+                    display: 'flex',
+                    gap: '1rem',
+                    justifyContent: 'center',
+                    flexWrap: 'wrap'
+                  }}>
                     <button 
-                      className="bg-gradient-to-r from-blue-500 to-cyan-500 text-white px-8 py-4 rounded-full font-medium hover:scale-105 transition-all duration-200 shadow-lg hover:shadow-xl"
+                      style={{
+                        background: 'linear-gradient(to right, rgb(59, 130, 246), rgb(14, 165, 233))',
+                        color: 'white',
+                        padding: '1rem 2rem',
+                        borderRadius: '9999px',
+                        fontWeight: '500',
+                        border: 'none',
+                        cursor: 'pointer',
+                        transition: 'all 0.2s',
+                        boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)',
+                        fontSize: '1rem'
+                      }}
+                      onMouseEnter={(e) => e.target.style.transform = 'scale(1.05)'}
+                      onMouseLeave={(e) => e.target.style.transform = 'scale(1)'}
                     >
                       🌊 Dive into this one!
                     </button>
                     <button 
                       onClick={handleWaterClick}
-                      className="bg-white/80 text-blue-600 border-2 border-blue-300 px-8 py-4 rounded-full font-medium hover:scale-105 transition-all duration-200 hover:bg-blue-50"
+                      style={{
+                        background: 'rgba(255, 255, 255, 0.8)',
+                        color: 'rgb(37, 99, 235)',
+                        border: '2px solid rgb(191, 219, 254)',
+                        padding: '1rem 2rem',
+                        borderRadius: '9999px',
+                        fontWeight: '500',
+                        cursor: 'pointer',
+                        transition: 'all 0.2s',
+                        fontSize: '1rem'
+                      }}
+                      onMouseEnter={(e) => {
+                        e.target.style.transform = 'scale(1.05)';
+                        e.target.style.background = 'rgb(239, 246, 255)';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.target.style.transform = 'scale(1)';
+                        e.target.style.background = 'rgba(255, 255, 255, 0.8)';
+                      }}
                     >
                       💧 Show me another
                     </button>
