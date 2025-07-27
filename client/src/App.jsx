@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import './App.css';
-import PhotoUpload from './components/PhotoUpload';
+import PhotoCapture from './pages/PhotoCapture';
 
 function App() {
      const [currentBook, setCurrentBook] = useState(null);
@@ -11,6 +11,7 @@ function App() {
   const [showPhotoUpload, setShowPhotoUpload] = useState(false);
   const [userBooks, setUserBooks] = useState([]);
   const [currentTab, setCurrentTab] = useState('home'); // home, library, add
+  const [currentView, setCurrentView] = useState('home'); // home, library, photo-capture
 
                                                const books = [
         // Romance & Love
@@ -172,7 +173,7 @@ function App() {
          </div>
 
                    {showPhotoUpload && (
-            <PhotoUpload 
+            <PhotoCapture 
               onBooksDetected={handleBooksDetected}
               onClose={handlePhotoUploadClose}
             />
