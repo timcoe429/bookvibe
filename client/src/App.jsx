@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Home, Library, Plus, Book } from 'lucide-react';
+import { Home, Library, Plus, Book, Sparkles, BookOpen, Heart } from 'lucide-react';
 import './App.css';
 import PhotoCapture from './pages/PhotoCapture';
 
@@ -178,10 +178,18 @@ function App() {
 
   if (loading) {
     return (
-      <div className="app-container">
-        <div className="phone-container">
-          <div className="loading">Loading...</div>
-        </div>
+      <div style={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        minHeight: '100vh',
+        background: '#ffffff'
+      }}>
+        <div style={{
+          fontSize: '1.25rem',
+          color: '#6366f1',
+          fontWeight: '600'
+        }}>Loading...</div>
       </div>
     );
   }
@@ -202,114 +210,134 @@ function App() {
 
      return (
     <div style={{
-      maxWidth: '28rem',
+      maxWidth: '448px',
       margin: '0 auto',
       minHeight: '100vh',
-      position: 'relative',
-      overflow: 'hidden'
+      background: '#ffffff',
+      position: 'relative'
     }}>
-      {/* Water Background Pattern */}
+      
+      {/* Premium Header */}
       <div style={{
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        opacity: 0.3,
-        backgroundImage: `url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23dbeafe' fill-opacity='0.4'%3E%3Cpath d='M20 20c0-5.5-4.5-10-10-10s-10 4.5-10 10 4.5 10 10 10 10-4.5 10-10zm10 0c0-5.5-4.5-10-10-10s-10 4.5-10 10 4.5 10 10 10 10-4.5 10-10z'/%3E%3C/g%3E%3C/svg%3E")`
-      }} />
-
-      {/* Content Overlay */}
-      <div style={{
-        position: 'relative',
-        zIndex: 10,
-        background: 'linear-gradient(to bottom, rgba(239, 246, 255, 0.8), rgba(207, 250, 254, 0.6), rgba(239, 246, 255, 0.8))',
-        minHeight: '100vh',
-        backdropFilter: 'blur(4px)'
+        background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 250, 252, 0.95) 100%)',
+        backdropFilter: 'blur(20px)',
+        borderBottom: '1px solid rgba(99, 102, 241, 0.1)',
+        padding: '2rem 1.5rem 1.5rem 1.5rem',
+        textAlign: 'center',
+        boxShadow: '0 4px 20px rgba(0, 0, 0, 0.03)'
       }}>
-        
-        {/* Simple Header */}
         <div style={{
-          background: 'rgba(255, 255, 255, 0.9)',
-          backdropFilter: 'blur(16px)',
-          borderBottom: '1px solid rgb(191, 219, 254)',
-          padding: '1rem 1.5rem',
-          textAlign: 'center'
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          marginBottom: '0.5rem'
         }}>
+          <Sparkles size={28} style={{
+            color: '#6366f1',
+            marginRight: '0.75rem'
+          }} />
           <h1 style={{
-            fontSize: '1.5rem',
-            fontWeight: '600',
-            color: 'rgb(31, 41, 55)',
-            margin: '0 0 0.25rem 0'
+            fontSize: '2rem',
+            fontWeight: '700',
+            background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)',
+            backgroundClip: 'text',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+            margin: 0,
+            letterSpacing: '-0.02em'
           }}>BookVibe</h1>
-          <div style={{
-            fontSize: '0.875rem',
-            color: 'rgb(75, 85, 99)',
-            margin: 0
-          }}>What should you read next?</div>
         </div>
+        <p style={{
+          fontSize: '1rem',
+          color: '#64748b',
+          margin: 0,
+          fontWeight: '500'
+        }}>Discover your next great read</p>
+      </div>
 
-        {/* Main Content */}
-        <div style={{
-          padding: '2rem 1.5rem 6rem 1.5rem'
-        }}>
+      {/* Main Content */}
+      <div style={{
+        padding: '2rem 1.5rem 6rem 1.5rem',
+        minHeight: 'calc(100vh - 200px)'
+      }}>
                      {currentTab === 'library' ? (
-             /* Library View */
+             /* Library View - Premium Design */
              <div style={{paddingTop: '1rem'}}>
-               <h2 style={{
-                 fontSize: '1.5rem',
-                 fontFamily: 'serif',
-                 color: 'rgb(31, 41, 55)',
-                 marginBottom: '1.5rem',
-                 textAlign: 'center'
-               }}>Your Library 📚</h2>
+               <div style={{
+                 display: 'flex',
+                 alignItems: 'center',
+                 justifyContent: 'center',
+                 marginBottom: '2rem'
+               }}>
+                 <Library size={24} style={{
+                   color: '#6366f1',
+                   marginRight: '0.75rem'
+                 }} />
+                 <h2 style={{
+                   fontSize: '1.5rem',
+                   fontWeight: '600',
+                   color: '#1f2937',
+                   margin: 0
+                 }}>Your Library</h2>
+               </div>
+               
                {userBooks.length > 0 ? (
                  <div style={{display: 'flex', flexDirection: 'column', gap: '1rem'}}>
                    {userBooks.map((book, index) => (
                      <div key={book.id || index} style={{
-                       background: 'rgba(255, 255, 255, 0.9)',
+                       background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(248, 250, 252, 0.9) 100%)',
                        backdropFilter: 'blur(16px)',
-                       borderRadius: '1rem',
-                       padding: '1rem',
-                       boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)',
-                       border: '1px solid rgb(191, 219, 254)'
-                     }}>
+                       borderRadius: '1.25rem',
+                       padding: '1.25rem',
+                       boxShadow: '0 4px 20px rgba(0, 0, 0, 0.08)',
+                       border: '1px solid rgba(99, 102, 241, 0.1)',
+                       transition: 'all 0.3s ease'
+                     }}
+                     onMouseEnter={(e) => {
+                       e.target.style.transform = 'translateY(-2px)';
+                       e.target.style.boxShadow = '0 8px 30px rgba(0, 0, 0, 0.12)';
+                     }}
+                     onMouseLeave={(e) => {
+                       e.target.style.transform = 'translateY(0)';
+                       e.target.style.boxShadow = '0 4px 20px rgba(0, 0, 0, 0.08)';
+                     }}
+                     >
                        <div style={{display: 'flex', alignItems: 'center'}}>
                          <div style={{
-                           width: '3rem',
-                           height: '4rem',
-                           background: 'linear-gradient(to bottom right, rgb(37, 99, 235), rgb(14, 165, 233))',
-                           borderRadius: '0.5rem',
+                           width: '3.5rem',
+                           height: '4.5rem',
+                           background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)',
+                           borderRadius: '0.75rem',
                            display: 'flex',
                            alignItems: 'center',
                            justifyContent: 'center',
                            color: 'white',
-                           fontSize: '0.75rem',
-                           fontWeight: 'bold',
-                           marginRight: '1rem'
+                           fontSize: '0.875rem',
+                           fontWeight: '600',
+                           marginRight: '1rem',
+                           boxShadow: '0 4px 12px rgba(99, 102, 241, 0.3)'
                          }}>
-                           {book.title.slice(0, 2)}
+                           <BookOpen size={20} />
                          </div>
                          <div style={{flex: 1}}>
                            <h4 style={{
                              fontWeight: '600',
-                             color: 'rgb(31, 41, 55)',
+                             color: '#1f2937',
                              marginBottom: '0.25rem',
-                             fontSize: '1rem'
+                             fontSize: '1rem',
+                             lineHeight: '1.4'
                            }}>{book.title}</h4>
                            <p style={{
-                             color: 'rgb(37, 99, 235)',
+                             color: '#6366f1',
                              fontSize: '0.875rem',
-                             margin: '0'
+                             margin: '0 0 0.25rem 0',
+                             fontWeight: '500'
                            }}>by {book.author}</p>
                            {book.vibe && <p style={{
-                             color: 'rgb(14, 165, 233)',
+                             color: '#64748b',
                              fontSize: '0.75rem',
                              fontStyle: 'italic',
-                             marginTop: '0.25rem',
-                             margin: '0.25rem 0 0 0'
+                             margin: 0
                            }}>{book.vibe}</p>}
                          </div>
                        </div>
@@ -317,45 +345,74 @@ function App() {
                    ))}
                  </div>
                ) : (
-                 <div style={{textAlign: 'center', paddingTop: '4rem'}}>
-                   <div style={{fontSize: '4rem', marginBottom: '1rem'}}>📖</div>
+                 <div style={{
+                   textAlign: 'center',
+                   paddingTop: '4rem',
+                   paddingBottom: '2rem'
+                 }}>
+                   <div style={{
+                     fontSize: '4rem',
+                     marginBottom: '1.5rem',
+                     opacity: 0.6
+                   }}>📚</div>
                    <h3 style={{
                      fontSize: '1.25rem',
-                     fontFamily: 'serif',
-                     color: 'rgb(31, 41, 55)',
-                     marginBottom: '0.5rem'
-                   }}>Your library is empty!</h3>
+                     fontWeight: '600',
+                     color: '#1f2937',
+                     marginBottom: '0.75rem'
+                   }}>Your library awaits</h3>
                    <p style={{
-                     color: 'rgb(75, 85, 99)',
-                     marginBottom: '2rem'
-                   }}>Add some books by taking photos of your bookshelf.</p>
+                     color: '#64748b',
+                     marginBottom: '2rem',
+                     fontSize: '1rem',
+                     lineHeight: '1.5'
+                   }}>Add books by taking photos of your bookshelf and let our AI identify them for you.</p>
                    <button 
                      onClick={() => {
                        setCurrentTab('add');
                        setShowPhotoUpload(true);
                      }}
                      style={{
-                       background: 'linear-gradient(to right, rgb(59, 130, 246), rgb(14, 165, 233))',
+                       background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)',
                        color: 'white',
-                       padding: '0.75rem 1.5rem',
+                       padding: '1rem 2rem',
                        borderRadius: '9999px',
-                       fontWeight: '500',
+                       fontWeight: '600',
                        border: 'none',
                        cursor: 'pointer',
-                       transition: 'all 0.2s',
-                       boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)'
+                       transition: 'all 0.3s ease',
+                       boxShadow: '0 8px 20px rgba(99, 102, 241, 0.3)',
+                       fontSize: '1rem',
+                       display: 'flex',
+                       alignItems: 'center',
+                       gap: '0.5rem',
+                       margin: '0 auto'
                      }}
-                     onMouseEnter={(e) => e.target.style.transform = 'scale(1.05)'}
-                     onMouseLeave={(e) => e.target.style.transform = 'scale(1)'}
+                     onMouseEnter={(e) => {
+                       e.target.style.transform = 'translateY(-2px) scale(1.02)';
+                       e.target.style.boxShadow = '0 12px 30px rgba(99, 102, 241, 0.4)';
+                     }}
+                     onMouseLeave={(e) => {
+                       e.target.style.transform = 'translateY(0) scale(1)';
+                       e.target.style.boxShadow = '0 8px 20px rgba(99, 102, 241, 0.3)';
+                     }}
                    >
-                     📸 Add Books
+                     <Plus size={20} />
+                     Add Books
                    </button>
                  </div>
                )}
              </div>
                      ) : !showVibes && !isSpinning && !currentBook ? (
-             /* Water Magic Button */
-             <div style={{display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', paddingTop: '4rem', position: 'relative'}}>
+             /* Premium Water Magic Button */
+             <div style={{
+               display: 'flex',
+               flexDirection: 'column',
+               alignItems: 'center',
+               justifyContent: 'center',
+               paddingTop: '3rem',
+               position: 'relative'
+             }}>
                
                <div 
                  onClick={handleWaterClick}
@@ -373,137 +430,192 @@ function App() {
                  {/* Magical glow behind button */}
                  <div className="water-magical-glow"></div>
                  
-                 {/* Round Water Button with floating effect */}
+                 {/* Premium Water Button */}
                  <div className={`water-button animate-gentle-float ${isExploding ? 'exploding' : ''}`}>
                    
-                   {/* Multiple water surface layers for depth */}
+                   {/* Water surface layers */}
                    <div className={`water-surface-layer-1 ${isExploding ? 'exploding' : ''}`}></div>
                    <div className={`water-surface-layer-2 ${isExploding ? 'exploding' : ''}`}></div>
                    
-                   {/* Inner magical water glow */}
+                   {/* Inner glow */}
                    <div className={`water-inner-glow ${isExploding ? 'exploding' : ''}`}></div>
                    
-                   {/* Sparkle effects around the edge */}
+                   {/* Sparkle effects */}
                    <div className="water-sparkles">
                      <div className="sparkle-top animate-twinkle">✨</div>
-                     <div className="sparkle-bottom animate-twinkle">✨</div>
-                     <div className="sparkle-left animate-twinkle">✨</div>
+                     <div className="sparkle-bottom animate-twinkle">💫</div>
+                     <div className="sparkle-left animate-twinkle">⭐</div>
                      <div className="sparkle-right animate-twinkle">✨</div>
                    </div>
                    
                    <div className={`water-content ${isExploding ? 'exploding' : ''}`}>
                      <div className="water-drop-container">
                        <div className={`water-drop ${isExploding ? 'exploding' : 'animate-gentle-bounce'}`}>
-                         💧
+                         💎
                        </div>
-                       {/* Tiny sparkles around the water drop */}
+                       {/* Floating sparkles */}
                        <div className="tiny-sparkle-1 animate-twinkle">✨</div>
-                       <div className="tiny-sparkle-2 animate-twinkle">✨</div>
+                       <div className="tiny-sparkle-2 animate-twinkle">💫</div>
                      </div>
                      <h2 className="water-adventure-text">Ready for your next adventure?</h2>
                      <div className="water-dive-text animate-gentle-pulse">
-                       🌊 Dive in ✨ 
+                       ✨ Discover Magic ✨ 
                      </div>
                    </div>
                  </div>
                </div>
              </div>
           ) : showVibes && !isSpinning ? (
-            /* Mood Selection with Water Theme */
+            /* Premium Mood Selection */
             <div style={{paddingTop: '1rem'}}>
-              <h2 style={{
-                fontSize: '1.5rem',
-                fontFamily: 'serif',
-                color: 'rgb(31, 41, 55)',
-                marginBottom: '2rem',
-                textAlign: 'center'
-              }}>Choose your adventure! ✨</h2>
-              <div style={{display: 'flex', flexDirection: 'column', gap: '1rem'}}>
+              <div style={{
+                textAlign: 'center',
+                marginBottom: '2rem'
+              }}>
+                <Sparkles size={24} style={{
+                  color: '#6366f1',
+                  marginBottom: '0.5rem'
+                }} />
+                <h2 style={{
+                  fontSize: '1.5rem',
+                  fontWeight: '600',
+                  color: '#1f2937',
+                  margin: 0
+                }}>Choose your adventure</h2>
+              </div>
+              
+              <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem'}}>
                 <button 
                   style={{
-                    width: '100%',
-                    background: 'linear-gradient(to right, rgb(244, 114, 182), rgb(251, 113, 133))',
+                    background: 'linear-gradient(135deg, #f472b6 0%, #ec4899 100%)',
                     color: 'white',
-                    padding: '1rem',
-                    borderRadius: '1rem',
+                    padding: '1.5rem 1rem',
+                    borderRadius: '1.25rem',
                     fontWeight: '600',
-                    boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)',
+                    boxShadow: '0 8px 20px rgba(244, 114, 182, 0.3)',
                     border: 'none',
                     cursor: 'pointer',
-                    transition: 'transform 0.2s',
-                    fontSize: '1rem'
+                    transition: 'all 0.3s ease',
+                    fontSize: '1rem',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    gap: '0.5rem'
                   }}
                   onClick={() => handleMoodChange('romance')}
-                  onMouseEnter={(e) => e.target.style.transform = 'scale(1.05)'}
-                  onMouseLeave={(e) => e.target.style.transform = 'scale(1)'}
+                  onMouseEnter={(e) => {
+                    e.target.style.transform = 'translateY(-3px) scale(1.02)';
+                    e.target.style.boxShadow = '0 12px 30px rgba(244, 114, 182, 0.4)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.target.style.transform = 'translateY(0) scale(1)';
+                    e.target.style.boxShadow = '0 8px 20px rgba(244, 114, 182, 0.3)';
+                  }}
                 >
-                  💕 Romance & Love
+                  <Heart size={24} />
+                  Romance & Love
                 </button>
+                
                 <button 
                   style={{
-                    width: '100%',
-                    background: 'linear-gradient(to right, rgb(239, 68, 68), rgb(249, 115, 22))',
+                    background: 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)',
                     color: 'white',
-                    padding: '1rem',
-                    borderRadius: '1rem',
+                    padding: '1.5rem 1rem',
+                    borderRadius: '1.25rem',
                     fontWeight: '600',
-                    boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)',
+                    boxShadow: '0 8px 20px rgba(239, 68, 68, 0.3)',
                     border: 'none',
                     cursor: 'pointer',
-                    transition: 'transform 0.2s',
-                    fontSize: '1rem'
+                    transition: 'all 0.3s ease',
+                    fontSize: '1rem',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    gap: '0.5rem'
                   }}
                   onClick={() => handleMoodChange('thriller')}
-                  onMouseEnter={(e) => e.target.style.transform = 'scale(1.05)'}
-                  onMouseLeave={(e) => e.target.style.transform = 'scale(1)'}
+                  onMouseEnter={(e) => {
+                    e.target.style.transform = 'translateY(-3px) scale(1.02)';
+                    e.target.style.boxShadow = '0 12px 30px rgba(239, 68, 68, 0.4)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.target.style.transform = 'translateY(0) scale(1)';
+                    e.target.style.boxShadow = '0 8px 20px rgba(239, 68, 68, 0.3)';
+                  }}
                 >
-                  🔥 Thrills & Chills
+                  🔥
+                  Thrills & Chills
                 </button>
+                
                 <button 
                   style={{
-                    width: '100%',
-                    background: 'linear-gradient(to right, rgb(251, 191, 36), rgb(245, 158, 11))',
+                    background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
                     color: 'white',
-                    padding: '1rem',
-                    borderRadius: '1rem',
+                    padding: '1.5rem 1rem',
+                    borderRadius: '1.25rem',
                     fontWeight: '600',
-                    boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)',
+                    boxShadow: '0 8px 20px rgba(245, 158, 11, 0.3)',
                     border: 'none',
                     cursor: 'pointer',
-                    transition: 'transform 0.2s',
-                    fontSize: '1rem'
+                    transition: 'all 0.3s ease',
+                    fontSize: '1rem',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    gap: '0.5rem'
                   }}
                   onClick={() => handleMoodChange('cozy')}
-                  onMouseEnter={(e) => e.target.style.transform = 'scale(1.05)'}
-                  onMouseLeave={(e) => e.target.style.transform = 'scale(1)'}
+                  onMouseEnter={(e) => {
+                    e.target.style.transform = 'translateY(-3px) scale(1.02)';
+                    e.target.style.boxShadow = '0 12px 30px rgba(245, 158, 11, 0.4)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.target.style.transform = 'translateY(0) scale(1)';
+                    e.target.style.boxShadow = '0 8px 20px rgba(245, 158, 11, 0.3)';
+                  }}
                 >
-                  ☕ Cozy & Warm
+                  ☕
+                  Cozy & Warm
                 </button>
+                
                 <button 
                   style={{
-                    width: '100%',
-                    background: 'linear-gradient(to right, rgb(168, 85, 247), rgb(99, 102, 241))',
+                    background: 'linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)',
                     color: 'white',
-                    padding: '1rem',
-                    borderRadius: '1rem',
+                    padding: '1.5rem 1rem',
+                    borderRadius: '1.25rem',
                     fontWeight: '600',
-                    boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)',
+                    boxShadow: '0 8px 20px rgba(139, 92, 246, 0.3)',
                     border: 'none',
                     cursor: 'pointer',
-                    transition: 'transform 0.2s',
-                    fontSize: '1rem'
+                    transition: 'all 0.3s ease',
+                    fontSize: '1rem',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    gap: '0.5rem'
                   }}
                   onClick={() => handleMoodChange('fantasy')}
-                  onMouseEnter={(e) => e.target.style.transform = 'scale(1.05)'}
-                  onMouseLeave={(e) => e.target.style.transform = 'scale(1)'}
+                  onMouseEnter={(e) => {
+                    e.target.style.transform = 'translateY(-3px) scale(1.02)';
+                    e.target.style.boxShadow = '0 12px 30px rgba(139, 92, 246, 0.4)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.target.style.transform = 'translateY(0) scale(1)';
+                    e.target.style.boxShadow = '0 8px 20px rgba(139, 92, 246, 0.3)';
+                  }}
                 >
-                  🐉 Fantasy & Magic
+                  🐉
+                  Fantasy & Magic
                 </button>
               </div>
             </div>
           ) : isSpinning ? (
-            /* Spinning Animation with Water Theme */
-            <div style={{paddingTop: '4rem', textAlign: 'center'}}>
+            /* Premium Spinning Animation */
+            <div style={{
+              paddingTop: '4rem',
+              textAlign: 'center'
+            }}>
               <div style={{
                 position: 'relative',
                 width: '16rem',
@@ -513,134 +625,170 @@ function App() {
                 <div style={{
                   position: 'absolute',
                   inset: 0,
-                  background: 'linear-gradient(to right, rgb(96, 165, 250), rgb(103, 232, 249))',
+                  background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)',
                   borderRadius: '50%',
-                  animation: 'spin 2s linear infinite'
+                  animation: 'spin 2s linear infinite',
+                  opacity: 0.8
                 }}></div>
                 <div style={{
                   position: 'absolute',
                   inset: '0.5rem',
-                  background: 'linear-gradient(to bottom right, rgb(239, 246, 255), rgb(207, 250, 254))',
+                  background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 250, 252, 0.95) 100%)',
                   borderRadius: '50%',
                   display: 'flex',
                   alignItems: 'center',
-                  justifyContent: 'center'
+                  justifyContent: 'center',
+                  backdropFilter: 'blur(8px)'
                 }}>
-                  <div style={{textAlign: 'center'}}>
-                    <div style={{fontSize: '2.5rem', marginBottom: '0.5rem'}}>📚</div>
+                  <div style={{textAlign: 'center', padding: '1rem'}}>
+                    <Sparkles size={40} style={{
+                      color: '#6366f1',
+                      marginBottom: '1rem'
+                    }} className="animate-gentle-pulse" />
                     <div style={{
-                      color: 'rgb(37, 99, 235)',
-                      fontWeight: '500',
+                      color: '#6366f1',
+                      fontWeight: '600',
                       fontSize: '0.875rem',
-                      padding: '0 1rem'
+                      lineHeight: '1.4'
                     }}>{spinningText}</div>
                   </div>
                 </div>
               </div>
             </div>
           ) : currentBook ? (
-            /* Book Display with Water Theme */
+            /* Premium Book Display */
             <div style={{paddingTop: '1rem'}} className="animate-book-materialize">
               <div style={{
-                background: 'rgba(255, 255, 255, 0.9)',
-                backdropFilter: 'blur(16px)',
-                borderRadius: '1.5rem',
-                padding: '2rem',
-                boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
-                border: '1px solid rgb(191, 219, 254)',
+                background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 250, 252, 0.95) 100%)',
+                backdropFilter: 'blur(20px)',
+                borderRadius: '2rem',
+                padding: '2.5rem 2rem',
+                boxShadow: '0 20px 40px rgba(0, 0, 0, 0.08)',
+                border: '1px solid rgba(99, 102, 241, 0.1)',
                 marginBottom: '1.5rem',
                 position: 'relative'
               }}>
                 <div style={{textAlign: 'center'}}>
-                  {/* Water-themed Book Cover */}
+                  {/* Premium Book Cover */}
                   <div style={{
                     position: 'relative',
-                    marginBottom: '2rem'
+                    marginBottom: '2.5rem'
                   }}>
                     <div style={{
-                      width: '9rem',
-                      height: '13rem',
-                      background: 'linear-gradient(to bottom right, rgb(37, 99, 235), rgb(14, 165, 233), rgb(37, 99, 235))',
-                      borderRadius: '1rem',
+                      width: '10rem',
+                      height: '14rem',
+                      background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #6366f1 100%)',
+                      borderRadius: '1.25rem',
                       margin: '0 auto',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
                       color: 'white',
-                      boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
-                      transform: 'rotate(3deg)',
-                      transition: 'transform 0.5s',
-                      cursor: 'pointer'
+                      boxShadow: '0 20px 40px rgba(99, 102, 241, 0.3)',
+                      transform: 'rotate(2deg)',
+                      transition: 'all 0.5s cubic-bezier(0.4, 0, 0.2, 1)',
+                      cursor: 'pointer',
+                      position: 'relative',
+                      overflow: 'hidden'
                     }}
-                    onMouseEnter={(e) => e.target.style.transform = 'rotate(0deg)'}
-                    onMouseLeave={(e) => e.target.style.transform = 'rotate(3deg)'}
+                    onMouseEnter={(e) => {
+                      e.target.style.transform = 'rotate(0deg) scale(1.05)';
+                      e.target.style.boxShadow = '0 30px 60px rgba(99, 102, 241, 0.4)';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.target.style.transform = 'rotate(2deg) scale(1)';
+                      e.target.style.boxShadow = '0 20px 40px rgba(99, 102, 241, 0.3)';
+                    }}
                     >
-                      <div style={{textAlign: 'center'}}>
-                        <Book size={40} style={{margin: '0 auto 0.75rem auto'}} />
-                        <div style={{fontSize: '0.75rem', fontFamily: 'serif', letterSpacing: '0.1em'}}>YOUR NEXT</div>
-                        <div style={{fontSize: '0.75rem', fontFamily: 'serif', letterSpacing: '0.1em'}}>ADVENTURE</div>
+                      {/* Shimmer effect */}
+                      <div style={{
+                        position: 'absolute',
+                        inset: 0,
+                        background: 'linear-gradient(45deg, transparent 30%, rgba(255, 255, 255, 0.2) 50%, transparent 70%)',
+                        animation: 'shimmer 3s infinite'
+                      }}></div>
+                      
+                      <div style={{
+                        textAlign: 'center',
+                        position: 'relative',
+                        zIndex: 2
+                      }}>
+                        <Sparkles size={32} style={{
+                          marginBottom: '1rem',
+                          filter: 'drop-shadow(0 2px 4px rgba(255, 255, 255, 0.3))'
+                        }} />
+                        <div style={{
+                          fontSize: '0.75rem',
+                          fontWeight: '600',
+                          letterSpacing: '0.1em',
+                          opacity: 0.9
+                        }}>YOUR NEXT</div>
+                        <div style={{
+                          fontSize: '0.75rem',
+                          fontWeight: '600',
+                          letterSpacing: '0.1em',
+                          opacity: 0.9
+                        }}>ADVENTURE</div>
                       </div>
                     </div>
-                    {/* Floating water elements around book */}
+                    
+                    {/* Floating elements */}
                     <div style={{
                       position: 'absolute',
                       top: '-0.5rem',
-                      left: '-0.5rem',
-                      color: 'rgb(103, 232, 249)',
-                      fontSize: '1.25rem'
+                      left: '-1rem',
+                      fontSize: '1.5rem'
                     }} className="animate-gentle-bounce">
-                      💧
-                    </div>
-                    <div style={{
-                      position: 'absolute',
-                      top: '-0.25rem',
-                      right: '-0.75rem',
-                      color: 'rgb(96, 165, 250)',
-                      fontSize: '1.125rem'
-                    }} className="animate-gentle-pulse">
                       ✨
                     </div>
                     <div style={{
                       position: 'absolute',
-                      bottom: '-0.5rem',
+                      top: '1rem',
+                      right: '-1rem',
+                      fontSize: '1.25rem'
+                    }} className="animate-gentle-pulse">
+                      💫
+                    </div>
+                    <div style={{
+                      position: 'absolute',
+                      bottom: '0rem',
                       left: '0.5rem',
-                      color: 'rgb(103, 232, 249)',
                       fontSize: '1.25rem',
                       animationDelay: '0.5s'
-                    }} className="animate-gentle-bounce">
-                      💧
+                    }} className="animate-twinkle">
+                      ⭐
                     </div>
                   </div>
                   
                   {/* Book Details */}
                   <h3 style={{
-                    fontSize: '1.5rem',
-                    fontFamily: 'serif',
-                    color: 'rgb(31, 41, 55)',
-                    marginBottom: '0.75rem',
-                    lineHeight: '1.2'
+                    fontSize: '1.75rem',
+                    fontWeight: '700',
+                    color: '#1f2937',
+                    marginBottom: '1rem',
+                    lineHeight: '1.3'
                   }}>{currentBook?.title}</h3>
                   <p style={{
-                    fontSize: '1.125rem',
-                    color: 'rgb(37, 99, 235)',
-                    marginBottom: '0.5rem',
-                    fontWeight: '500'
+                    fontSize: '1.25rem',
+                    color: '#6366f1',
+                    marginBottom: '0.75rem',
+                    fontWeight: '600'
                   }}>by {currentBook?.author}</p>
                   <p style={{
-                    color: 'rgb(14, 165, 233)',
-                    fontSize: '0.875rem',
-                    marginBottom: '0.5rem',
+                    color: '#8b5cf6',
+                    fontSize: '1rem',
+                    marginBottom: '0.75rem',
                     fontStyle: 'italic'
                   }}>{currentBook?.vibe}</p>
                   {currentBook?.pages && (
                     <p style={{
-                      color: 'rgb(75, 85, 99)',
+                      color: '#64748b',
                       fontSize: '0.875rem',
-                      marginBottom: '2rem'
-                    }}>{currentBook.pages} pages of adventure</p>
+                      marginBottom: '2.5rem'
+                    }}>{currentBook.pages} pages of adventure await</p>
                   )}
                   
-                  {/* Water-themed Action Buttons */}
+                  {/* Premium Action Buttons */}
                   <div style={{
                     display: 'flex',
                     gap: '1rem',
@@ -649,45 +797,61 @@ function App() {
                   }}>
                     <button 
                       style={{
-                        background: 'linear-gradient(to right, rgb(59, 130, 246), rgb(14, 165, 233))',
+                        background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)',
                         color: 'white',
                         padding: '1rem 2rem',
                         borderRadius: '9999px',
-                        fontWeight: '500',
+                        fontWeight: '600',
                         border: 'none',
                         cursor: 'pointer',
-                        transition: 'all 0.2s',
-                        boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)',
-                        fontSize: '1rem'
+                        transition: 'all 0.3s ease',
+                        boxShadow: '0 8px 20px rgba(99, 102, 241, 0.3)',
+                        fontSize: '1rem',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '0.5rem'
                       }}
-                      onMouseEnter={(e) => e.target.style.transform = 'scale(1.05)'}
-                      onMouseLeave={(e) => e.target.style.transform = 'scale(1)'}
+                      onMouseEnter={(e) => {
+                        e.target.style.transform = 'translateY(-2px) scale(1.02)';
+                        e.target.style.boxShadow = '0 12px 30px rgba(99, 102, 241, 0.4)';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.target.style.transform = 'translateY(0) scale(1)';
+                        e.target.style.boxShadow = '0 8px 20px rgba(99, 102, 241, 0.3)';
+                      }}
                     >
-                      🌊 Dive into this one!
+                      <Sparkles size={18} />
+                      Start Reading
                     </button>
                     <button 
                       onClick={handleWaterClick}
                       style={{
-                        background: 'rgba(255, 255, 255, 0.8)',
-                        color: 'rgb(37, 99, 235)',
-                        border: '2px solid rgb(191, 219, 254)',
+                        background: 'rgba(255, 255, 255, 0.9)',
+                        color: '#6366f1',
+                        border: '2px solid rgba(99, 102, 241, 0.2)',
                         padding: '1rem 2rem',
                         borderRadius: '9999px',
-                        fontWeight: '500',
+                        fontWeight: '600',
                         cursor: 'pointer',
-                        transition: 'all 0.2s',
-                        fontSize: '1rem'
+                        transition: 'all 0.3s ease',
+                        fontSize: '1rem',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '0.5rem'
                       }}
                       onMouseEnter={(e) => {
-                        e.target.style.transform = 'scale(1.05)';
-                        e.target.style.background = 'rgb(239, 246, 255)';
+                        e.target.style.transform = 'translateY(-2px) scale(1.02)';
+                        e.target.style.background = 'rgba(99, 102, 241, 0.05)';
+                        e.target.style.borderColor = 'rgba(99, 102, 241, 0.3)';
                       }}
                       onMouseLeave={(e) => {
-                        e.target.style.transform = 'scale(1)';
-                        e.target.style.background = 'rgba(255, 255, 255, 0.8)';
+                        e.target.style.transform = 'translateY(0) scale(1)';
+                        e.target.style.background = 'rgba(255, 255, 255, 0.9)';
+                        e.target.style.borderColor = 'rgba(99, 102, 241, 0.2)';
                       }}
                     >
-                      💧 Show me another
+                      ✨
+                      Show Another
                     </button>
                   </div>
                 </div>
@@ -696,18 +860,19 @@ function App() {
           ) : null}
         </div>
 
-                 {/* Water-themed Bottom Navigation */}
+                 {/* Premium Bottom Navigation */}
          <div style={{
            position: 'fixed',
            bottom: 0,
            left: '50%',
            transform: 'translateX(-50%)',
            width: '100%',
-           maxWidth: '28rem',
-           background: 'rgba(255, 255, 255, 0.9)',
-           backdropFilter: 'blur(16px)',
-           borderTop: '1px solid rgb(191, 219, 254)',
-           padding: '1rem 1.5rem'
+           maxWidth: '448px',
+           background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 250, 252, 0.95) 100%)',
+           backdropFilter: 'blur(20px)',
+           borderTop: '1px solid rgba(99, 102, 241, 0.1)',
+           padding: '1rem 1.5rem 1.5rem 1.5rem',
+           boxShadow: '0 -4px 20px rgba(0, 0, 0, 0.08)'
          }}>
            <div style={{
              display: 'flex',
@@ -718,35 +883,69 @@ function App() {
                onClick={resetToHome}
                style={{
                  padding: '1rem',
-                 borderRadius: '50%',
+                 borderRadius: '1rem',
                  border: 'none',
-                 background: currentTab === 'home' ? 'rgb(219, 234, 254)' : 'transparent',
-                 color: currentTab === 'home' ? 'rgb(37, 99, 235)' : 'rgb(59, 130, 246)',
-                 transition: 'all 0.2s',
+                 background: currentTab === 'home' ? 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)' : 'transparent',
+                 color: currentTab === 'home' ? 'white' : '#64748b',
+                 transition: 'all 0.3s ease',
                  cursor: 'pointer',
                  display: 'flex',
+                 flexDirection: 'column',
                  alignItems: 'center',
-                 justifyContent: 'center'
+                 gap: '0.25rem',
+                 fontSize: '0.75rem',
+                 fontWeight: '600',
+                 minWidth: '4rem'
+               }}
+               onMouseEnter={(e) => {
+                 if (currentTab !== 'home') {
+                   e.target.style.background = 'rgba(99, 102, 241, 0.1)';
+                   e.target.style.color = '#6366f1';
+                 }
+               }}
+               onMouseLeave={(e) => {
+                 if (currentTab !== 'home') {
+                   e.target.style.background = 'transparent';
+                   e.target.style.color = '#64748b';
+                 }
                }}
              >
-               <Home size={22} />
+               <Home size={20} />
+               Home
              </button>
              <button 
                onClick={() => setCurrentTab('library')}
                style={{
                  padding: '1rem',
-                 borderRadius: '50%',
+                 borderRadius: '1rem',
                  border: 'none',
-                 background: currentTab === 'library' ? 'rgb(219, 234, 254)' : 'transparent',
-                 color: currentTab === 'library' ? 'rgb(37, 99, 235)' : 'rgb(59, 130, 246)',
-                 transition: 'all 0.2s',
+                 background: currentTab === 'library' ? 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)' : 'transparent',
+                 color: currentTab === 'library' ? 'white' : '#64748b',
+                 transition: 'all 0.3s ease',
                  cursor: 'pointer',
                  display: 'flex',
+                 flexDirection: 'column',
                  alignItems: 'center',
-                 justifyContent: 'center'
+                 gap: '0.25rem',
+                 fontSize: '0.75rem',
+                 fontWeight: '600',
+                 minWidth: '4rem'
+               }}
+               onMouseEnter={(e) => {
+                 if (currentTab !== 'library') {
+                   e.target.style.background = 'rgba(99, 102, 241, 0.1)';
+                   e.target.style.color = '#6366f1';
+                 }
+               }}
+               onMouseLeave={(e) => {
+                 if (currentTab !== 'library') {
+                   e.target.style.background = 'transparent';
+                   e.target.style.color = '#64748b';
+                 }
                }}
              >
-               <Library size={22} />
+               <Library size={20} />
+               Library
              </button>
              <button 
                onClick={() => {
@@ -755,26 +954,30 @@ function App() {
                }}
                style={{
                  padding: '1.25rem',
-                 background: 'linear-gradient(to right, rgb(59, 130, 246), rgb(14, 165, 233))',
+                 background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)',
                  color: 'white',
                  borderRadius: '50%',
                  border: 'none',
-                 boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)',
+                 boxShadow: '0 8px 20px rgba(99, 102, 241, 0.3)',
                  cursor: 'pointer',
-                 transition: 'transform 0.2s',
+                 transition: 'all 0.3s ease',
                  display: 'flex',
                  alignItems: 'center',
                  justifyContent: 'center'
                }}
-               onMouseEnter={(e) => e.target.style.transform = 'scale(1.1)'}
-               onMouseLeave={(e) => e.target.style.transform = 'scale(1)'}
+               onMouseEnter={(e) => {
+                 e.target.style.transform = 'scale(1.1) translateY(-2px)';
+                 e.target.style.boxShadow = '0 12px 30px rgba(99, 102, 241, 0.4)';
+               }}
+               onMouseLeave={(e) => {
+                 e.target.style.transform = 'scale(1) translateY(0)';
+                 e.target.style.boxShadow = '0 8px 20px rgba(99, 102, 241, 0.3)';
+               }}
              >
-               <Plus size={22} />
+               <Plus size={24} />
              </button>
            </div>
          </div>
-      </div>
-
 
     </div>
   );
