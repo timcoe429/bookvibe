@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import { Heart, X, BookOpen, Clock, Star, Zap, Moon, Sun, Coffee } from 'lucide-react';
+import PhotoUpload from './components/PhotoUpload';
 
 const BookPickerApp = () => {
   const [currentView, setCurrentView] = useState('home');
   const [currentBook, setCurrentBook] = useState(0);
+  const [showPhotoUpload, setShowPhotoUpload] = useState(false);
 
   const sampleBooks = [
     {
@@ -46,6 +48,16 @@ const BookPickerApp = () => {
     { icon: Sun, label: "Uplifting", color: "bg-yellow-100 text-yellow-800" },
     { icon: BookOpen, label: "Literary", color: "bg-blue-100 text-blue-800" }
   ];
+
+  const handleBooksDetected = (newBooks) => {
+    console.log('Books detected:', newBooks);
+    // TODO: Add books to user library
+    setShowPhotoUpload(false);
+  };
+
+  const handlePhotoUploadClose = () => {
+    setShowPhotoUpload(false);
+  };
 
   const HomeScreen = () => (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 to-pink-50 p-4">
@@ -91,7 +103,10 @@ const BookPickerApp = () => {
         <button className="w-full bg-white text-gray-700 p-4 rounded-xl font-medium border-2 border-gray-200 hover:border-purple-300 transition-all">
           📚 Browse My Library (47)
         </button>
-        <button className="w-full bg-white text-gray-700 p-4 rounded-xl font-medium border-2 border-gray-200 hover:border-purple-300 transition-all">
+        <button 
+          onClick={() => setShowPhotoUpload(true)}
+          className="w-full bg-white text-gray-700 p-4 rounded-xl font-medium border-2 border-gray-200 hover:border-purple-300 transition-all"
+        >
           ➕ Add New Books
         </button>
       </div>
@@ -184,6 +199,16 @@ const BookPickerApp = () => {
       </div>
     );
   };
+
+  // Show PhotoUpload as overlay when active
+  if (showPhotoUpload) {
+    return (
+      <PhotoUpload 
+        onBooksDetected={handleBooksDetected}
+        onClose={handlePhotoUploadClose}
+      />
+    );
+  }
 
   return (
     <div className="max-w-sm mx-auto bg-white min-h-screen">
