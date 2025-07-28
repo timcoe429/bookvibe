@@ -4,6 +4,126 @@ const multer = require('multer');
 const visionService = require('../services/googleVisionService');
 const bookMatchingService = require('../services/bookMatchingService');
 
+// Simple debug endpoint to check environment variables
+router.get('/debug-env', (req, res) => {
+  res.json({
+    hasApiKey: !!process.env.GOOGLE_CLOUD_VISION_API_KEY,
+    hasCredentialsJson: !!process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON,
+    hasProjectId: !!process.env.GOOGLE_CLOUD_PROJECT,
+    nodeEnv: process.env.NODE_ENV || 'not set',
+    timestamp: new Date().toISOString()
+  });
+});
+
+// Browser-friendly debug page
+router.get('/debug-page', async (req, res) => {
+  let html = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>Google Vision API Debug</title>
+        <style>
+            body { font-family: Arial, sans-serif; margin: 40px; }
+            .test { margin: 20px 0; padding: 15px; border: 1px solid #ddd; border-radius: 5px; }
+            .success { background-color: #d4edda; border-color: #c3e6cb; }
+            .error { background-color: #f8d7da; border-color: #f5c6cb; }
+            .info { background-color: #d1ecf1; border-color: #bee5eb; }
+            pre { background-color: #f8f9fa; padding: 10px; border-radius: 3px; overflow-x: auto; }
+        </style>
+    </head>
+    <body>
+        <h1>Google Vision API Debug Results</h1>
+        <p>Generated at: ${new Date().toISOString()}</p>
+  `;
+
+  // Test 1: Environment Variables
+  const envCheck = {
+    hasApiKey: !!process.env.GOOGLE_CLOUD_VISION_API_KEY,
+    hasCredentialsJson: !!process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON,
+    hasProjectId: !!process.env.GOOGLE_CLOUD_PROJECT,
+    nodeEnv: process.env.NODE_ENV || 'not set'
+  };
+
+  html += `
+        <div class="test ${envCheck.hasCredentialsJson ? 'success' : 'error'}">
+            <h2>🔧 Environment Variables</h2>
+            <p><strong>GOOGLE_APPLICATION_CREDENTIALS_JSON:</strong> ${envCheck.hasCredentialsJson ? '✅ Set' : '❌ Missing'}</p>
+            <p><strong>GOOGLE_CLOUD_VISION_API_KEY:</strong> ${envCheck.hasApiKey ? '✅ Set' : '❌ Missing'}</p>
+            <p><strong>GOOGLE_CLOUD_PROJECT:</strong> ${envCheck.hasProjectId ? '✅ Set' : '❌ Missing'}</p>
+            <p><strong>NODE_ENV:</strong> ${envCheck.nodeEnv}</p>
+        </div>
+  `;
+
+  // Test 2: Service Initialization
+  let serviceCheck = { initialized: false, error: null };
+  try {
+    const testVisionService = require('../services/googleVisionService');
+    serviceCheck.initialized = true;
+  } catch (error) {
+    serviceCheck.error = error.message;
+  }
+
+  html += `
+        <div class="test ${serviceCheck.initialized ? 'success' : 'error'}">
+            <h2>⚙️ Service Initialization</h2>
+            ${serviceCheck.initialized 
+              ? '<p>✅ Google Vision service initialized successfully</p>' 
+              : `<p>❌ Failed to initialize service</p><pre>${serviceCheck.error}</pre>`
+            }
+        </div>
+  `;
+
+  // Test 3: API Call Test
+  let apiCheck = { success: false, error: null };
+  try {
+    const testImageBuffer = Buffer.from(
+      'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==',
+      'base64'
+    );
+    
+    const visionService = require('../services/googleVisionService');
+    const result = await visionService.extractTextFromImage(testImageBuffer);
+    apiCheck.success = true;
+    apiCheck.result = 'API call successful';
+  } catch (error) {
+    apiCheck.error = error.message;
+    apiCheck.errorCode = error.code;
+  }
+
+  html += `
+        <div class="test ${apiCheck.success ? 'success' : 'error'}">
+            <h2>🔍 API Test Call</h2>
+            ${apiCheck.success 
+              ? '<p>✅ Google Vision API call successful!</p>' 
+              : `<p>❌ API call failed</p>
+                 <p><strong>Error:</strong> ${apiCheck.error}</p>
+                 <p><strong>Error Code:</strong> ${apiCheck.errorCode || 'N/A'}</p>`
+            }
+        </div>
+  `;
+
+  // Test 4: Photo Upload Form
+  html += `
+        <div class="test info">
+            <h2>📸 Test Photo Upload</h2>
+            <p>Use this form to test actual photo upload:</p>
+            <form action="/api/photos/upload" method="post" enctype="multipart/form-data">
+                <input type="file" name="photo" accept="image/*" required>
+                <input type="hidden" name="sessionId" value="debug-test">
+                <br><br>
+                <button type="submit">Upload Test Photo</button>
+            </form>
+        </div>
+  `;
+
+  html += `
+    </body>
+    </html>
+  `;
+
+  res.send(html);
+});
+
 // Configure multer for image uploads
 const storage = multer.memoryStorage();
 const upload = multer({
