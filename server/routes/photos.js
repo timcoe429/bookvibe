@@ -209,4 +209,60 @@ router.post('/test-vision', upload.single('photo'), async (req, res) => {
   }
 });
 
+// Debug endpoint to test Google Vision API configuration
+router.get('/debug-vision', async (req, res) => {
+  try {
+    // Test 1: Check environment variables
+    const envCheck = {
+      hasApiKey: !!process.env.GOOGLE_CLOUD_VISION_API_KEY,
+      hasCredentialsJson: !!process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON,
+      hasProjectId: !!process.env.GOOGLE_CLOUD_PROJECT,
+      nodeEnv: process.env.NODE_ENV
+    };
+
+    // Test 2: Try to initialize the service
+    let serviceCheck = { initialized: false, error: null };
+    try {
+      const testVisionService = require('../services/googleVisionService');
+      serviceCheck.initialized = true;
+    } catch (error) {
+      serviceCheck.error = error.message;
+    }
+
+    // Test 3: Try a simple API call with a test image (small base64 encoded image)
+    let apiCheck = { success: false, error: null };
+    try {
+      // Create a simple 1x1 pixel PNG in base64
+      const testImageBuffer = Buffer.from(
+        'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==',
+        'base64'
+      );
+      
+      const visionService = require('../services/googleVisionService');
+      const result = await visionService.extractTextFromImage(testImageBuffer);
+      apiCheck.success = true;
+      apiCheck.result = 'API call successful (no text expected in test image)';
+    } catch (error) {
+      apiCheck.error = error.message;
+      apiCheck.errorCode = error.code;
+      apiCheck.errorDetails = error.details;
+    }
+
+    res.json({
+      environment: envCheck,
+      service: serviceCheck,
+      apiTest: apiCheck,
+      timestamp: new Date().toISOString()
+    });
+
+  } catch (error) {
+    console.error('Error in debug vision endpoint:', error);
+    res.status(500).json({ 
+      error: 'Debug endpoint failed',
+      message: error.message,
+      timestamp: new Date().toISOString()
+    });
+  }
+});
+
 module.exports = router;
