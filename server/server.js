@@ -5,6 +5,59 @@ require('dotenv').config();
 const app = require('./app');
 const { sequelize } = require('./config/database');
 
+// DIRECT API TEST - bypassing all other routing
+app.get('/api/vision-test', async (req, res) => {
+  try {
+    // Test environment variables
+    const envCheck = {
+      hasApiKey: !!process.env.GOOGLE_CLOUD_VISION_API_KEY,
+      hasCredentialsJson: !!process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON,
+      hasProjectId: !!process.env.GOOGLE_CLOUD_PROJECT,
+      nodeEnv: process.env.NODE_ENV || 'not set'
+    };
+
+    // Test service initialization
+    let serviceCheck = { initialized: false, error: null };
+    try {
+      const visionService = require('./services/googleVisionService');
+      serviceCheck.initialized = true;
+    } catch (error) {
+      serviceCheck.error = error.message;
+    }
+
+    // Test API call
+    let apiCheck = { success: false, error: null };
+    try {
+      const testImageBuffer = Buffer.from(
+        'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==',
+        'base64'
+      );
+      
+      const visionService = require('./services/googleVisionService');
+      const result = await visionService.extractTextFromImage(testImageBuffer);
+      apiCheck.success = true;
+      apiCheck.result = 'API call successful';
+    } catch (error) {
+      apiCheck.error = error.message;
+      apiCheck.errorCode = error.code;
+    }
+
+    res.json({
+      message: 'VISION API TEST RESULTS',
+      environment: envCheck,
+      service: serviceCheck,
+      apiTest: apiCheck,
+      timestamp: new Date().toISOString()
+    });
+  } catch (error) {
+    res.status(500).json({ 
+      error: 'Test failed',
+      message: error.message,
+      timestamp: new Date().toISOString()
+    });
+  }
+});
+
 // Simple test endpoints
 app.get('/api/test', (req, res) => {
   console.log('🧪 API TEST HIT!');
