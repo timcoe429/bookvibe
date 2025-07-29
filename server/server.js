@@ -33,16 +33,16 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 if (process.env.NODE_ENV === 'production') {
   app.use(express.static(path.join(__dirname, 'public')));
   
-  // Catch-all for React routing - LAST
-  app.get('*', (req, res) => {
+  // Catch-all for React routing - but EXCLUDE API routes
+  app.get(/^(?!\/api).*/, (req, res) => {
     console.log(`📋 Serving React app for: ${req.url}`);
     const indexPath = path.join(__dirname, 'public', 'index.html');
     console.log(`📂 Looking for index.html at: ${indexPath}`);
     res.sendFile(indexPath);
   });
 } else {
-  // Development fallback
-  app.get('*', (req, res) => {
+  // Development fallback - but EXCLUDE API routes
+  app.get(/^(?!\/api).*/, (req, res) => {
     console.log(`📋 Development mode - no React build`);
     res.json({ message: 'API server running', path: req.url });
   });
