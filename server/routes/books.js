@@ -151,19 +151,15 @@ router.post('/bulk-import', async (req, res) => {
 
     for (const bookData of books) {
       try {
-        // Try to find book by title and author first
-        let book = await Book.findOne({
-          where: {
-            title: { [require('sequelize').Op.iLike]: bookData.title },
-            author: { [require('sequelize').Op.iLike]: bookData.author }
-          }
+        // Create book directly from Claude detection (no external API lookup)
+        const book = await Book.create({
+          title: bookData.title || 'Unknown Title',
+          author: bookData.author || 'Unknown Author',
+          pages: bookData.pages || null,
+          description: bookData.description || null,
+          mood: bookData.mood || 'thoughtful',
+          spine_text: bookData.spine_text || null
         });
-
-        if (!book) {
-          // Try to enrich book data from external APIs
-          const enrichedData = await bookService.enrichBookData(bookData);
-          book = await Book.create(enrichedData);
-        }
 
         createdBooks.push(book);
 
@@ -177,7 +173,7 @@ router.post('/bulk-import', async (req, res) => {
             userId: user.id,
             bookId: book.id,
             status: 'to-read',
-            source: 'photo'
+            source: bookData.source || 'claude_vision'
           });
           userBooks.push(userBook);
         }

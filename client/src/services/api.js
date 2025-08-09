@@ -64,14 +64,7 @@ export const bookAPI = {
     return response.data;
   },
 
-  // Bulk import books (used by photo upload)
-  bulkImport: async (books) => {
-    const response = await api.post('/books/bulk-import', {
-      books,
-      sessionId: getSessionId()
-    });
-    return response.data;
-  },
+
 
   // Add a single book
   addBook: async (bookData) => {
@@ -98,6 +91,15 @@ export const userAPI = {
   getBooks: async (filters = {}) => {
     const response = await api.get(`/users/${getSessionId()}/books`, {
       params: filters
+    });
+    return response.data;
+  },
+
+  // Bulk import books (used by photo upload) - moved here for better organization
+  bulkImport: async (books) => {
+    const response = await api.post('/books/bulk-import', {
+      books,
+      sessionId: getSessionId()
     });
     return response.data;
   },

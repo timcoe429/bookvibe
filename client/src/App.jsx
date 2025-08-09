@@ -1,44 +1,15 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Heart, X, BookOpen, Clock, Star, Zap, Moon, Sun, Coffee } from 'lucide-react';
 import PhotoUpload from './components/PhotoUpload';
+import { userAPI } from './services/api';
 
 const BookPickerApp = () => {
   const [currentView, setCurrentView] = useState('home');
   const [currentBook, setCurrentBook] = useState(0);
   const [showPhotoUpload, setShowPhotoUpload] = useState(false);
-
-  const sampleBooks = [
-    {
-      title: "The Seven Husbands of Evelyn Hugo",
-      author: "Taylor Jenkins Reid",
-      cover: "bg-gradient-to-b from-pink-400 to-purple-600",
-      genre: "Contemporary Fiction",
-      mood: "Glamorous & Emotional",
-      readTime: "4.2 hours",
-      rating: 4.8,
-      vibe: "✨ Drama Queen Energy"
-    },
-    {
-      title: "Mexican Gothic",
-      author: "Silvia Moreno-Garcia",
-      cover: "bg-gradient-to-b from-emerald-800 to-gray-900",
-      genre: "Gothic Horror",
-      mood: "Dark & Atmospheric",
-      readTime: "5.1 hours",
-      rating: 4.6,
-      vibe: "🌙 Mysterious Vibes"
-    },
-    {
-      title: "Beach Read",
-      author: "Emily Henry",
-      cover: "bg-gradient-to-b from-yellow-400 to-orange-400",
-      genre: "Romance",
-      mood: "Light & Flirty",
-      readTime: "3.8 hours",
-      rating: 4.7,
-      vibe: "☀️ Sunshine Energy"
-    }
-  ];
+  const [userBooks, setUserBooks] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [userStats, setUserStats] = useState({ inQueue: 0, totalBooks: 0 });
 
   const moods = [
     { icon: Coffee, label: "Cozy", color: "bg-amber-100 text-amber-800" },
@@ -49,10 +20,40 @@ const BookPickerApp = () => {
     { icon: BookOpen, label: "Literary", color: "bg-blue-100 text-blue-800" }
   ];
 
-  const handleBooksDetected = (newBooks) => {
+  // Load user data on component mount
+  useEffect(() => {
+    loadUserData();
+  }, []);
+
+  const loadUserData = async () => {
+    try {
+      setLoading(true);
+      const [books, stats] = await Promise.all([
+        userAPI.getBooks({ status: 'to-read' }), // Get only books in TBR pile
+        userAPI.getStats()
+      ]);
+      setUserBooks(books);
+      setUserStats(stats);
+    } catch (error) {
+      console.error('Error loading user data:', error);
+      setUserBooks([]);
+      setUserStats({ inQueue: 0, totalBooks: 0 });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleBooksDetected = async (newBooks) => {
     console.log('Books detected:', newBooks);
-    // TODO: Add books to user library
-    setShowPhotoUpload(false);
+    try {
+      // Add books to user library via the bulk import endpoint
+      await userAPI.bulkImport(newBooks);
+      // Reload user data to reflect new books
+      await loadUserData();
+      setShowPhotoUpload(false);
+    } catch (error) {
+      console.error('Error adding books to library:', error);
+    }
   };
 
   const handlePhotoUploadClose = () => {
@@ -70,7 +71,9 @@ const BookPickerApp = () => {
         <div className="flex items-center justify-center mt-4 text-sm">
           <div className="flex items-center space-x-1">
             <BookOpen size={16} className="text-purple-500" />
-            <span className="text-gray-700">47 books in your library</span>
+            <span className="text-gray-700">
+              {loading ? 'Loading...' : `${userStats.inQueue} books in your TBR pile`}
+            </span>
           </div>
         </div>
       </div>
@@ -114,10 +117,54 @@ const BookPickerApp = () => {
   );
 
   const SwipeScreen = () => {
-    const book = sampleBooks[currentBook];
+    if (loading) {
+      return (
+        <div className="min-h-screen bg-gradient-to-br from-purple-50 to-pink-50 p-4 flex items-center justify-center">
+          <div className="text-center">
+            <BookOpen size={48} className="mx-auto mb-4 text-purple-500 animate-pulse" />
+            <p className="text-gray-600">Loading your books...</p>
+          </div>
+        </div>
+      );
+    }
+
+    if (userBooks.length === 0) {
+      return (
+        <div className="min-h-screen bg-gradient-to-br from-purple-50 to-pink-50 p-4 flex items-center justify-center">
+          <div className="text-center">
+            <BookOpen size={48} className="mx-auto mb-4 text-gray-400" />
+            <h3 className="text-xl font-semibold text-gray-800 mb-2">No books in your TBR pile!</h3>
+            <p className="text-gray-600 mb-6">Add some books by taking a photo of your bookshelf</p>
+            <button
+              onClick={() => setShowPhotoUpload(true)}
+              className="bg-purple-600 text-white px-6 py-3 rounded-xl font-medium hover:bg-purple-700 transition-colors"
+            >
+              📸 Add Books from Photo
+            </button>
+          </div>
+        </div>
+      );
+    }
+
+    const book = userBooks[currentBook];
+    if (!book) {
+      return (
+        <div className="min-h-screen bg-gradient-to-br from-purple-50 to-pink-50 p-4 flex items-center justify-center">
+          <div className="text-center">
+            <p className="text-gray-600">No book selected</p>
+            <button 
+              onClick={() => setCurrentView('home')}
+              className="mt-4 text-purple-600 hover:text-purple-800"
+            >
+              ← Back to Home
+            </button>
+          </div>
+        </div>
+      );
+    }
     
     const handleSwipe = (direction) => {
-      setCurrentBook((prev) => (prev + 1) % sampleBooks.length);
+      setCurrentBook((prev) => (prev + 1) % userBooks.length);
     };
 
     return (
@@ -136,38 +183,43 @@ const BookPickerApp = () => {
 
         {/* Book Card */}
         <div className="relative mb-8">
-          <div className={`${book.cover} rounded-2xl p-6 text-white shadow-2xl h-96 flex flex-col justify-end relative overflow-hidden`}>
+          <div className="bg-gradient-to-br from-purple-500 to-pink-500 rounded-2xl p-6 text-white shadow-2xl h-96 flex flex-col justify-end relative overflow-hidden">
             {/* Subtle pattern overlay */}
             <div className="absolute inset-0 bg-black bg-opacity-20"></div>
             
             <div className="relative z-10">
               <div className="mb-4">
-                <div className="text-sm font-medium opacity-90 mb-1">{book.vibe}</div>
+                <div className="text-sm font-medium opacity-90 mb-1">📚 From your library</div>
                 <h3 className="text-2xl font-bold mb-1 leading-tight">{book.title}</h3>
                 <p className="text-lg opacity-90">by {book.author}</p>
               </div>
               
               <div className="flex items-center space-x-4 text-sm">
-                <div className="flex items-center space-x-1">
-                  <Clock size={16} />
-                  <span>{book.readTime}</span>
-                </div>
-                <div className="flex items-center space-x-1">
-                  <Star size={16} className="fill-current" />
-                  <span>{book.rating}</span>
-                </div>
+                {book.pages && (
+                  <div className="flex items-center space-x-1">
+                    <BookOpen size={16} />
+                    <span>{book.pages} pages</span>
+                  </div>
+                )}
+                {book.mood && (
+                  <span className="bg-white bg-opacity-20 px-2 py-1 rounded-full text-xs">
+                    {book.mood}
+                  </span>
+                )}
               </div>
             </div>
           </div>
 
-          {/* Genre & Mood Tags */}
+          {/* Status & Source Info */}
           <div className="flex space-x-2 mt-4">
             <span className="bg-white text-purple-700 px-3 py-1 rounded-full text-sm font-medium">
-              {book.genre}
+              To Read
             </span>
-            <span className="bg-purple-100 text-purple-700 px-3 py-1 rounded-full text-sm font-medium">
-              {book.mood}
-            </span>
+            {book.source && (
+              <span className="bg-purple-100 text-purple-700 px-3 py-1 rounded-full text-sm font-medium">
+                {book.source === 'claude_vision' ? '📸 From Photo' : book.source}
+              </span>
+            )}
           </div>
         </div>
 
