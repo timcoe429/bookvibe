@@ -21,6 +21,9 @@ class BookMatchingService {
 
     const potentialTitles = [];
     const processedTitles = new Set();
+    
+    // Common generic words that shouldn't be searched alone
+    const genericWords = new Set(['love', 'story', 'waiting', 'life', 'time', 'world', 'book', 'best', 'new']);
 
     for (const line of lines) {
       // Skip content that looks like an author's name (reduces false positives)
@@ -32,6 +35,12 @@ class BookMatchingService {
       
       for (const title of cleanedTitles) {
         const normalizedTitle = this.normalizeTitle(title);
+        
+        // Skip single generic words
+        const titleWords = normalizedTitle.split(' ');
+        if (titleWords.length === 1 && genericWords.has(titleWords[0].toLowerCase())) {
+          continue;
+        }
         
         // Avoid duplicates and very short titles
         if (normalizedTitle.length >= 3 && !processedTitles.has(normalizedTitle)) {
@@ -48,6 +57,11 @@ class BookMatchingService {
   extractTitlesFromLine(line) {
     const titles = [];
     
+    // Skip lines that are clearly just author names
+    if (this.looksLikePersonName(line)) {
+      return [];
+    }
+    
     // Remove common spine elements that aren't titles
     let cleaned = line
       .replace(/^(THE|A|AN)\s+/i, '') // Remove articles at start
@@ -56,19 +70,18 @@ class BookMatchingService {
       .replace(/\s+(PAPERBACK|HARDCOVER|EDITION)$/gi, '') // Remove format info
       .trim();
 
-    // Split on common separators that might indicate multiple titles
-    const separators = [' | ', ' / ', ' - ', '  '];
+    // Split on common separators that might indicate author/title split
+    const authorSeparators = [' by ', ' - ', ' / '];
     
-    for (const separator of separators) {
-      if (cleaned.includes(separator)) {
-        const parts = cleaned.split(separator);
-        for (const part of parts) {
-          const trimmed = part.trim();
-          if (this.isLikelyBookTitle(trimmed)) {
-            titles.push(trimmed);
-          }
+    for (const separator of authorSeparators) {
+      if (cleaned.toLowerCase().includes(separator)) {
+        // Take only the part before the separator (likely the title)
+        const parts = cleaned.split(new RegExp(separator, 'i'));
+        const titlePart = parts[0].trim();
+        if (this.isLikelyBookTitle(titlePart)) {
+          titles.push(titlePart);
+          return titles;
         }
-        return titles; // Return early if we found separators
       }
     }
 
@@ -241,19 +254,31 @@ class BookMatchingService {
   }
 
   looksLikePersonName(text) {
-    // e.g., "Simon Garfield", "Jack E. Davis", "Jonathan Franzen"
-    const tokens = text.trim().split(/\s+/);
-    if (tokens.length < 2 || tokens.length > 4) {
-      return false;
-    }
-    // At least two tokens should be capitalized like a name
-    let capitalizedCount = 0;
-    for (const t of tokens) {
-      if (/^[A-Z][a-z]+\.?$/.test(t) || /^[A-Z]\.$/.test(t)) {
-        capitalizedCount += 1;
+    // e.g., "Simon Garfield", "Jack E. Davis", "Jonathan Franzen", "MARK HADDON", "JIM COLLINS"
+    const cleaned = text.trim();
+    const tokens = cleaned.split(/\s+/);
+    
+    // Check various author name patterns
+    if (tokens.length === 2 || tokens.length === 3) {
+      // Check if it's all caps (common on book spines)
+      const allCapsName = tokens.every(t => /^[A-Z]+$/.test(t) && t.length > 1);
+      if (allCapsName) return true;
+      
+      // Check standard name pattern
+      let capitalizedCount = 0;
+      for (const t of tokens) {
+        if (/^[A-Z][a-z]+\.?$/.test(t) || /^[A-Z]\.$/.test(t)) {
+          capitalizedCount += 1;
+        }
       }
+      if (capitalizedCount >= 2) return true;
     }
-    return capitalizedCount >= 2;
+    
+    // Check for specific author indicators
+    const lower = cleaned.toLowerCase();
+    if (lower.includes(' by ') || lower.startsWith('by ')) return true;
+    
+    return false;
   }
 
   // Find book data by title using multiple APIs
@@ -285,8 +310,8 @@ class BookMatchingService {
   async searchGoogleBooks(title) {
     try {
       const query = encodeURIComponent(title);
-      // Fetch a few candidates and choose best match by token overlap
-      const url = `${this.googleBooksBaseUrl}?q=intitle:"${query}"&printType=books&orderBy=relevance&maxResults=5`;
+      // Use more specific query to avoid false matches
+      const url = `${this.googleBooksBaseUrl}?q="${query}"&printType=books&orderBy=relevance&maxResults=5`;
       const response = await axios.get(url, { timeout: 7000 });
 
       if (!response.data.items || response.data.items.length === 0) {
@@ -365,14 +390,32 @@ class BookMatchingService {
       // Final verification: ensure the result contains most of our query words
       const resultNormalized = this.normalizeTitle(book.title);
       let queryWordsInResult = 0;
+      let resultWordsInQuery = 0;
+      
+      // Check how many query words appear in result
       for (const qToken of normalizedQueryTokens) {
         if (resultNormalized.includes(qToken)) {
           queryWordsInResult++;
         }
       }
+      
+      // Also check how many result words appear in query (prevent author-based false matches)
+      const resultTokens = resultNormalized.split(' ').filter(Boolean);
+      for (const rToken of resultTokens) {
+        if (rToken.length > 2) { // Skip small words
+          const queryStr = normalizedQueryTokens.join(' ');
+          if (queryStr.includes(rToken)) {
+            resultWordsInQuery++;
+          }
+        }
+      }
+      
       const queryMatchRatio = queryWordsInResult / normalizedQueryTokens.length;
-      if (queryMatchRatio < 0.6) {
-        return null; // Too many query words missing from result
+      const resultMatchRatio = resultWordsInQuery / Math.max(1, resultTokens.filter(t => t.length > 2).length);
+      
+      // Require high match in both directions to prevent false associations
+      if (queryMatchRatio < 0.7 || resultMatchRatio < 0.5) {
+        return null; // Too much mismatch between query and result
       }
       
       return {
