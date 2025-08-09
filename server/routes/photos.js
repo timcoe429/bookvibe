@@ -3,6 +3,7 @@ const router = express.Router();
 const multer = require('multer');
 const visionService = require('../services/googleVisionService');
 const claudeVisionService = require('../services/claudeVisionService');
+const gpt5VisionService = require('../services/gpt5VisionService');
 const bookMatchingService = require('../services/bookMatchingService');
 
 // Simple debug endpoint to check environment variables and code version
@@ -21,6 +22,7 @@ router.get('/debug-env', (req, res) => {
   
   res.json({
     hasClaudeApiKey: !!process.env.CLAUDE_API_KEY,
+    hasOpenAIApiKey: !!process.env.OPENAI_API_KEY,
     hasGoogleApiKey: !!process.env.GOOGLE_CLOUD_VISION_API_KEY,
     hasGoogleCredentialsJson: !!process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON,
     hasGoogleProjectId: !!process.env.GOOGLE_CLOUD_PROJECT,
@@ -178,13 +180,23 @@ router.post('/upload', upload.single('photo'), async (req, res) => {
     let detectedBooks = [];
     
     try {
-      console.log('🚀 STARTING: Claude Vision book detection...');
-      detectedBooks = await claudeVisionService.extractBooksFromImage(req.file.buffer);
-      console.log('✅ CLAUDE: Detection completed successfully');
-    } catch (claudeError) {
-      console.error('❌ CLAUDE: Vision failed, falling back to Google Vision:', claudeError);
+      console.log('🚀 STARTING: GPT-5 Vision book detection...');
+      detectedBooks = await gpt5VisionService.extractBooksFromImage(req.file.buffer);
+      console.log('✅ GPT-5: Detection completed successfully');
+      visionService = 'GPT-5 Vision API';
+    } catch (gpt5Error) {
+      console.error('❌ GPT-5: Vision failed, falling back to Claude Vision:', gpt5Error);
       
-      // Fallback to Google Vision if Claude fails
+      // Fallback to Claude Vision if GPT-5 fails
+      try {
+        console.log('🔄 FALLBACK: Claude Vision book detection...');
+        detectedBooks = await claudeVisionService.extractBooksFromImage(req.file.buffer);
+        console.log('✅ CLAUDE: Detection completed successfully');
+        visionService = 'Claude Vision API (fallback)';
+      } catch (claudeError) {
+        console.error('❌ CLAUDE: Vision also failed, falling back to Google Vision:', claudeError);
+        
+        // Final fallback to Google Vision if both AI services fail
       const extractedText = await visionService.extractTextFromImage(req.file.buffer);
       
       if (!extractedText || extractedText.length === 0) {
@@ -252,7 +264,7 @@ router.post('/upload', upload.single('photo'), async (req, res) => {
       processing: {
         detectedByVision: detectedBooks.length,
         totalBooks: matchedBooks.length,
-        visionService: 'Claude Vision API',
+                  visionService: visionService || 'GPT-5 Vision API',
         databaseLookup: 'disabled - using direct detection only'
       }
     });
