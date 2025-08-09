@@ -175,15 +175,16 @@ router.post('/upload', upload.single('photo'), async (req, res) => {
       return res.status(400).json({ error: 'Session ID required' });
     }
 
-    // Step 1: Extract books from image using Claude Vision API
-    console.log('Processing image with Claude Vision API...');
+    // Step 1: Extract books from image using AI Vision APIs
+    console.log('Processing image with AI Vision APIs...');
     let detectedBooks = [];
+    let visionServiceName = 'Unknown';
     
     try {
       console.log('🚀 STARTING: GPT-5 Vision book detection...');
       detectedBooks = await gpt5VisionService.extractBooksFromImage(req.file.buffer);
       console.log('✅ GPT-5: Detection completed successfully');
-      visionService = 'GPT-5 Vision API';
+      visionServiceName = 'GPT-5 Vision API';
     } catch (gpt5Error) {
       console.error('❌ GPT-5: Vision failed, falling back to Claude Vision:', gpt5Error);
       
@@ -192,7 +193,7 @@ router.post('/upload', upload.single('photo'), async (req, res) => {
         console.log('🔄 FALLBACK: Claude Vision book detection...');
         detectedBooks = await claudeVisionService.extractBooksFromImage(req.file.buffer);
         console.log('✅ CLAUDE: Detection completed successfully');
-        visionService = 'Claude Vision API (fallback)';
+        visionServiceName = 'Claude Vision API (fallback)';
       } catch (claudeError) {
         console.error('❌ CLAUDE: Vision also failed, falling back to Google Vision:', claudeError);
         
@@ -224,7 +225,7 @@ router.post('/upload', upload.single('photo'), async (req, res) => {
             author: null,
             spine_text: title
           }));
-          visionService = 'Google Vision OCR (final fallback)';
+          visionServiceName = 'Google Vision OCR (final fallback)';
         } catch (googleError) {
           console.error('❌ ALL VISION SERVICES FAILED:', googleError);
           return res.status(500).json({
@@ -274,7 +275,7 @@ router.post('/upload', upload.single('photo'), async (req, res) => {
       processing: {
         detectedByVision: detectedBooks.length,
         totalBooks: matchedBooks.length,
-                  visionService: visionService || 'GPT-5 Vision API',
+                  visionService: visionServiceName,
         databaseLookup: 'disabled - using direct detection only'
       }
     });

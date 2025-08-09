@@ -90,7 +90,10 @@ Count very carefully and respond with ONLY the number of distinct book spines yo
 
     const countText = response.data.content[0].text.trim();
     console.log(`🔢 CLAUDE: Count response: "${countText}"`);
-    const count = parseInt(countText);
+    
+    // Extract the highest number from the response (likely the final count)
+    const numbers = countText.match(/\d+/g);
+    const count = numbers ? Math.max(...numbers.map(n => parseInt(n))) : 5;
     const finalCount = isNaN(count) ? 5 : count;
     console.log(`🔢 CLAUDE: Parsed count: ${finalCount}`);
     return finalCount;

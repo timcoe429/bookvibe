@@ -26,7 +26,7 @@ class GPT5VisionService {
     const response = await axios.post(
       this.apiUrl,
       {
-        model: 'gpt-5-turbo',
+        model: 'gpt-4o',
         max_tokens: 100,
         messages: [
           {
@@ -100,7 +100,7 @@ Respond with ONLY the number of distinct book spines you can identify.`
     const response = await axios.post(
       this.apiUrl,
       {
-        model: 'gpt-5-turbo',
+        model: 'gpt-4o',
         max_tokens: 2000,
         messages: [
           {
