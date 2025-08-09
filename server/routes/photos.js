@@ -163,9 +163,24 @@ router.post('/upload', upload.single('photo'), async (req, res) => {
       });
     }
 
-    // Step 2: Parse potential book titles from extracted text
+    // Step 2: Parse potential book titles from extracted text and spatial blocks
     console.log('Parsing book titles from extracted text...');
-    const potentialTitles = bookMatchingService.parseBookTitles(extractedText);
+    let potentialTitles = bookMatchingService.parseBookTitles(extractedText);
+
+    // Try to use structured text blocks when available for better spine grouping
+    try {
+      const structured = await visionService.extractStructuredText(req.file.buffer);
+      if (structured && Array.isArray(structured.blocks)) {
+        const fromBlocks = bookMatchingService.extractTitlesFromBlocks(structured.blocks);
+        const merged = new Set([
+          ...potentialTitles.map(t => bookMatchingService.normalizeTitle(t)),
+          ...fromBlocks.map(t => bookMatchingService.normalizeTitle(t))
+        ]);
+        potentialTitles = [...merged];
+      }
+    } catch (e) {
+      // Non-fatal; continue with text-only candidates
+    }
     
     if (potentialTitles.length === 0) {
       return res.status(400).json({ 

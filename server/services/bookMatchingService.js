@@ -140,6 +140,108 @@ class BookMatchingService {
       .trim();
   }
 
+  // Extract candidate titles by grouping OCR blocks into vertical spines
+  extractTitlesFromBlocks(blocks) {
+    if (!Array.isArray(blocks) || blocks.length === 0) {
+      return [];
+    }
+
+    const toBox = (b) => {
+      const bb = b.boundingBox || b.boundingPoly || b.bounding_box || {};
+      const v = bb.vertices || bb.normalizedVertices || bb.points || [];
+      if (!Array.isArray(v) || v.length === 0) {
+        return { minX: 0, maxX: 0, minY: 0, maxY: 0 };
+      }
+      const xs = v.map(p => p.x || 0);
+      const ys = v.map(p => p.y || 0);
+      return {
+        minX: Math.min(...xs),
+        maxX: Math.max(...xs),
+        minY: Math.min(...ys),
+        maxY: Math.max(...ys)
+      };
+    };
+
+    const items = blocks
+      .filter(b => (b.text || '').trim().length > 0)
+      .map(b => {
+        const box = toBox(b);
+        const centerX = (box.minX + box.maxX) / 2;
+        const centerY = (box.minY + box.maxY) / 2;
+        const width = Math.max(1, box.maxX - box.minX);
+        return { text: b.text.trim(), confidence: b.confidence || 0, box, centerX, centerY, width };
+      })
+      .sort((a, b) => a.centerX - b.centerX);
+
+    if (items.length === 0) return [];
+
+    // Estimate a reasonable gap to split spines using median width
+    const widths = items.map(i => i.width).sort((a, b) => a - b);
+    const medianWidth = widths[Math.floor(widths.length / 2)] || 40;
+    const columnGap = Math.max(40, Math.floor(medianWidth * 0.6));
+
+    // Group into vertical columns (spines)
+    const spines = [];
+    for (const it of items) {
+      const last = spines[spines.length - 1];
+      if (!last) {
+        spines.push([it]);
+      } else {
+        const lastCenterX = last[last.length - 1].centerX;
+        if (Math.abs(it.centerX - lastCenterX) <= columnGap) {
+          last.push(it);
+        } else {
+          spines.push([it]);
+        }
+      }
+    }
+
+    // For each spine, join blocks from top to bottom and extract likely titles
+    const candidates = [];
+    for (const spine of spines) {
+      const sorted = spine.sort((a, b) => a.centerY - b.centerY);
+      const spineText = sorted.map(s => s.text).join(' ').replace(/\s+/g, ' ').trim();
+      if (!spineText) continue;
+
+      // Try extracting from the whole spine text
+      const local = this.extractTitlesFromLine(spineText);
+      for (const t of local) {
+        if (this.isLikelyBookTitle(t)) {
+          candidates.push(t);
+        }
+      }
+    }
+
+    // Deduplicate and return
+    const seen = new Set();
+    const unique = [];
+    for (const c of candidates) {
+      const n = this.normalizeTitle(c);
+      if (!seen.has(n)) {
+        seen.add(n);
+        unique.push(c);
+      }
+    }
+
+    return unique.slice(0, 50);
+  }
+
+  // Merge, dedupe and score candidates from multiple sources
+  mergeCandidateLists(...lists) {
+    const counts = new Map();
+    for (const list of lists) {
+      for (const t of list || []) {
+        const n = this.normalizeTitle(t);
+        counts.set(n, (counts.get(n) || 0) + 1);
+      }
+    }
+    return [...counts.entries()]
+      .sort((a, b) => b[1] - a[1])
+      .map(([n]) => n)
+      .map(n => n) // already normalized; callers can look up original if needed
+      .slice(0, 50);
+  }
+
   looksLikePersonName(text) {
     // e.g., "Simon Garfield", "Jack E. Davis", "Jonathan Franzen"
     const tokens = text.trim().split(/\s+/);
