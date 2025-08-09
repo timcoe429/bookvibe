@@ -36,13 +36,26 @@ class GoogleVisionService {
       }
     ];
 
-    const { data } = await axios.post(endpoint, { requests }, { timeout: 20000 });
+    try {
+      const { data } = await axios.post(endpoint, { requests }, { timeout: 20000 });
 
-    if (!data.responses || !data.responses[0]) {
-      throw new Error('Empty response from Vision API');
+      if (!data.responses || !data.responses[0]) {
+        const error = new Error('Empty response from Vision API');
+        error.code = 'EMPTY_RESPONSE';
+        throw error;
+      }
+
+      return data.responses[0];
+    } catch (err) {
+      // Bubble up helpful error info for debugging 403/401/etc
+      const details = err.response?.data?.error || {};
+      const message = details.message || err.message || 'Vision API request failed';
+      const error = new Error(`Vision API error: ${message}`);
+      error.code = details.code || err.code;
+      error.status = err.response?.status;
+      error.details = details;
+      throw error;
     }
-
-    return data.responses[0];
   }
 
   async extractTextFromImage(imageBuffer) {
