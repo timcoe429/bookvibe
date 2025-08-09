@@ -1,42 +1,64 @@
 const vision = require('@google-cloud/vision');
+const axios = require('axios');
 
 class GoogleVisionService {
   constructor() {
-    // Initialize the client with environment-based authentication
-    // Option 1: Use API key (simpler for development)
-    if (process.env.GOOGLE_CLOUD_VISION_API_KEY) {
-      this.client = new vision.ImageAnnotatorClient({
-        apiKey: process.env.GOOGLE_CLOUD_VISION_API_KEY
-      });
-    } 
-    // Option 2: Use service account credentials from environment variables
-    else if (process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON) {
-      const credentials = JSON.parse(process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON);
-      this.client = new vision.ImageAnnotatorClient({
-        credentials: credentials,
-        projectId: credentials.project_id
-      });
+    // We support two auth strategies:
+    // 1) Service Account via client libraries
+    // 2) API Key via REST (works well on Railway)
+
+    this.useRestWithApiKey = Boolean(process.env.GOOGLE_CLOUD_VISION_API_KEY);
+
+    if (!this.useRestWithApiKey) {
+      if (process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON) {
+        const credentials = JSON.parse(process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON);
+        this.client = new vision.ImageAnnotatorClient({
+          credentials,
+          projectId: credentials.project_id
+        });
+      } else if (process.env.GOOGLE_CLOUD_PROJECT) {
+        this.client = new vision.ImageAnnotatorClient({
+          projectId: process.env.GOOGLE_CLOUD_PROJECT
+        });
+      } else {
+        throw new Error('Google Vision API authentication not configured. Set GOOGLE_CLOUD_VISION_API_KEY (recommended for Railway) or GOOGLE_APPLICATION_CREDENTIALS_JSON.');
+      }
     }
-    // Option 3: Use default Google Cloud authentication (for GCP environments)
-    else if (process.env.GOOGLE_CLOUD_PROJECT) {
-      this.client = new vision.ImageAnnotatorClient({
-        projectId: process.env.GOOGLE_CLOUD_PROJECT
-      });
+  }
+
+  async callRestAnnotate(features, imageBuffer) {
+    const apiKey = process.env.GOOGLE_CLOUD_VISION_API_KEY;
+    const endpoint = `https://vision.googleapis.com/v1/images:annotate?key=${apiKey}`;
+    const requests = [
+      {
+        image: { content: imageBuffer.toString('base64') },
+        features
+      }
+    ];
+
+    const { data } = await axios.post(endpoint, { requests }, { timeout: 20000 });
+
+    if (!data.responses || !data.responses[0]) {
+      throw new Error('Empty response from Vision API');
     }
-    else {
-      throw new Error('Google Vision API authentication not configured. Please set GOOGLE_CLOUD_VISION_API_KEY, GOOGLE_APPLICATION_CREDENTIALS_JSON, or GOOGLE_CLOUD_PROJECT environment variable.');
-    }
+
+    return data.responses[0];
   }
 
   async extractTextFromImage(imageBuffer) {
     try {
       console.log('Sending image to Google Vision API...');
       
-      const [result] = await this.client.textDetection({
-        image: { content: imageBuffer }
-      });
-
-      const detections = result.textAnnotations;
+      let detections;
+      if (this.useRestWithApiKey) {
+        const resp = await this.callRestAnnotate([
+          { type: 'TEXT_DETECTION' }
+        ], imageBuffer);
+        detections = resp.textAnnotations || [];
+      } else {
+        const [result] = await this.client.textDetection({ image: { content: imageBuffer } });
+        detections = result.textAnnotations;
+      }
       
       if (!detections || detections.length === 0) {
         console.log('No text detected in image');
@@ -67,11 +89,16 @@ class GoogleVisionService {
     try {
       console.log('Performing document text detection...');
       
-      const [result] = await this.client.documentTextDetection({
-        image: { content: imageBuffer }
-      });
-
-      const fullTextAnnotation = result.fullTextAnnotation;
+      let fullTextAnnotation;
+      if (this.useRestWithApiKey) {
+        const resp = await this.callRestAnnotate([
+          { type: 'DOCUMENT_TEXT_DETECTION' }
+        ], imageBuffer);
+        fullTextAnnotation = resp.fullTextAnnotation;
+      } else {
+        const [result] = await this.client.documentTextDetection({ image: { content: imageBuffer } });
+        fullTextAnnotation = result.fullTextAnnotation;
+      }
       
       if (!fullTextAnnotation) {
         return { text: '', blocks: [] };
@@ -109,11 +136,16 @@ class GoogleVisionService {
     try {
       console.log('Detecting objects in image...');
       
-      const [result] = await this.client.objectLocalization({
-        image: { content: imageBuffer }
-      });
-
-      const objects = result.localizedObjectAnnotations;
+      let objects;
+      if (this.useRestWithApiKey) {
+        const resp = await this.callRestAnnotate([
+          { type: 'OBJECT_LOCALIZATION' }
+        ], imageBuffer);
+        objects = resp.localizedObjectAnnotations || [];
+      } else {
+        const [result] = await this.client.objectLocalization({ image: { content: imageBuffer } });
+        objects = result.localizedObjectAnnotations;
+      }
       
       // Filter for book-related objects
       const bookObjects = objects.filter(obj => 
