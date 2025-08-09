@@ -73,7 +73,13 @@ app.get('/health', (req, res) => {
   res.status(200).json({ status: 'OK', message: 'Server running' });
 });
 
-// Add a catch-all to see ALL requests
+// Health check alias under /api to match client base URL
+app.get('/api/health', (req, res) => {
+  console.log('🏥 API HEALTH CHECK HIT!');
+  res.status(200).json({ status: 'OK', message: 'Server running' });
+});
+
+// Add a catch-all logger to see ALL requests (before static/SPA serving)
 app.use('*', (req, res, next) => {
   console.log(`📋 INCOMING: ${req.method} ${req.originalUrl}`);
   next();
@@ -100,6 +106,12 @@ if (process.env.NODE_ENV === 'production') {
     res.json({ message: 'API server running', path: req.url });
   });
 }
+
+// Final 404 handler for unmatched routes (API only)
+app.use('/api/*', (req, res) => {
+  console.log(`❌ 404 - Route not found: ${req.method} ${req.originalUrl}`);
+  res.status(404).json({ error: 'Route not found' });
+});
 
 // Database connection and server start
 const PORT = process.env.PORT || 5000;

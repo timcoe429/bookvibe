@@ -44,10 +44,6 @@ app.use((err, req, res, next) => {
   });
 });
 
-// 404 handler
-app.use('*', (req, res) => {
-  console.log(`❌ 404 - Route not found: ${req.method} ${req.url}`);
-  res.status(404).json({ error: 'Route not found' });
-});
+// Note: 404 handler is registered in server.js AFTER all routes are mounted
 
 module.exports = app;
