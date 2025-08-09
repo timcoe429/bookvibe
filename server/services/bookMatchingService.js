@@ -102,10 +102,28 @@ class BookMatchingService {
       }
     }
 
+    // Exclude lines containing common publisher/imprint or non-title indicators
+    const lower = text.toLowerCase();
+    const nonTitleIndicators = [
+      'knopf', 'vintage', 'doran', 'chronicle books', 'chronicle',
+      'lyons', 'carnahan', 'wylie', 'press', 'edition', 'editions',
+      'museum', 'smithsonian', 'bulletin', 'dictionary', 'webster',
+      'random house', 'merriam', 'pocket', 'grammar', 'usage', 'punctuation',
+      'zone', 'guide', 'study', 'summary', 'analysis'
+    ];
+    for (const k of nonTitleIndicators) {
+      if (lower.includes(k)) {
+        return false;
+      }
+    }
+
     // Heuristics to reduce false positives:
     // - Prefer at least 2 words OR a long single word (>= 6)
     // - Avoid lines that look like a person name (handled earlier)
     const wordCount = text.split(/\s+/).length;
+    if (wordCount < 2) {
+      return false;
+    }
     const hasLetters = /[a-zA-Z]/.test(text);
     const hasReasonableLength = text.length >= 3 && text.length <= 80;
     const notAllCaps = text !== text.toUpperCase() || wordCount <= 3;
@@ -168,14 +186,14 @@ class BookMatchingService {
     try {
       const query = encodeURIComponent(title);
       // Fetch a few candidates and choose best match by token overlap
-      const url = `${this.googleBooksBaseUrl}?q=intitle:"${query}"&printType=books&orderBy=relevance&maxResults=3`;
+      const url = `${this.googleBooksBaseUrl}?q=intitle:"${query}"&printType=books&orderBy=relevance&maxResults=5`;
       const response = await axios.get(url, { timeout: 7000 });
 
       if (!response.data.items || response.data.items.length === 0) {
         return null;
       }
 
-      const normalizedQueryTokens = this.normalizeTitle(title).split(' ');
+      const normalizedQueryTokens = this.normalizeTitle(title).split(' ').filter(Boolean);
       const isQueryShort = normalizedQueryTokens.length < 2;
       
       let best = null;
@@ -184,11 +202,23 @@ class BookMatchingService {
       for (const item of response.data.items) {
         const book = item.volumeInfo;
         const resultTitle = book.title || '';
-        const normalizedResultTokens = this.normalizeTitle(resultTitle).split(' ');
+        const normalizedResultTokens = this.normalizeTitle(resultTitle).split(' ').filter(Boolean);
 
         // Reject summaries/study guides/companions
         const lowered = resultTitle.toLowerCase();
-        if (lowered.startsWith('summary of') || lowered.includes('study guide') || lowered.includes('analysis of')) {
+        if (
+          lowered.startsWith('summary of') ||
+          lowered.includes('study guide') ||
+          lowered.includes('analysis of') ||
+          lowered.includes('summary and analysis') ||
+          lowered.includes('companion to') ||
+          lowered.includes('sparknotes') ||
+          lowered.includes('cliff notes') ||
+          lowered.includes('cliffsnotes') ||
+          lowered.includes('workbook') ||
+          lowered.includes("author's guide") ||
+          lowered.includes('teacher guide')
+        ) {
           continue;
         }
 
@@ -201,6 +231,10 @@ class BookMatchingService {
         }
         const union = new Set([...setQ, ...setR]).size || 1;
         const score = intersection / union;
+        const minCommonTokens = normalizedQueryTokens.length >= 2 ? 2 : 1;
+        if (intersection < minCommonTokens) {
+          continue;
+        }
 
         // For very short queries (1 word), require exact word match and minimum length
         if (isQueryShort) {
@@ -219,7 +253,7 @@ class BookMatchingService {
       }
 
       // Require a reasonable similarity to accept
-      const acceptanceThreshold = normalizedQueryTokens.length >= 2 ? 0.4 : 0.8;
+      const acceptanceThreshold = normalizedQueryTokens.length >= 2 ? 0.55 : 0.9;
       if (!best || bestScore < acceptanceThreshold) {
         return null;
       }
