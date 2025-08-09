@@ -104,7 +104,7 @@ const BookPickerApp = () => {
           🎲 Pick My Next Read!
         </button>
         <button className="w-full bg-white text-gray-700 p-4 rounded-xl font-medium border-2 border-gray-200 hover:border-purple-300 transition-all">
-          📚 Browse My Library (47)
+          📚 Browse My Library ({loading ? '...' : userStats.totalBooks || 0})
         </button>
         <button 
           onClick={() => setShowPhotoUpload(true)}

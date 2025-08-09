@@ -48,6 +48,10 @@ const Book = sequelize.define('Book', {
   publicationYear: {
     type: DataTypes.INTEGER,
     field: 'publication_year'
+  },
+  spineText: {
+    type: DataTypes.TEXT,
+    field: 'spine_text'
   }
 }, {
   tableName: 'books',

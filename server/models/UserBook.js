@@ -47,7 +47,7 @@ const UserBook = sequelize.define('UserBook', {
     field: 'date_finished'
   },
   source: {
-    type: DataTypes.ENUM('goodreads', 'photo', 'manual'),
+    type: DataTypes.ENUM('goodreads', 'photo', 'manual', 'claude_vision'),
     defaultValue: 'manual'
   }
 }, {
