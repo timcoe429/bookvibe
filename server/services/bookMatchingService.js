@@ -23,6 +23,11 @@ class BookMatchingService {
     const processedTitles = new Set();
 
     for (const line of lines) {
+      // Skip content that looks like an author's name (reduces false positives)
+      if (this.looksLikePersonName(line)) {
+        continue;
+      }
+
       const cleanedTitles = this.extractTitlesFromLine(line);
       
       for (const title of cleanedTitles) {
@@ -97,13 +102,16 @@ class BookMatchingService {
       }
     }
 
-    // Positive indicators
+    // Heuristics to reduce false positives:
+    // - Prefer at least 2 words OR a long single word (>= 6)
+    // - Avoid lines that look like a person name (handled earlier)
     const wordCount = text.split(/\s+/).length;
     const hasLetters = /[a-zA-Z]/.test(text);
     const hasReasonableLength = text.length >= 3 && text.length <= 80;
     const notAllCaps = text !== text.toUpperCase() || wordCount <= 3;
+    const enoughWordsOrLength = wordCount >= 2 || text.length >= 6;
 
-    return hasLetters && hasReasonableLength && notAllCaps;
+    return hasLetters && hasReasonableLength && notAllCaps && enoughWordsOrLength;
   }
 
   normalizeTitle(title) {
@@ -112,6 +120,22 @@ class BookMatchingService {
       .replace(/[^\w\s]/g, '') // Remove punctuation
       .replace(/\s+/g, ' ') // Normalize spaces
       .trim();
+  }
+
+  looksLikePersonName(text) {
+    // e.g., "Simon Garfield", "Jack E. Davis", "Jonathan Franzen"
+    const tokens = text.trim().split(/\s+/);
+    if (tokens.length < 2 || tokens.length > 4) {
+      return false;
+    }
+    // At least two tokens should be capitalized like a name
+    let capitalizedCount = 0;
+    for (const t of tokens) {
+      if (/^[A-Z][a-z]+\.?$/.test(t) || /^[A-Z]\.$/.test(t)) {
+        capitalizedCount += 1;
+      }
+    }
+    return capitalizedCount >= 2;
   }
 
   // Find book data by title using multiple APIs
@@ -143,16 +167,64 @@ class BookMatchingService {
   async searchGoogleBooks(title) {
     try {
       const query = encodeURIComponent(title);
-      const url = `${this.googleBooksBaseUrl}?q=intitle:"${query}"&maxResults=1`;
-      
-      const response = await axios.get(url, { timeout: 5000 });
-      
+      // Fetch a few candidates and choose best match by token overlap
+      const url = `${this.googleBooksBaseUrl}?q=intitle:"${query}"&printType=books&orderBy=relevance&maxResults=3`;
+      const response = await axios.get(url, { timeout: 7000 });
+
       if (!response.data.items || response.data.items.length === 0) {
         return null;
       }
 
-      const book = response.data.items[0].volumeInfo;
+      const normalizedQueryTokens = this.normalizeTitle(title).split(' ');
+      const isQueryShort = normalizedQueryTokens.length < 2;
       
+      let best = null;
+      let bestScore = 0;
+
+      for (const item of response.data.items) {
+        const book = item.volumeInfo;
+        const resultTitle = book.title || '';
+        const normalizedResultTokens = this.normalizeTitle(resultTitle).split(' ');
+
+        // Reject summaries/study guides/companions
+        const lowered = resultTitle.toLowerCase();
+        if (lowered.startsWith('summary of') || lowered.includes('study guide') || lowered.includes('analysis of')) {
+          continue;
+        }
+
+        // Compute token overlap score (Jaccard)
+        const setQ = new Set(normalizedQueryTokens);
+        const setR = new Set(normalizedResultTokens);
+        let intersection = 0;
+        for (const t of setQ) {
+          if (setR.has(t)) intersection += 1;
+        }
+        const union = new Set([...setQ, ...setR]).size || 1;
+        const score = intersection / union;
+
+        // For very short queries (1 word), require exact word match and minimum length
+        if (isQueryShort) {
+          if (normalizedQueryTokens[0].length < 4) {
+            continue; // too short, likely an author/word
+          }
+          if (!setR.has(normalizedQueryTokens[0])) {
+            continue;
+          }
+        }
+
+        if (score > bestScore) {
+          bestScore = score;
+          best = item;
+        }
+      }
+
+      // Require a reasonable similarity to accept
+      const acceptanceThreshold = normalizedQueryTokens.length >= 2 ? 0.4 : 0.8;
+      if (!best || bestScore < acceptanceThreshold) {
+        return null;
+      }
+
+      const book = best.volumeInfo;
       return {
         title: book.title,
         author: book.authors ? book.authors.join(', ') : 'Unknown Author',
@@ -165,9 +237,8 @@ class BookMatchingService {
         genre: book.categories ? book.categories[0] : null,
         mood: this.inferMoodFromGenre(book.categories?.[0] || ''),
         averageRating: book.averageRating || null,
-        publicationYear: book.publishedDate ? 
-          parseInt(book.publishedDate.split('-')[0]) : null,
-        googleBooksId: response.data.items[0].id
+        publicationYear: book.publishedDate ? parseInt(book.publishedDate.split('-')[0]) : null,
+        googleBooksId: best.id
       };
     } catch (error) {
       console.error(`Google Books API error for "${title}":`, error.message);
