@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { Camera, Upload, CheckCircle, X, AlertCircle, Loader } from 'lucide-react';
-import { photoAPI, isValidImageFile, formatFileSize, handleAPIError } from '../services/api';
+import { photoAPI, userAPI, isValidImageFile, formatFileSize, handleAPIError } from '../services/api';
 
 const PhotoUpload = ({ onBooksDetected, onClose }) => {
   const [uploadState, setUploadState] = useState('idle'); // idle, uploading, processing, results, confirming
@@ -115,23 +115,26 @@ const PhotoUpload = ({ onBooksDetected, onClose }) => {
 
     try {
       const selectedBookIds = Array.from(selectedBooks);
-      const result = await photoAPI.confirmBooks(detectedBooks, selectedBookIds);
       
-      console.log('Books confirmation result:', result);
+      // Filter detected books to only selected ones
+      const selectedBooksData = detectedBooks.filter(book => {
+        const identifier = book.id || book.title;
+        return selectedBookIds.includes(identifier);
+      });
+
+      // Use the bulk import API directly
+      const result = await userAPI.bulkImport(selectedBooksData);
       
-      if (result.success) {
-        // Notify parent component
-        if (onBooksDetected) {
-          onBooksDetected(result.importedBooks);
-        }
-        
-        // Close the upload modal
-        if (onClose) {
-          onClose();
-        }
-      } else {
-        setError(result.error || 'Failed to add books to your library');
-        setUploadState('results');
+      console.log('Books import result:', result);
+      
+      // Notify parent component with the imported books
+      if (onBooksDetected) {
+        onBooksDetected(selectedBooksData);
+      }
+      
+      // Close the upload modal
+      if (onClose) {
+        onClose();
       }
     } catch (err) {
       console.error('Book confirmation failed:', err);
