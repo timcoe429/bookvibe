@@ -12,109 +12,16 @@ class ClaudeVisionService {
     }
     
     try {
-      console.log('Sending image to Claude Vision API...');
+      console.log('Using multi-step book detection with Claude...');
       
-      // Convert image buffer to base64
-      const base64Image = imageBuffer.toString('base64');
+      // Step 1: Count books first
+      const bookCount = await this.countBooks(imageBuffer);
+      console.log(`Claude detected ${bookCount} books in the image`);
       
-      // Determine image type from buffer
-      let mediaType = 'image/jpeg';
-      if (imageBuffer[0] === 0x89 && imageBuffer[1] === 0x50) {
-        mediaType = 'image/png';
-      } else if (imageBuffer[0] === 0x47 && imageBuffer[1] === 0x49) {
-        mediaType = 'image/gif';
-      } else if (imageBuffer[0] === 0x52 && imageBuffer[1] === 0x49) {
-        mediaType = 'image/webp';
-      }
+      // Step 2: Extract each book with the count as context
+      const books = await this.extractWithCount(imageBuffer, bookCount);
       
-      const response = await axios.post(
-        this.apiUrl,
-        {
-          model: 'claude-3-5-sonnet-20241022', // Sonnet is more accurate for detailed vision tasks
-          max_tokens: 1000,
-          messages: [
-            {
-              role: 'user',
-              content: [
-                {
-                  type: 'image',
-                  source: {
-                    type: 'base64',
-                    media_type: mediaType,
-                    data: base64Image
-                  }
-                },
-                {
-                  type: 'text',
-                  text: `Look at this image carefully and identify ALL the books you can see. These are book spines stacked on top of each other.
-
-I can see multiple books in this stack. Please examine each book spine from top to bottom and identify:
-1. The title (main text, usually largest)
-2. The author name (if visible)
-3. Any publisher information
-
-Look carefully at each individual book spine - don't miss any books in the stack.
-
-Return ONLY a JSON array with ALL books you can identify. Format:
-[
-  {"title": "Museums in a Troubled World", "author": "Robert R. Janes", "spine_text": "Museums in a Troubled World Robert R. Janes"},
-  {"title": "Letting Go", "author": "Author Name", "spine_text": "Letting Go Sharing Historical Authority in a User-Generated World"},
-  {"title": "Engaging Art", "author": null, "spine_text": "ENGAGING ART"}
-]
-
-Be thorough - examine each book spine individually. Return an empty array [] only if you truly cannot see any books.`
-                }
-              ]
-            }
-          ]
-        },
-        {
-          headers: {
-            'x-api-key': this.apiKey,
-            'anthropic-version': '2023-06-01',
-            'content-type': 'application/json'
-          },
-          timeout: 30000
-        }
-      );
-
-      const content = response.data.content[0].text;
-      console.log('Claude response:', content);
-      
-      // Try to parse the JSON response
-      try {
-        // Extract JSON array from the response (in case there's any extra text)
-        const jsonMatch = content.match(/\[[\s\S]*\]/);
-        if (!jsonMatch) {
-          console.error('No JSON array found in Claude response');
-          return [];
-        }
-        
-        const books = JSON.parse(jsonMatch[0]);
-        
-        // Validate and clean the response
-        if (!Array.isArray(books)) {
-          console.error('Claude response is not an array');
-          return [];
-        }
-        
-        // Ensure each book has required fields
-        const validBooks = books.filter(book => 
-          book && typeof book === 'object' && book.title
-        ).map(book => ({
-          title: book.title.trim(),
-          author: book.author ? book.author.trim() : null,
-          spine_text: book.spine_text ? book.spine_text.trim() : book.title.trim()
-        }));
-        
-        console.log(`Successfully extracted ${validBooks.length} books from image`);
-        return validBooks;
-        
-      } catch (parseError) {
-        console.error('Failed to parse Claude response as JSON:', parseError);
-        console.error('Response was:', content);
-        return [];
-      }
+      return books;
       
     } catch (error) {
       console.error('Claude Vision API error:', error.response?.data || error.message);
@@ -129,6 +36,165 @@ Be thorough - examine each book spine individually. Return an empty array [] onl
       
       throw new Error(`Claude Vision API error: ${error.message}`);
     }
+  }
+
+  async countBooks(imageBuffer) {
+    const base64Image = imageBuffer.toString('base64');
+    const mediaType = this.getMediaType(imageBuffer);
+    
+    const response = await axios.post(
+      this.apiUrl,
+      {
+        model: 'claude-3-5-sonnet-20241022',
+        max_tokens: 100,
+        messages: [
+          {
+            role: 'user',
+            content: [
+              {
+                type: 'image',
+                source: {
+                  type: 'base64',
+                  media_type: mediaType,
+                  data: base64Image
+                }
+              },
+              {
+                type: 'text',
+                text: `This is a photograph of physical books. The books are stacked horizontally on top of each other, with their spines facing the camera. Each book spine contains the title and often the author's name.
+
+Count how many individual book spines you can see in this stack. Look at the image from top to bottom - each horizontal band/layer is typically one book. Some books may be thicker or thinner than others.
+
+Count carefully and respond with ONLY the number of distinct book spines you can identify.`
+              }
+            ]
+          }
+        ]
+      },
+      {
+        headers: {
+          'x-api-key': this.apiKey,
+          'anthropic-version': '2023-06-01',
+          'content-type': 'application/json'
+        },
+        timeout: 20000
+      }
+    );
+
+    const countText = response.data.content[0].text.trim();
+    const count = parseInt(countText);
+    return isNaN(count) ? 5 : count; // Default to 5 if parsing fails
+  }
+
+  async extractWithCount(imageBuffer, expectedCount) {
+    const base64Image = imageBuffer.toString('base64');
+    const mediaType = this.getMediaType(imageBuffer);
+    
+    const response = await axios.post(
+      this.apiUrl,
+      {
+        model: 'claude-3-5-sonnet-20241022',
+        max_tokens: 1500,
+        messages: [
+          {
+            role: 'user',
+            content: [
+              {
+                type: 'image',
+                source: {
+                  type: 'base64',
+                  media_type: mediaType,
+                  data: base64Image
+                }
+              },
+              {
+                type: 'text',
+                text: `This is a photograph of ${expectedCount} physical books stacked horizontally. The books are lying flat with their spines facing the camera. You need to identify ALL ${expectedCount} books.
+
+IMPORTANT CONTEXT:
+- These are book spines viewed from the side
+- Books are stacked one on top of another
+- Each horizontal band/layer in the image represents one book
+- Text runs horizontally across each spine
+- Book titles are usually the largest/most prominent text
+- Author names are typically smaller and may be at either end of the spine
+- Publisher logos/names may also be visible
+
+TASK: Examine the image from TOP to BOTTOM and identify each of the ${expectedCount} book spines. For each spine, extract:
+
+1. TITLE: The main title (usually largest text on the spine)
+2. AUTHOR: Author's name if visible (often smaller text)
+3. SPINE_TEXT: All readable text you can see on that particular spine
+
+Work systematically from top to bottom. Don't skip any layers/bands in the stack.
+
+Return exactly ${expectedCount} books in this JSON format:
+[
+  {"title": "Complete Title", "author": "Author Name or null", "spine_text": "All visible text on this spine"},
+  {"title": "Next Book Title", "author": "Author Name or null", "spine_text": "All visible text"},
+  ... (continue for all ${expectedCount} books)
+]
+
+CRITICAL: You must return exactly ${expectedCount} books. If text is partially obscured, do your best to read what's visible. If you can't determine an author, use null.`
+              }
+            ]
+          }
+        ]
+      },
+      {
+        headers: {
+          'x-api-key': this.apiKey,
+          'anthropic-version': '2023-06-01',
+          'content-type': 'application/json'
+        },
+        timeout: 30000
+      }
+    );
+
+    const content = response.data.content[0].text;
+    console.log('Claude detailed response:', content);
+    
+    try {
+      const jsonMatch = content.match(/\[[\s\S]*\]/);
+      if (!jsonMatch) {
+        console.error('No JSON array found in Claude response');
+        return [];
+      }
+      
+      const books = JSON.parse(jsonMatch[0]);
+      
+      if (!Array.isArray(books)) {
+        console.error('Claude response is not an array');
+        return [];
+      }
+      
+      const validBooks = books.filter(book => 
+        book && typeof book === 'object' && book.title
+      ).map(book => ({
+        title: book.title.trim(),
+        author: book.author ? book.author.trim() : null,
+        spine_text: book.spine_text ? book.spine_text.trim() : book.title.trim()
+      }));
+      
+      console.log(`Successfully extracted ${validBooks.length} books from image`);
+      return validBooks;
+      
+    } catch (parseError) {
+      console.error('Failed to parse Claude response as JSON:', parseError);
+      console.error('Response was:', content);
+      return [];
+    }
+  }
+
+  getMediaType(imageBuffer) {
+    if (imageBuffer[0] === 0x89 && imageBuffer[1] === 0x50) {
+      return 'image/png';
+    } else if (imageBuffer[0] === 0x47 && imageBuffer[1] === 0x49) {
+      return 'image/gif';
+    } else if (imageBuffer[0] === 0x52 && imageBuffer[1] === 0x49) {
+      return 'image/webp';
+    }
+    return 'image/jpeg';
   }
 }
 
