@@ -12,11 +12,11 @@ class ClaudeVisionService {
     }
     
     try {
-      console.log('Using multi-step book detection with Claude...');
+      console.log('🔍 CLAUDE: Using multi-step book detection...');
       
       // Step 1: Count books first
       const bookCount = await this.countBooks(imageBuffer);
-      console.log(`Claude detected ${bookCount} books in the image`);
+      console.log(`🔢 CLAUDE: Counted ${bookCount} books in the image`);
       
       // Step 2: Extract each book with the count as context
       const books = await this.extractWithCount(imageBuffer, bookCount);
@@ -82,8 +82,11 @@ Count carefully and respond with ONLY the number of distinct book spines you can
     );
 
     const countText = response.data.content[0].text.trim();
+    console.log(`🔢 CLAUDE: Count response: "${countText}"`);
     const count = parseInt(countText);
-    return isNaN(count) ? 5 : count; // Default to 5 if parsing fails
+    const finalCount = isNaN(count) ? 5 : count;
+    console.log(`🔢 CLAUDE: Parsed count: ${finalCount}`);
+    return finalCount;
   }
 
   async extractWithCount(imageBuffer, expectedCount) {
@@ -176,7 +179,8 @@ CRITICAL: You must return exactly ${expectedCount} books. If text is partially o
         spine_text: book.spine_text ? book.spine_text.trim() : book.title.trim()
       }));
       
-      console.log(`Successfully extracted ${validBooks.length} books from image`);
+      console.log(`📚 CLAUDE: Successfully extracted ${validBooks.length} books from image`);
+      console.log(`📚 CLAUDE: Books found:`, validBooks.map(b => b.title));
       return validBooks;
       
     } catch (parseError) {

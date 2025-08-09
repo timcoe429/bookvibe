@@ -159,9 +159,11 @@ router.post('/upload', upload.single('photo'), async (req, res) => {
     let detectedBooks = [];
     
     try {
+      console.log('🚀 STARTING: Claude Vision book detection...');
       detectedBooks = await claudeVisionService.extractBooksFromImage(req.file.buffer);
+      console.log('✅ CLAUDE: Detection completed successfully');
     } catch (claudeError) {
-      console.error('Claude Vision failed, falling back to Google Vision:', claudeError);
+      console.error('❌ CLAUDE: Vision failed, falling back to Google Vision:', claudeError);
       
       // Fallback to Google Vision if Claude fails
       const extractedText = await visionService.extractTextFromImage(req.file.buffer);
@@ -200,6 +202,7 @@ router.post('/upload', upload.single('photo'), async (req, res) => {
     }
 
     console.log(`Claude detected ${detectedBooks.length} books in the image`);
+    console.log('Detected books:', JSON.stringify(detectedBooks, null, 2));
 
     // Step 2: Match detected books against book databases to get metadata
     console.log(`Matching ${detectedBooks.length} detected books against databases...`);
