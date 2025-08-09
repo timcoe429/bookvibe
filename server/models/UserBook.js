@@ -47,8 +47,9 @@ const UserBook = sequelize.define('UserBook', {
     field: 'date_finished'
   },
   source: {
-    type: DataTypes.ENUM('goodreads', 'photo', 'manual', 'claude_vision'),
+    type: DataTypes.ENUM('goodreads', 'photo', 'manual'),
     defaultValue: 'manual'
+    // Note: 'claude_vision' not included until database migration is run
   }
 }, {
   tableName: 'user_books',

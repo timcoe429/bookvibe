@@ -48,11 +48,12 @@ const Book = sequelize.define('Book', {
   publicationYear: {
     type: DataTypes.INTEGER,
     field: 'publication_year'
-  },
-  spineText: {
-    type: DataTypes.TEXT,
-    field: 'spine_text'
   }
+  // spineText field commented out until database migration is run
+  // spineText: {
+  //   type: DataTypes.TEXT,
+  //   field: 'spine_text'
+  // }
 }, {
   tableName: 'books',
   underscored: true,

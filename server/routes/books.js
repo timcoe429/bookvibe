@@ -130,8 +130,6 @@ router.post('/', async (req, res) => {
 // Bulk import books (for photo upload processing)
 router.post('/bulk-import', async (req, res) => {
   try {
-    console.log('📚 Bulk import started:', { sessionId: req.body.sessionId, bookCount: req.body.books?.length });
-    
     const { books, sessionId } = req.body;
     
     if (!sessionId) {
@@ -142,15 +140,10 @@ router.post('/bulk-import', async (req, res) => {
       return res.status(400).json({ error: 'Books array required' });
     }
 
-    console.log('📋 Books to import:', books.map(b => `"${b.title}" by ${b.author}`));
-
     // Find or create user
     let user = await User.findOne({ where: { sessionId } });
     if (!user) {
-      console.log('👤 Creating new user for session:', sessionId);
       user = await User.create({ sessionId });
-    } else {
-      console.log('👤 Found existing user:', user.id, 'for session:', sessionId);
     }
 
     const createdBooks = [];
@@ -158,19 +151,16 @@ router.post('/bulk-import', async (req, res) => {
 
     for (const bookData of books) {
       try {
-        console.log(`📖 Processing book: "${bookData.title}" by ${bookData.author}`);
-        
         // Create book directly from Claude detection (no external API lookup)
-        const book = await Book.create({
+        const bookCreateData = {
           title: bookData.title || 'Unknown Title',
           author: bookData.author || 'Unknown Author',
           pages: bookData.pages || null,
           description: bookData.description || null,
-          mood: bookData.mood || 'thoughtful',
-          spineText: bookData.spine_text || null
-        });
-
-        console.log(`✅ Created book with ID: ${book.id}`);
+          mood: bookData.mood || 'thoughtful'
+        };
+        
+        const book = await Book.create(bookCreateData);
         createdBooks.push(book);
 
         // Add to user's library if not already there
@@ -179,32 +169,30 @@ router.post('/bulk-import', async (req, res) => {
         });
 
         if (!existingUserBook) {
+          // Use 'photo' instead of 'claude_vision' if the enum doesn't support it yet
+          const source = bookData.source === 'claude_vision' ? 'photo' : (bookData.source || 'photo');
+          
           const userBook = await UserBook.create({
             userId: user.id,
             bookId: book.id,
             status: 'to-read',
-            source: bookData.source || 'claude_vision'
+            source: source
           });
-          console.log(`📚 Added book to user library: ${book.title}`);
           userBooks.push(userBook);
-        } else {
-          console.log(`⚠️ Book already in user library: ${book.title}`);
         }
       } catch (bookError) {
-        console.error(`❌ Error processing book ${bookData.title}:`, bookError);
+        console.error(`Error processing book ${bookData.title}:`, bookError.message);
         // Continue with other books
       }
     }
 
-    console.log(`🎉 Bulk import complete: ${createdBooks.length} books created, ${userBooks.length} added to library`);
-    
     res.json({
       message: `Successfully imported ${createdBooks.length} books`,
       books: createdBooks,
       addedToLibrary: userBooks.length
     });
   } catch (error) {
-    console.error('❌ Error bulk importing books:', error);
+    console.error('Error bulk importing books:', error.message);
     res.status(500).json({ error: 'Failed to import books' });
   }
 });
