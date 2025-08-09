@@ -217,8 +217,17 @@ router.post('/upload', upload.single('photo'), async (req, res) => {
         const searchQuery = detectedBook.author 
           ? `${detectedBook.title} ${detectedBook.author}`
           : detectedBook.title;
-          
-        const bookData = await bookMatchingService.findBookByTitle(searchQuery);
+        
+        console.log(`🔍 SEARCHING for: "${searchQuery}"`);
+        let bookData = await bookMatchingService.findBookByTitle(searchQuery);
+        
+        // If no match with full query, try just the title
+        if (!bookData && detectedBook.author) {
+          console.log(`🔍 RETRY SEARCH (title only): "${detectedBook.title}"`);
+          bookData = await bookMatchingService.findBookByTitle(detectedBook.title);
+        }
+        
+        console.log(`📖 SEARCH RESULT: ${bookData ? 'FOUND' : 'NOT FOUND'} - "${searchQuery}"`);
         
         if (bookData) {
           // Deduplicate by ISBN and normalized title
@@ -239,10 +248,32 @@ router.post('/upload', upload.single('photo'), async (req, res) => {
             seenTitles.add(normalizedTitle);
           }
         } else {
+          console.log(`❌ FAILED to match: "${detectedBook.title}" by ${detectedBook.author}`);
+          
+          // For Claude-detected books, create a basic entry even if no database match
+          const basicBook = {
+            title: detectedBook.title,
+            author: detectedBook.author || 'Unknown Author',
+            pages: null,
+            description: `Detected from book spine: ${detectedBook.spine_text}`,
+            coverUrl: null,
+            genre: null,
+            mood: 'thoughtful', // Default for academic books
+            averageRating: null,
+            publicationYear: null,
+            isbn: null,
+            detected_title: detectedBook.title,
+            detected_author: detectedBook.author,
+            spine_text: detectedBook.spine_text,
+            source: 'claude_vision'
+          };
+          
+          matchedBooks.push(basicBook);
+          
           failedMatches.push({
             title: detectedBook.title,
             author: detectedBook.author,
-            reason: 'No match found in book databases'
+            reason: 'No database match - using detected info'
           });
         }
       } catch (error) {
