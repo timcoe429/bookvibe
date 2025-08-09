@@ -10,6 +10,9 @@ const photoRoutes = require('./routes/photos');
 
 const app = express();
 
+// Trust proxy for Railway deployment (fixes rate limiting warnings)
+app.set('trust proxy', 1);
+
 // Security middleware
 app.use(helmet());
 app.use(cors({
