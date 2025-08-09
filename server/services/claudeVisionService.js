@@ -30,7 +30,7 @@ class ClaudeVisionService {
       const response = await axios.post(
         this.apiUrl,
         {
-          model: 'claude-3-haiku-20240307', // Haiku is fast and good for this task
+          model: 'claude-3-5-sonnet-20241022', // Sonnet is more accurate for detailed vision tasks
           max_tokens: 1000,
           messages: [
             {
@@ -46,20 +46,23 @@ class ClaudeVisionService {
                 },
                 {
                   type: 'text',
-                  text: `Please analyze this image of books and return ONLY a JSON array of the books you can see. 
-                  
-For each book, include:
-- title: The exact title as shown on the spine/cover
-- author: The author's name if visible (or null if not visible)
-- spine_text: The complete text visible on the spine
+                  text: `Look at this image carefully and identify ALL the books you can see. These are book spines stacked on top of each other.
 
-Return ONLY the JSON array, no other text. Example format:
+I can see multiple books in this stack. Please examine each book spine from top to bottom and identify:
+1. The title (main text, usually largest)
+2. The author name (if visible)
+3. Any publisher information
+
+Look carefully at each individual book spine - don't miss any books in the stack.
+
+Return ONLY a JSON array with ALL books you can identify. Format:
 [
-  {"title": "The Great Gatsby", "author": "F. Scott Fitzgerald", "spine_text": "THE GREAT GATSBY F. SCOTT FITZGERALD"},
-  {"title": "1984", "author": "George Orwell", "spine_text": "1984 ORWELL"}
+  {"title": "Museums in a Troubled World", "author": "Robert R. Janes", "spine_text": "Museums in a Troubled World Robert R. Janes"},
+  {"title": "Letting Go", "author": "Author Name", "spine_text": "Letting Go Sharing Historical Authority in a User-Generated World"},
+  {"title": "Engaging Art", "author": null, "spine_text": "ENGAGING ART"}
 ]
 
-If you cannot identify any books, return an empty array: []`
+Be thorough - examine each book spine individually. Return an empty array [] only if you truly cannot see any books.`
                 }
               ]
             }
