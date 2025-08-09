@@ -151,19 +151,35 @@ router.post('/bulk-import', async (req, res) => {
 
     for (const bookData of books) {
       try {
-        // Create book directly from Claude detection (no external API lookup)
-        const bookCreateData = {
-          title: bookData.title || 'Unknown Title',
-          author: bookData.author || 'Unknown Author',
-          pages: bookData.pages || null,
-          description: bookData.description || null,
-          mood: bookData.mood || 'escapist' // Default to escapist instead of thoughtful
-        };
+        console.log(`📖 Processing book: "${bookData.title}" with mood: ${bookData.mood}`);
         
-        const book = await Book.create(bookCreateData);
-        createdBooks.push(book);
+        // Check if book already exists for this user (deduplication)
+        const existingBook = await Book.findOne({
+          where: {
+            title: { [require('sequelize').Op.iLike]: bookData.title },
+            author: { [require('sequelize').Op.iLike]: bookData.author || '%' }
+          }
+        });
 
-        // Add to user's library if not already there
+        let book;
+        if (existingBook) {
+          console.log(`📚 Book "${bookData.title}" already exists, using existing book`);
+          book = existingBook;
+        } else {
+          // Create book directly from AI detection (no external API lookup)
+          const bookCreateData = {
+            title: bookData.title || 'Unknown Title',
+            author: bookData.author || 'Unknown Author',
+            pages: bookData.pages || null,
+            description: bookData.description || null,
+            mood: bookData.mood || 'escapist' // Default to escapist instead of thoughtful
+          };
+          
+          book = await Book.create(bookCreateData);
+          console.log(`✅ Created new book: "${book.title}" with mood: ${book.mood}`);
+        }
+
+        // Check if this book is already in user's library before adding
         const existingUserBook = await UserBook.findOne({
           where: { userId: user.id, bookId: book.id }
         });
@@ -178,7 +194,13 @@ router.post('/bulk-import', async (req, res) => {
             status: 'to-read',
             source: source
           });
+          
+          // Only add to response arrays if it's actually new to the user
+          createdBooks.push(book);
           userBooks.push(userBook);
+          console.log(`✅ Added "${book.title}" to user library`);
+        } else {
+          console.log(`🔄 Skipped "${book.title}" - already in your library`);
         }
       } catch (bookError) {
         console.error(`Error processing book ${bookData.title}:`, bookError.message);

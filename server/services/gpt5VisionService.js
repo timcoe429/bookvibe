@@ -130,10 +130,10 @@ TASK: Identify each of the ${expectedCount} book spines and extract:
 1. TITLE: Complete title as shown on spine (including subtitles)
 2. AUTHOR: Full author name if visible on spine
 3. MOOD: Classify based on title/content as: "escapist", "intense", "thoughtful", or "light"
-   - escapist: Fiction, romance, fantasy, adventure, mysteries
-   - intense: Thrillers, horror, dark topics, serious drama
-   - thoughtful: Non-fiction, philosophy, memoirs, self-help, literary fiction
-   - light: Comedy, humor, light romance, feel-good stories
+   - escapist: Fiction, romance, fantasy, adventure, mysteries, novels
+   - intense: Thrillers, horror, dark topics, serious drama, true crime
+   - thoughtful: Non-fiction, philosophy, memoirs, self-help, spirituality, psychology, personal development
+   - light: Comedy, humor, light romance, feel-good stories, entertainment
 
 CRITICAL REQUIREMENTS:
 - Return exactly ${expectedCount} books
@@ -142,12 +142,26 @@ CRITICAL REQUIREMENTS:
 - If author unclear, use null
 - Work systematically to avoid missing books
 
+MOOD CLASSIFICATION EXAMPLES:
+- Business books like "Good to Great" = thoughtful
+- Self-help like "Soul without Shame" = thoughtful  
+- Psychology like "The Enneagram" = thoughtful
+- Spirituality like "Awake in the Wild" = thoughtful
+- Science books like "Chaos" = thoughtful
+- History like "Tutankhamun" = thoughtful
+- Fiction novels like "Waiting" = escapist
+- Thrillers/crime like "L.A. Dead" = intense
+- Humor/comedy like "You Suck", "A Spot of Bother" = light
+- Travel stories like "Unsavory Elements" = light
+
 Return JSON array in this exact format:
 [
   {"title": "Complete Book Title", "author": "Full Author Name or null", "mood": "thoughtful"},
   {"title": "Next Book Title", "author": "Author Name or null", "mood": "escapist"},
   ... (exactly ${expectedCount} books)
-]`
+]
+
+CRITICAL: Analyze each title carefully and assign the most appropriate mood based on the content type.`
               }
             ]
           }
@@ -162,7 +176,7 @@ Return JSON array in this exact format:
     );
 
     const content = response.data.choices[0].message.content.trim();
-    console.log('📖 GPT-5 extraction response:', content.substring(0, 500) + '...');
+    console.log('📖 GPT-4o full extraction response:', content);
     
     // Parse JSON response
     const jsonMatch = content.match(/\[[\s\S]*\]/);
