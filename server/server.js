@@ -10,43 +10,53 @@ app.get('/api/vision-test', async (req, res) => {
   try {
     // Test environment variables
     const envCheck = {
-      hasApiKey: !!process.env.GOOGLE_CLOUD_VISION_API_KEY,
-      hasCredentialsJson: !!process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON,
-      hasProjectId: !!process.env.GOOGLE_CLOUD_PROJECT,
+      hasClaudeApiKey: !!process.env.CLAUDE_API_KEY,
+      hasGoogleApiKey: !!process.env.GOOGLE_CLOUD_VISION_API_KEY,
+      hasGoogleCredentialsJson: !!process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON,
+      hasGoogleProjectId: !!process.env.GOOGLE_CLOUD_PROJECT,
       nodeEnv: process.env.NODE_ENV || 'not set'
     };
 
-    // Test service initialization
-    let serviceCheck = { initialized: false, error: null };
+    // Test Claude Vision service
+    let claudeCheck = { initialized: false, error: null, apiTest: { success: false, error: null } };
     try {
-      const visionService = require('./services/googleVisionService');
-      serviceCheck.initialized = true;
+      const claudeService = require('./services/claudeVisionService');
+      claudeCheck.initialized = true;
+      
+      // Skip API test for Claude (requires real image with books)
+      claudeCheck.apiTest.skipped = true;
+      claudeCheck.apiTest.message = 'Claude Vision requires a real book image to test';
     } catch (error) {
-      serviceCheck.error = error.message;
+      claudeCheck.error = error.message;
     }
 
-    // Test API call
-    let apiCheck = { success: false, error: null };
+    // Test Google Vision service
+    let googleCheck = { initialized: false, error: null, apiTest: { success: false, error: null } };
     try {
+      const visionService = require('./services/googleVisionService');
+      googleCheck.initialized = true;
+      
       const testImageBuffer = Buffer.from(
         'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==',
         'base64'
       );
       
-      const visionService = require('./services/googleVisionService');
-      const result = await visionService.extractTextFromImage(testImageBuffer);
-      apiCheck.success = true;
-      apiCheck.result = 'API call successful';
+      try {
+        const result = await visionService.extractTextFromImage(testImageBuffer);
+        googleCheck.apiTest.success = true;
+        googleCheck.apiTest.result = 'API call successful';
+      } catch (apiError) {
+        googleCheck.apiTest.error = apiError.message;
+      }
     } catch (error) {
-      apiCheck.error = error.message;
-      apiCheck.errorCode = error.code;
+      googleCheck.error = error.message;
     }
 
     res.json({
       message: 'VISION API TEST RESULTS',
       environment: envCheck,
-      service: serviceCheck,
-      apiTest: apiCheck,
+      claude: claudeCheck,
+      google: googleCheck,
       timestamp: new Date().toISOString()
     });
   } catch (error) {

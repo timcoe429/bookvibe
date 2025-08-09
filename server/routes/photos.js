@@ -2,14 +2,16 @@ const express = require('express');
 const router = express.Router();
 const multer = require('multer');
 const visionService = require('../services/googleVisionService');
+const claudeVisionService = require('../services/claudeVisionService');
 const bookMatchingService = require('../services/bookMatchingService');
 
 // Simple debug endpoint to check environment variables
 router.get('/debug-env', (req, res) => {
   res.json({
-    hasApiKey: !!process.env.GOOGLE_CLOUD_VISION_API_KEY,
-    hasCredentialsJson: !!process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON,
-    hasProjectId: !!process.env.GOOGLE_CLOUD_PROJECT,
+    hasClaudeApiKey: !!process.env.CLAUDE_API_KEY,
+    hasGoogleApiKey: !!process.env.GOOGLE_CLOUD_VISION_API_KEY,
+    hasGoogleCredentialsJson: !!process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON,
+    hasGoogleProjectId: !!process.env.GOOGLE_CLOUD_PROJECT,
     nodeEnv: process.env.NODE_ENV || 'not set',
     timestamp: new Date().toISOString()
   });
@@ -152,54 +154,69 @@ router.post('/upload', upload.single('photo'), async (req, res) => {
       return res.status(400).json({ error: 'Session ID required' });
     }
 
-    // Step 1: Extract text from image using Google Vision API
-    console.log('Processing image with Google Vision API...');
-    const extractedText = await visionService.extractTextFromImage(req.file.buffer);
+    // Step 1: Extract books from image using Claude Vision API
+    console.log('Processing image with Claude Vision API...');
+    let detectedBooks = [];
     
-    if (!extractedText || extractedText.length === 0) {
-      return res.status(400).json({ 
-        error: 'No text found in image',
-        suggestion: 'Try taking a clearer photo with better lighting'
-      });
-    }
-
-    // Step 2: Parse potential book titles from extracted text and spatial blocks
-    console.log('Parsing book titles from extracted text...');
-    let potentialTitles = bookMatchingService.parseBookTitles(extractedText);
-
-    // Try to use structured text blocks when available for better spine grouping
     try {
-      const structured = await visionService.extractStructuredText(req.file.buffer);
-      if (structured && Array.isArray(structured.blocks)) {
-        const fromBlocks = bookMatchingService.extractTitlesFromBlocks(structured.blocks);
-        const merged = new Set([
-          ...potentialTitles.map(t => bookMatchingService.normalizeTitle(t)),
-          ...fromBlocks.map(t => bookMatchingService.normalizeTitle(t))
-        ]);
-        potentialTitles = [...merged];
+      detectedBooks = await claudeVisionService.extractBooksFromImage(req.file.buffer);
+    } catch (claudeError) {
+      console.error('Claude Vision failed, falling back to Google Vision:', claudeError);
+      
+      // Fallback to Google Vision if Claude fails
+      const extractedText = await visionService.extractTextFromImage(req.file.buffer);
+      
+      if (!extractedText || extractedText.length === 0) {
+        return res.status(400).json({ 
+          error: 'No text found in image',
+          suggestion: 'Try taking a clearer photo with better lighting'
+        });
       }
-    } catch (e) {
-      // Non-fatal; continue with text-only candidates
+
+      // Parse potential book titles from extracted text
+      const potentialTitles = bookMatchingService.parseBookTitles(extractedText);
+      
+      if (potentialTitles.length === 0) {
+        return res.status(400).json({ 
+          error: 'No book titles detected',
+          extractedText: extractedText.slice(0, 500),
+          suggestion: 'Make sure book spines are clearly visible and facing the camera'
+        });
+      }
+      
+      // Convert to book format for consistency
+      detectedBooks = potentialTitles.map(title => ({
+        title: title,
+        author: null,
+        spine_text: title
+      }));
     }
     
-    if (potentialTitles.length === 0) {
+    if (detectedBooks.length === 0) {
       return res.status(400).json({ 
-        error: 'No book titles detected',
-        extractedText: extractedText.slice(0, 500), // Return sample for debugging
+        error: 'No books detected in image',
         suggestion: 'Make sure book spines are clearly visible and facing the camera'
       });
     }
 
-    // Step 3: Match titles against book databases
-    console.log(`Found ${potentialTitles.length} potential titles, matching against databases...`);
+    console.log(`Claude detected ${detectedBooks.length} books in the image`);
+
+    // Step 2: Match detected books against book databases to get metadata
+    console.log(`Matching ${detectedBooks.length} detected books against databases...`);
     const matchedBooks = [];
     const failedMatches = [];
     const seenISBNs = new Set();
     const seenTitles = new Set();
 
-    for (const title of potentialTitles.slice(0, 20)) { // Limit to first 20 to avoid rate limits
+    for (const detectedBook of detectedBooks.slice(0, 30)) { // Increased limit since Claude is more accurate
       try {
-        const bookData = await bookMatchingService.findBookByTitle(title);
+        // Use title and author if available for better matching
+        const searchQuery = detectedBook.author 
+          ? `${detectedBook.title} ${detectedBook.author}`
+          : detectedBook.title;
+          
+        const bookData = await bookMatchingService.findBookByTitle(searchQuery);
+        
         if (bookData) {
           // Deduplicate by ISBN and normalized title
           const normalizedTitle = bookMatchingService.normalizeTitle(bookData.title);
@@ -207,16 +224,31 @@ router.post('/upload', upload.single('photo'), async (req, res) => {
                               seenTitles.has(normalizedTitle);
           
           if (!isDuplicate) {
-            matchedBooks.push(bookData);
+            // Preserve original detected info if metadata lookup differs
+            const enrichedBook = {
+              ...bookData,
+              detected_title: detectedBook.title,
+              detected_author: detectedBook.author,
+              spine_text: detectedBook.spine_text
+            };
+            matchedBooks.push(enrichedBook);
             if (bookData.isbn) seenISBNs.add(bookData.isbn);
             seenTitles.add(normalizedTitle);
           }
         } else {
-          failedMatches.push(title);
+          failedMatches.push({
+            title: detectedBook.title,
+            author: detectedBook.author,
+            reason: 'No match found in book databases'
+          });
         }
       } catch (error) {
-        console.error(`Error matching book "${title}":`, error);
-        failedMatches.push(title);
+        console.error(`Error matching book "${detectedBook.title}":`, error);
+        failedMatches.push({
+          title: detectedBook.title,
+          author: detectedBook.author,
+          reason: error.message
+        });
       }
       
       // Small delay to respect API rate limits
@@ -230,12 +262,12 @@ router.post('/upload', upload.single('photo'), async (req, res) => {
       message: `Found ${matchedBooks.length} books from your photo`,
       books: matchedBooks,
       failedMatches: failedMatches.slice(0, 10), // Return sample of failed matches
-      totalPotentialTitles: potentialTitles.length,
+      detectedBooks: detectedBooks.length,
       processing: {
-        extractedTextLength: extractedText.length,
-        potentialTitlesFound: potentialTitles.length,
+        detectedByVision: detectedBooks.length,
         successfulMatches: matchedBooks.length,
-        failedMatches: failedMatches.length
+        failedMatches: failedMatches.length,
+        visionService: 'Claude Vision API'
       }
     });
 
@@ -339,14 +371,43 @@ router.post('/test-vision', upload.single('photo'), async (req, res) => {
       return res.status(400).json({ error: 'No photo uploaded' });
     }
 
-    const extractedText = await visionService.extractTextFromImage(req.file.buffer);
-    const potentialTitles = bookMatchingService.parseBookTitles(extractedText);
+    // Test Claude Vision
+    let claudeResult = null;
+    let claudeError = null;
+    try {
+      claudeResult = await claudeVisionService.extractBooksFromImage(req.file.buffer);
+    } catch (err) {
+      claudeError = err.message;
+    }
+
+    // Test Google Vision
+    let googleResult = null;
+    let googleError = null;
+    try {
+      const extractedText = await visionService.extractTextFromImage(req.file.buffer);
+      const potentialTitles = bookMatchingService.parseBookTitles(extractedText);
+      googleResult = {
+        extractedText: extractedText.slice(0, 500),
+        potentialTitles,
+        textLength: extractedText.length,
+        titlesFound: potentialTitles.length
+      };
+    } catch (err) {
+      googleError = err.message;
+    }
 
     res.json({
-      extractedText,
-      potentialTitles,
-      textLength: extractedText.length,
-      titlesFound: potentialTitles.length
+      claude: {
+        success: !claudeError,
+        error: claudeError,
+        books: claudeResult,
+        bookCount: claudeResult ? claudeResult.length : 0
+      },
+      google: {
+        success: !googleError,
+        error: googleError,
+        result: googleResult
+      }
     });
 
   } catch (error) {
