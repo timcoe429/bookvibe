@@ -153,18 +153,23 @@ router.post('/bulk-import', async (req, res) => {
       try {
         console.log(`📖 Processing book: "${bookData.title}" with mood: ${bookData.mood}`);
         
-        // Check if book already exists for this user (deduplication)
+        // Check if book already exists (deduplication by title and author)
         const existingBook = await Book.findOne({
           where: {
-            title: { [require('sequelize').Op.iLike]: bookData.title },
-            author: { [require('sequelize').Op.iLike]: bookData.author || '%' }
+            title: { [require('sequelize').Op.iLike]: bookData.title.trim() },
+            author: { [require('sequelize').Op.iLike]: (bookData.author || '').trim() || '%' }
           }
         });
 
         let book;
         if (existingBook) {
-          console.log(`📚 Book "${bookData.title}" already exists, using existing book`);
+          console.log(`📚 Book "${bookData.title}" already exists, updating mood from "${existingBook.mood}" to "${bookData.mood}"`);
+          // Update the existing book with new mood from AI
+          await existingBook.update({
+            mood: bookData.mood || 'escapist'
+          });
           book = existingBook;
+          console.log(`✅ Updated existing book: "${book.title}" with new mood: ${book.mood}`);
         } else {
           // Create book directly from AI detection (no external API lookup)
           const bookCreateData = {

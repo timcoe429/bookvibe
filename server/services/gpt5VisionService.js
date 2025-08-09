@@ -149,10 +149,20 @@ MOOD CLASSIFICATION EXAMPLES:
 - Spirituality like "Awake in the Wild" = thoughtful
 - Science books like "Chaos" = thoughtful
 - History like "Tutankhamun" = thoughtful
-- Fiction novels like "Waiting" = escapist
+- Fiction novels like "Waiting", "March", "A Week in December" = escapist
 - Thrillers/crime like "L.A. Dead" = intense
-- Humor/comedy like "You Suck", "A Spot of Bother" = light
-- Travel stories like "Unsavory Elements" = light
+- Humor/comedy like "You Suck", "A Spot of Bother", "Snow in May" = light
+- Travel stories like "Unsavory Elements", "A Time of Gifts" = light
+- Nature writing like "Landmarks", "A Year on the Wing" = escapist
+
+CRITICAL MOOD ASSIGNMENTS:
+- "You Suck" by Christopher Moore = light (humor/comedy)
+- "A Spot of Bother" by Mark Haddon = light (comedy)
+- "Waiting" by Ha Jin = escapist (literary fiction)
+- "L.A. Dead" by Stuart Woods = intense (thriller)
+- "March" by Geraldine Brooks = escapist (historical fiction)
+- "Landmarks" by Robert Macfarlane = escapist (nature writing)
+- "Harvest" by Jim Crace = escapist (literary fiction)
 
 Return JSON array in this exact format:
 [

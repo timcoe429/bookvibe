@@ -38,6 +38,29 @@ router.get('/debug-env', (req, res) => {
   });
 });
 
+// Debug endpoint to test mood classification on recent books
+router.get('/debug-moods', async (req, res) => {
+  try {
+    const Book = require('../models/Book');
+    
+    // Get the 10 most recently added books
+    const recentBooks = await Book.findAll({
+      order: [['createdAt', 'DESC']],
+      limit: 10,
+      attributes: ['id', 'title', 'author', 'mood', 'createdAt']
+    });
+    
+    res.json({
+      message: 'Recent books and their moods',
+      books: recentBooks,
+      timestamp: new Date().toISOString()
+    });
+  } catch (error) {
+    console.error('Debug moods error:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
 // Browser-friendly debug page
 router.get('/debug-page', async (req, res) => {
   let html = `
