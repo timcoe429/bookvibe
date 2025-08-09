@@ -197,7 +197,8 @@ router.post('/upload', upload.single('photo'), async (req, res) => {
         console.error('❌ CLAUDE: Vision also failed, falling back to Google Vision:', claudeError);
         
         // Final fallback to Google Vision if both AI services fail
-      const extractedText = await visionService.extractTextFromImage(req.file.buffer);
+        try {
+          const extractedText = await visionService.extractTextFromImage(req.file.buffer);
       
       if (!extractedText || extractedText.length === 0) {
         return res.status(400).json({ 
@@ -217,12 +218,21 @@ router.post('/upload', upload.single('photo'), async (req, res) => {
         });
       }
       
-      // Convert to book format for consistency
-      detectedBooks = potentialTitles.map(title => ({
-        title: title,
-        author: null,
-        spine_text: title
-      }));
+          // Convert to book format for consistency
+          detectedBooks = potentialTitles.map(title => ({
+            title: title,
+            author: null,
+            spine_text: title
+          }));
+          visionService = 'Google Vision OCR (final fallback)';
+        } catch (googleError) {
+          console.error('❌ ALL VISION SERVICES FAILED:', googleError);
+          return res.status(500).json({
+            success: false,
+            error: 'All vision services failed to process the image'
+          });
+        }
+      }
     }
     
     if (detectedBooks.length === 0) {
