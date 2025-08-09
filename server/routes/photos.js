@@ -194,12 +194,23 @@ router.post('/upload', upload.single('photo'), async (req, res) => {
     console.log(`Found ${potentialTitles.length} potential titles, matching against databases...`);
     const matchedBooks = [];
     const failedMatches = [];
+    const seenISBNs = new Set();
+    const seenTitles = new Set();
 
     for (const title of potentialTitles.slice(0, 20)) { // Limit to first 20 to avoid rate limits
       try {
         const bookData = await bookMatchingService.findBookByTitle(title);
         if (bookData) {
-          matchedBooks.push(bookData);
+          // Deduplicate by ISBN and normalized title
+          const normalizedTitle = bookMatchingService.normalizeTitle(bookData.title);
+          const isDuplicate = (bookData.isbn && seenISBNs.has(bookData.isbn)) || 
+                              seenTitles.has(normalizedTitle);
+          
+          if (!isDuplicate) {
+            matchedBooks.push(bookData);
+            if (bookData.isbn) seenISBNs.add(bookData.isbn);
+            seenTitles.add(normalizedTitle);
+          }
         } else {
           failedMatches.push(title);
         }

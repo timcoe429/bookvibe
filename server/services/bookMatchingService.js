@@ -81,7 +81,7 @@ class BookMatchingService {
   }
 
   isLikelyBookTitle(text) {
-    if (!text || text.length < 3 || text.length > 100) {
+    if (!text || text.length < 8 || text.length > 80) {
       return false;
     }
 
@@ -109,7 +109,8 @@ class BookMatchingService {
       'lyons', 'carnahan', 'wylie', 'press', 'edition', 'editions',
       'museum', 'smithsonian', 'bulletin', 'dictionary', 'webster',
       'random house', 'merriam', 'pocket', 'grammar', 'usage', 'punctuation',
-      'zone', 'guide', 'study', 'summary', 'analysis'
+      'zone', 'guide', 'study', 'summary', 'analysis', 'review of',
+      'workbook', 'journal', 'grades', 'primary', 'composition'
     ];
     for (const k of nonTitleIndicators) {
       if (lower.includes(k)) {
@@ -117,19 +118,16 @@ class BookMatchingService {
       }
     }
 
-    // Heuristics to reduce false positives:
-    // - Prefer at least 2 words OR a long single word (>= 6)
-    // - Avoid lines that look like a person name (handled earlier)
+    // More strict requirements
     const wordCount = text.split(/\s+/).length;
-    if (wordCount < 2) {
+    if (wordCount < 2 || wordCount > 12) {
       return false;
     }
     const hasLetters = /[a-zA-Z]/.test(text);
-    const hasReasonableLength = text.length >= 3 && text.length <= 80;
+    const hasReasonableLength = text.length >= 8 && text.length <= 80;
     const notAllCaps = text !== text.toUpperCase() || wordCount <= 3;
-    const enoughWordsOrLength = wordCount >= 2 || text.length >= 6;
 
-    return hasLetters && hasReasonableLength && notAllCaps && enoughWordsOrLength;
+    return hasLetters && hasReasonableLength && notAllCaps;
   }
 
   normalizeTitle(title) {
@@ -333,8 +331,10 @@ class BookMatchingService {
         }
         const union = new Set([...setQ, ...setR]).size || 1;
         const score = intersection / union;
-        const minCommonTokens = normalizedQueryTokens.length >= 2 ? 2 : 1;
-        if (intersection < minCommonTokens) {
+        
+        // Require significant overlap: at least 2/3 of query tokens must match
+        const requiredOverlap = Math.max(2, Math.ceil(normalizedQueryTokens.length * 0.66));
+        if (intersection < requiredOverlap) {
           continue;
         }
 
@@ -355,12 +355,26 @@ class BookMatchingService {
       }
 
       // Require a reasonable similarity to accept
-      const acceptanceThreshold = normalizedQueryTokens.length >= 2 ? 0.55 : 0.9;
+      const acceptanceThreshold = normalizedQueryTokens.length >= 3 ? 0.7 : 0.85;
       if (!best || bestScore < acceptanceThreshold) {
         return null;
       }
 
       const book = best.volumeInfo;
+      
+      // Final verification: ensure the result contains most of our query words
+      const resultNormalized = this.normalizeTitle(book.title);
+      let queryWordsInResult = 0;
+      for (const qToken of normalizedQueryTokens) {
+        if (resultNormalized.includes(qToken)) {
+          queryWordsInResult++;
+        }
+      }
+      const queryMatchRatio = queryWordsInResult / normalizedQueryTokens.length;
+      if (queryMatchRatio < 0.6) {
+        return null; // Too many query words missing from result
+      }
+      
       return {
         title: book.title,
         author: book.authors ? book.authors.join(', ') : 'Unknown Author',
