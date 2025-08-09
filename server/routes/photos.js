@@ -256,7 +256,7 @@ router.post('/upload', upload.single('photo'), async (req, res) => {
             author: detectedBook.author || 'Unknown Author',
             pages: null,
             description: `Detected from book spine: ${detectedBook.spine_text}`,
-            coverUrl: null,
+            coverUrl: null, // No cover image for manually detected books
             genre: null,
             mood: 'thoughtful', // Default for academic books
             averageRating: null,

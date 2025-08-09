@@ -426,7 +426,7 @@ class BookMatchingService {
           book.industryIdentifiers.find(id => id.type === 'ISBN_10')?.identifier : null,
         pages: book.pageCount || null,
         description: book.description || null,
-        coverUrl: book.imageLinks?.thumbnail?.replace('http:', 'https:') || null,
+        coverUrl: this.cleanCoverUrl(book.imageLinks?.thumbnail) || null,
         genre: book.categories ? book.categories[0] : null,
         mood: this.inferMoodFromGenre(book.categories?.[0] || ''),
         averageRating: book.averageRating || null,
@@ -589,6 +589,19 @@ class BookMatchingService {
     }
     
     return { results, failed };
+  }
+
+  cleanCoverUrl(url) {
+    if (!url) return null;
+    
+    // Ensure HTTPS
+    let cleanUrl = url.replace('http:', 'https:');
+    
+    // Try to get a larger image if available
+    cleanUrl = cleanUrl.replace(/zoom=\d+/, 'zoom=1');
+    cleanUrl = cleanUrl.replace(/&edge=curl/, '');
+    
+    return cleanUrl;
   }
 }
 
