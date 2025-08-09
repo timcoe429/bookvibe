@@ -40,11 +40,15 @@ router.get('/session/:sessionId', async (req, res) => {
 router.get('/:sessionId/stats', async (req, res) => {
   try {
     const { sessionId } = req.params;
+    console.log('📊 Getting stats for session:', sessionId);
     
     const user = await User.findOne({ where: { sessionId } });
     if (!user) {
+      console.log('❌ User not found for session:', sessionId);
       return res.status(404).json({ error: 'User not found' });
     }
+    
+    console.log('👤 Found user:', user.id);
 
     // Calculate real-time stats
     const currentYear = new Date().getFullYear();
@@ -79,6 +83,8 @@ router.get('/:sessionId/stats', async (req, res) => {
       }
     });
 
+    console.log('📈 Calculated stats:', { booksThisYear, totalBooks, inQueue, currentlyReading });
+
     // Update user stats
     await user.update({
       stats: {
@@ -88,7 +94,7 @@ router.get('/:sessionId/stats', async (req, res) => {
       }
     });
 
-    res.json({
+    const statsResponse = {
       booksThisYear,
       totalBooks,
       inQueue,
@@ -96,7 +102,10 @@ router.get('/:sessionId/stats', async (req, res) => {
       readingStreak: user.stats.currentStreak || 0,
       readingGoal: user.preferences.readingGoal || 52,
       progressToGoal: Math.round((booksThisYear / (user.preferences.readingGoal || 52)) * 100)
-    });
+    };
+    
+    console.log('✅ Returning stats:', statsResponse);
+    res.json(statsResponse);
   } catch (error) {
     console.error('Error getting user stats:', error);
     res.status(500).json({ error: 'Failed to get user stats' });
@@ -108,11 +117,15 @@ router.get('/:sessionId/books', async (req, res) => {
   try {
     const { sessionId } = req.params;
     const { status, mood, limit, offset } = req.query;
+    console.log('📚 Getting books for session:', sessionId, 'with filters:', { status, mood, limit, offset });
     
     const user = await User.findOne({ where: { sessionId } });
     if (!user) {
+      console.log('❌ User not found for session:', sessionId);
       return res.status(404).json({ error: 'User not found' });
     }
+    
+    console.log('👤 Found user:', user.id);
 
     const whereClause = { userId: user.id };
     if (status) whereClause.status = status;
@@ -142,6 +155,7 @@ router.get('/:sessionId/books', async (req, res) => {
       source: ub.source
     }));
 
+    console.log(`📖 Found ${booksWithStatus.length} books for user`);
     res.json(booksWithStatus);
   } catch (error) {
     console.error('Error getting user books:', error);
