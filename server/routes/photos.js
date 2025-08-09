@@ -5,15 +5,34 @@ const visionService = require('../services/googleVisionService');
 const claudeVisionService = require('../services/claudeVisionService');
 const bookMatchingService = require('../services/bookMatchingService');
 
-// Simple debug endpoint to check environment variables
+// Simple debug endpoint to check environment variables and code version
 router.get('/debug-env', (req, res) => {
+  // Check if our latest updates are deployed
+  const fs = require('fs');
+  const claudeServicePath = require('path').join(__dirname, '../services/claudeVisionService.js');
+  const claudeContent = fs.readFileSync(claudeServicePath, 'utf8');
+  const hasNewRules = claudeContent.includes('CRITICAL RULES');
+  const hasCompleteTitle = claudeContent.includes('COMPLETE title including subtitles');
+  
+  const bookServicePath = require('path').join(__dirname, '../services/bookMatchingService.js');
+  const bookContent = fs.readFileSync(bookServicePath, 'utf8');
+  const hasCleanCoverUrl = bookContent.includes('cleanCoverUrl');
+  const hasNewFilters = bookContent.includes('key takeaways');
+  
   res.json({
     hasClaudeApiKey: !!process.env.CLAUDE_API_KEY,
     hasGoogleApiKey: !!process.env.GOOGLE_CLOUD_VISION_API_KEY,
     hasGoogleCredentialsJson: !!process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON,
     hasGoogleProjectId: !!process.env.GOOGLE_CLOUD_PROJECT,
     nodeEnv: process.env.NODE_ENV || 'not set',
-    timestamp: new Date().toISOString()
+    timestamp: new Date().toISOString(),
+    codeVersion: {
+      claudeHasNewRules: hasNewRules,
+      claudeHasCompleteTitle: hasCompleteTitle,
+      bookServiceHasCleanCoverUrl: hasCleanCoverUrl,
+      bookServiceHasNewFilters: hasNewFilters,
+      deploymentCheck: 'v1.2.0-' + Date.now()
+    }
   });
 });
 
