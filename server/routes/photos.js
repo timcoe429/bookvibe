@@ -223,90 +223,25 @@ router.post('/upload', upload.single('photo'), async (req, res) => {
     console.log(`Claude detected ${detectedBooks.length} books in the image`);
     console.log('Detected books:', JSON.stringify(detectedBooks, null, 2));
 
-    // Step 2: Match detected books against book databases to get metadata
-    console.log(`Matching ${detectedBooks.length} detected books against databases...`);
-    const matchedBooks = [];
-    const failedMatches = [];
-    const seenISBNs = new Set();
-    const seenTitles = new Set();
-
-    for (const detectedBook of detectedBooks.slice(0, 30)) { // Increased limit since Claude is more accurate
-      try {
-        // Use title and author if available for better matching
-        const searchQuery = detectedBook.author 
-          ? `${detectedBook.title} ${detectedBook.author}`
-          : detectedBook.title;
-        
-        console.log(`🔍 SEARCHING for: "${searchQuery}"`);
-        let bookData = await bookMatchingService.findBookByTitle(searchQuery);
-        
-        // If no match with full query, try just the title
-        if (!bookData && detectedBook.author) {
-          console.log(`🔍 RETRY SEARCH (title only): "${detectedBook.title}"`);
-          bookData = await bookMatchingService.findBookByTitle(detectedBook.title);
-        }
-        
-        console.log(`📖 SEARCH RESULT: ${bookData ? 'FOUND' : 'NOT FOUND'} - "${searchQuery}"`);
-        
-        if (bookData) {
-          // Deduplicate by ISBN and normalized title
-          const normalizedTitle = bookMatchingService.normalizeTitle(bookData.title);
-          const isDuplicate = (bookData.isbn && seenISBNs.has(bookData.isbn)) || 
-                              seenTitles.has(normalizedTitle);
-          
-          if (!isDuplicate) {
-            // Preserve original detected info if metadata lookup differs
-            const enrichedBook = {
-              ...bookData,
-              detected_title: detectedBook.title,
-              detected_author: detectedBook.author,
-              spine_text: detectedBook.spine_text
-            };
-            matchedBooks.push(enrichedBook);
-            if (bookData.isbn) seenISBNs.add(bookData.isbn);
-            seenTitles.add(normalizedTitle);
-          }
-        } else {
-          console.log(`❌ FAILED to match: "${detectedBook.title}" by ${detectedBook.author}`);
-          
-          // For Claude-detected books, create a basic entry even if no database match
-          const basicBook = {
-            title: detectedBook.title,
-            author: detectedBook.author || 'Unknown Author',
-            pages: null,
-            description: `Detected from book spine: ${detectedBook.spine_text}`,
-            coverUrl: null, // No cover image for manually detected books
-            genre: null,
-            mood: 'thoughtful', // Default for academic books
-            averageRating: null,
-            publicationYear: null,
-            isbn: null,
-            detected_title: detectedBook.title,
-            detected_author: detectedBook.author,
-            spine_text: detectedBook.spine_text,
-            source: 'claude_vision'
-          };
-          
-          matchedBooks.push(basicBook);
-          
-          failedMatches.push({
-            title: detectedBook.title,
-            author: detectedBook.author,
-            reason: 'No database match - using detected info'
-          });
-        }
-      } catch (error) {
-        console.error(`Error matching book "${detectedBook.title}":`, error);
-        failedMatches.push({
-          title: detectedBook.title,
-          author: detectedBook.author,
-          reason: error.message
-        });
-      }
-      
-      // Small delay to respect API rate limits
-      await new Promise(resolve => setTimeout(resolve, 100));
-    }
+    // Step 2: Convert Claude's detected books to our format (no database lookup needed)
+    console.log(`Converting ${detectedBooks.length} detected books to app format...`);
+    const matchedBooks = detectedBooks.map(detectedBook => ({
+      title: detectedBook.title || 'Unknown Title',
+      author: detectedBook.author || 'Unknown Author',
+      pages: null,
+      description: null,
+      coverUrl: null, // No cover images needed
+      genre: null,
+      mood: 'thoughtful', // Default mood
+      averageRating: null,
+      publicationYear: null,
+      isbn: null,
+      spine_text: detectedBook.spine_text,
+      source: 'claude_vision',
+      id: `claude_${Math.random().toString(36).substr(2, 9)}` // Generate simple ID
+    }));
+    
+    const failedMatches = []; // No failures since we're not matching
 
     console.log(`Successfully matched ${matchedBooks.length} books`);
 
@@ -314,13 +249,11 @@ router.post('/upload', upload.single('photo'), async (req, res) => {
       success: true,
       message: `Found ${matchedBooks.length} books from your photo`,
       books: matchedBooks,
-      failedMatches: failedMatches.slice(0, 10), // Return sample of failed matches
-      detectedBooks: detectedBooks.length,
       processing: {
         detectedByVision: detectedBooks.length,
-        successfulMatches: matchedBooks.length,
-        failedMatches: failedMatches.length,
-        visionService: 'Claude Vision API'
+        totalBooks: matchedBooks.length,
+        visionService: 'Claude Vision API',
+        databaseLookup: 'disabled - using direct detection only'
       }
     });
 
