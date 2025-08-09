@@ -61,11 +61,18 @@ class ClaudeVisionService {
               },
               {
                 type: 'text',
-                text: `This is a photograph of physical books. The books are stacked horizontally on top of each other, with their spines facing the camera. Each book spine contains the title and often the author's name.
+                text: `This is a photograph of physical books with their spines visible. Count how many individual book spines you can see.
 
-Count how many individual book spines you can see in this stack. Look at the image from top to bottom - each horizontal band/layer is typically one book. Some books may be thicker or thinner than others.
+COUNTING INSTRUCTIONS:
+- Books may be arranged VERTICALLY (standing upright) or HORIZONTALLY (lying flat)
+- If VERTICAL: Look from LEFT to RIGHT across the image
+- If HORIZONTAL: Look from TOP to BOTTOM 
+- Each distinct spine represents one book
+- Look for title text, author names, and spine boundaries to distinguish individual books
+- Some books may be thicker or thinner than others
+- Count ALL visible book spines, even if partially obscured
 
-Count carefully and respond with ONLY the number of distinct book spines you can identify.`
+Count very carefully and respond with ONLY the number of distinct book spines you can identify.`
               }
             ]
           }
@@ -112,22 +119,33 @@ Count carefully and respond with ONLY the number of distinct book spines you can
               },
               {
                 type: 'text',
-                text: `This is a photograph of ${expectedCount} physical books stacked horizontally. The books are lying flat with their spines facing the camera. You need to identify ALL ${expectedCount} books.
+                text: `This is a photograph of ${expectedCount} physical books with their spines visible. You need to identify ALL ${expectedCount} books.
 
 IMPORTANT CONTEXT:
-- These are book spines viewed from the side
-- Books are stacked one on top of another
-- Each horizontal band/layer in the image represents one book
-- Text runs horizontally across each spine
-- Book titles are usually the largest/most prominent text
+- These are book spines that may be oriented in different ways:
+  * VERTICAL: Books standing upright (spines read left to right across the image)
+  * HORIZONTAL: Books lying flat stacked on top of each other (spines read top to bottom)
+- Book titles are usually the largest/most prominent text on the spine
 - Author names are typically smaller and may be at either end of the spine
 - Publisher logos/names may also be visible
 
-TASK: Examine the image from TOP to BOTTOM and identify each of the ${expectedCount} book spines. For each spine, extract:
+DETECTION STRATEGY:
+1. First determine the orientation - are books standing vertically or lying horizontally?
+2. If VERTICAL (standing upright): Examine the image from LEFT to RIGHT
+3. If HORIZONTAL (lying flat): Examine the image from TOP to BOTTOM
+4. Look for distinct spine boundaries - each spine represents one book
+5. Count carefully to ensure you find all ${expectedCount} books
+
+TASK: Systematically identify each of the ${expectedCount} book spines. For each spine, extract:
 
 1. TITLE: The COMPLETE title including subtitles (e.g., "You Suck: A Love Story" not just "You Suck")
-2. AUTHOR: Author's name if clearly visible on the spine
-3. SPINE_TEXT: All readable text you can see on that particular spine
+2. AUTHOR: Full author name if clearly visible on the spine (first and last name when possible)
+3. MOOD: Based on the title and any visible content, classify as one of: "escapist", "intense", "thoughtful", "light"
+   - escapist: Fiction, romance, fantasy, adventure, mysteries
+   - intense: Thrillers, horror, dark topics, serious drama
+   - thoughtful: Non-fiction, philosophy, memoirs, literary fiction, self-help
+   - light: Comedy, humor, light romance, feel-good stories
+4. SPINE_TEXT: All readable text you can see on that particular spine
 
 Work systematically from top to bottom. Don't skip any layers/bands in the stack.
 
@@ -135,8 +153,8 @@ IMPORTANT: Only transcribe text that is ACTUALLY VISIBLE on each spine. Do not g
 
 Return exactly ${expectedCount} books in this JSON format:
 [
-  {"title": "Complete Title", "author": "Author Name or null", "spine_text": "All visible text on this spine"},
-  {"title": "Next Book Title", "author": "Author Name or null", "spine_text": "All visible text"},
+  {"title": "Complete Title", "author": "Full Author Name or null", "mood": "thoughtful", "spine_text": "All visible text on this spine"},
+  {"title": "Next Book Title", "author": "Full Author Name or null", "mood": "escapist", "spine_text": "All visible text"},
   ... (continue for all ${expectedCount} books)
 ]
 

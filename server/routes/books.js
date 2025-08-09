@@ -157,7 +157,7 @@ router.post('/bulk-import', async (req, res) => {
           author: bookData.author || 'Unknown Author',
           pages: bookData.pages || null,
           description: bookData.description || null,
-          mood: bookData.mood || 'thoughtful'
+          mood: bookData.mood || 'escapist' // Default to escapist instead of thoughtful
         };
         
         const book = await Book.create(bookCreateData);

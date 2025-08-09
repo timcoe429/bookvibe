@@ -346,11 +346,7 @@ const BookPickerApp = () => {
                         {book.mood}
                       </span>
                     )}
-                    {book.source && (
-                      <span className="bg-gray-100 text-gray-600 px-2 py-1 rounded-full text-xs">
-                        {book.source === 'photo' ? '📸 From Photo' : book.source}
-                      </span>
-                    )}
+
                   </div>
                 </div>
                 
