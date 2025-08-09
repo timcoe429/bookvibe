@@ -4,7 +4,7 @@ import PhotoUpload from './components/PhotoUpload';
 import { userAPI } from './services/api';
 
 const BookPickerApp = () => {
-  const [currentView, setCurrentView] = useState('home');
+  const [currentView, setCurrentView] = useState('home'); // 'home', 'swipe', 'library'
   const [currentBook, setCurrentBook] = useState(0);
   const [showPhotoUpload, setShowPhotoUpload] = useState(false);
   const [userBooks, setUserBooks] = useState([]);
@@ -104,7 +104,7 @@ const BookPickerApp = () => {
           🎲 Pick My Next Read!
         </button>
         <button 
-          onClick={() => setCurrentView('swipe')}
+          onClick={() => setCurrentView('library')}
           className="w-full bg-white text-gray-700 p-4 rounded-xl font-medium border-2 border-gray-200 hover:border-purple-300 transition-all"
         >
           📚 Browse My Library ({loading ? '...' : userStats.inQueue || 0})
@@ -265,9 +265,133 @@ const BookPickerApp = () => {
     );
   }
 
+  const LibraryScreen = () => {
+    if (loading) {
+      return (
+        <div className="min-h-screen bg-gradient-to-br from-purple-50 to-pink-50 p-4 flex items-center justify-center">
+          <div className="text-center">
+            <BookOpen size={48} className="mx-auto mb-4 text-purple-500 animate-pulse" />
+            <p className="text-gray-600">Loading your library...</p>
+          </div>
+        </div>
+      );
+    }
+
+    if (userBooks.length === 0) {
+      return (
+        <div className="min-h-screen bg-gradient-to-br from-purple-50 to-pink-50 p-4">
+          <div className="pt-8 pb-6">
+            <button 
+              onClick={() => setCurrentView('home')}
+              className="text-gray-600 hover:text-gray-800 mb-4"
+            >
+              ← Back
+            </button>
+            <h2 className="text-2xl font-semibold text-gray-800 text-center">Your Library</h2>
+          </div>
+          
+          <div className="flex items-center justify-center flex-1">
+            <div className="text-center">
+              <BookOpen size={48} className="mx-auto mb-4 text-gray-400" />
+              <h3 className="text-xl font-semibold text-gray-800 mb-2">No books in your library!</h3>
+              <p className="text-gray-600 mb-6">Add some books by taking a photo of your bookshelf</p>
+              <button
+                onClick={() => setShowPhotoUpload(true)}
+                className="bg-purple-600 text-white px-6 py-3 rounded-xl font-medium hover:bg-purple-700 transition-colors"
+              >
+                📸 Add Books from Photo
+              </button>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-purple-50 to-pink-50 p-4">
+        <div className="pt-8 pb-6">
+          <button 
+            onClick={() => setCurrentView('home')}
+            className="text-gray-600 hover:text-gray-800 mb-4"
+          >
+            ← Back
+          </button>
+          <h2 className="text-2xl font-semibold text-gray-800 text-center">Your Library</h2>
+          <p className="text-center text-gray-600 mt-2">{userBooks.length} books in your TBR pile</p>
+        </div>
+
+        <div className="grid gap-4 max-w-2xl mx-auto">
+          {userBooks.map((book, index) => (
+            <div
+              key={book.id}
+              className="bg-white rounded-xl p-4 shadow-sm border border-gray-200 hover:shadow-md transition-shadow"
+            >
+              <div className="flex items-start gap-4">
+                <div className="w-12 h-16 bg-gradient-to-br from-purple-400 to-pink-400 rounded-lg flex items-center justify-center text-white text-xs font-medium flex-shrink-0">
+                  📚
+                </div>
+                
+                <div className="flex-1 min-w-0">
+                  <h3 className="font-semibold text-gray-800 text-lg leading-tight mb-1">
+                    {book.title}
+                  </h3>
+                  <p className="text-gray-600 mb-2">by {book.author}</p>
+                  
+                  <div className="flex items-center gap-3 text-sm">
+                    {book.pages && (
+                      <span className="text-gray-500">{book.pages} pages</span>
+                    )}
+                    {book.mood && (
+                      <span className="bg-purple-100 text-purple-700 px-2 py-1 rounded-full text-xs">
+                        {book.mood}
+                      </span>
+                    )}
+                    {book.source && (
+                      <span className="bg-gray-100 text-gray-600 px-2 py-1 rounded-full text-xs">
+                        {book.source === 'photo' ? '📸 From Photo' : book.source}
+                      </span>
+                    )}
+                  </div>
+                </div>
+                
+                <div className="flex flex-col gap-2">
+                  <span className="bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-medium">
+                    To Read
+                  </span>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <div className="mt-8 text-center">
+          <button
+            onClick={() => setShowPhotoUpload(true)}
+            className="bg-purple-600 text-white px-6 py-3 rounded-xl font-medium hover:bg-purple-700 transition-colors"
+          >
+            ➕ Add More Books
+          </button>
+        </div>
+      </div>
+    );
+  };
+
+  const renderCurrentView = () => {
+    switch(currentView) {
+      case 'home':
+        return <HomeScreen />;
+      case 'swipe':
+        return <SwipeScreen />;
+      case 'library':
+        return <LibraryScreen />;
+      default:
+        return <HomeScreen />;
+    }
+  };
+
   return (
     <div className="max-w-sm mx-auto bg-white min-h-screen">
-      {currentView === 'home' ? <HomeScreen /> : <SwipeScreen />}
+      {renderCurrentView()}
     </div>
   );
 };
