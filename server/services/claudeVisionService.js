@@ -125,11 +125,13 @@ IMPORTANT CONTEXT:
 
 TASK: Examine the image from TOP to BOTTOM and identify each of the ${expectedCount} book spines. For each spine, extract:
 
-1. TITLE: The main title (usually largest text on the spine)
-2. AUTHOR: Author's name if visible (often smaller text)
+1. TITLE: The COMPLETE title including subtitles (e.g., "You Suck: A Love Story" not just "You Suck")
+2. AUTHOR: Author's name if clearly visible on the spine
 3. SPINE_TEXT: All readable text you can see on that particular spine
 
 Work systematically from top to bottom. Don't skip any layers/bands in the stack.
+
+IMPORTANT: Only transcribe text that is ACTUALLY VISIBLE on each spine. Do not guess or substitute similar titles.
 
 Return exactly ${expectedCount} books in this JSON format:
 [
@@ -138,7 +140,14 @@ Return exactly ${expectedCount} books in this JSON format:
   ... (continue for all ${expectedCount} books)
 ]
 
-CRITICAL: You must return exactly ${expectedCount} books. If text is partially obscured, do your best to read what's visible. If you can't determine an author, use null.`
+CRITICAL RULES:
+1. You must return exactly ${expectedCount} books
+2. ONLY extract text that is ACTUALLY VISIBLE on the spine - do not guess or infer
+3. Read the COMPLETE title as shown on the spine, including subtitles (like "You Suck: A Love Story")
+4. If text is partially obscured, include only what you can actually see
+5. If you can't determine an author from the spine, use null
+6. DO NOT make assumptions about what a book might be based on partial text
+7. DO NOT substitute similar book titles - only use exactly what you see`
               }
             ]
           }

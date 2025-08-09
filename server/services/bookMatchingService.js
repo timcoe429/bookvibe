@@ -310,8 +310,8 @@ class BookMatchingService {
   async searchGoogleBooks(title) {
     try {
       const query = encodeURIComponent(title);
-      // Use more specific query to avoid false matches
-      const url = `${this.googleBooksBaseUrl}?q="${query}"&printType=books&orderBy=relevance&maxResults=5`;
+      // Use more specific query to avoid false matches and prefer original books
+      const url = `${this.googleBooksBaseUrl}?q="${query}"&printType=books&orderBy=relevance&maxResults=10`;
       const response = await axios.get(url, { timeout: 7000 });
 
       if (!response.data.items || response.data.items.length === 0) {
@@ -329,7 +329,7 @@ class BookMatchingService {
         const resultTitle = book.title || '';
         const normalizedResultTokens = this.normalizeTitle(resultTitle).split(' ').filter(Boolean);
 
-        // Reject summaries/study guides/companions
+        // Reject summaries/study guides/companions/analysis books
         const lowered = resultTitle.toLowerCase();
         if (
           lowered.startsWith('summary of') ||
@@ -342,7 +342,14 @@ class BookMatchingService {
           lowered.includes('cliffsnotes') ||
           lowered.includes('workbook') ||
           lowered.includes("author's guide") ||
-          lowered.includes('teacher guide')
+          lowered.includes('teacher guide') ||
+          lowered.includes('key takeaways') ||
+          lowered.includes('analysis & review') ||
+          lowered.includes('| analysis') ||
+          lowered.includes('instaread') ||
+          lowered.includes('summary by') ||
+          lowered.includes('notes on') ||
+          lowered.includes('book summary')
         ) {
           continue;
         }
@@ -387,8 +394,28 @@ class BookMatchingService {
 
       const book = best.volumeInfo;
       
+      // Clean up the title from common issues
+      let cleanedTitle = book.title;
+      
+      // Remove dates in parentheses like "(2006-08-31)"
+      cleanedTitle = cleanedTitle.replace(/\s*\([0-9]{4}-[0-9]{2}-[0-9]{2}\)/, '');
+      
+      // Remove author name if it appears in title (like "James Gleick's Chaos" -> "Chaos")
+      if (book.authors && book.authors.length > 0) {
+        const authorName = book.authors[0];
+        const authorLastName = authorName.split(' ').pop();
+        const possessivePattern = new RegExp(`^${authorName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}'?s\\s+`, 'i');
+        const lastNamePattern = new RegExp(`^${authorLastName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}'?s\\s+`, 'i');
+        
+        if (possessivePattern.test(cleanedTitle)) {
+          cleanedTitle = cleanedTitle.replace(possessivePattern, '');
+        } else if (lastNamePattern.test(cleanedTitle)) {
+          cleanedTitle = cleanedTitle.replace(lastNamePattern, '');
+        }
+      }
+      
       // Final verification: ensure the result contains most of our query words
-      const resultNormalized = this.normalizeTitle(book.title);
+      const resultNormalized = this.normalizeTitle(cleanedTitle);
       let queryWordsInResult = 0;
       let resultWordsInQuery = 0;
       
@@ -419,7 +446,7 @@ class BookMatchingService {
       }
       
       return {
-        title: book.title,
+        title: cleanedTitle.trim(),
         author: book.authors ? book.authors.join(', ') : 'Unknown Author',
         isbn: book.industryIdentifiers ? 
           book.industryIdentifiers.find(id => id.type === 'ISBN_13')?.identifier ||
