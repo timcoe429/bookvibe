@@ -278,7 +278,7 @@ router.post('/upload', upload.single('photo'), async (req, res) => {
       description: null,
       coverUrl: null, // No cover images needed
       genre: null,
-      mood: 'thoughtful', // Default mood
+      mood: detectedBook.mood, // Use GPT-4o mood - no fallback, it should always provide one
       averageRating: null,
       publicationYear: null,
       isbn: null,

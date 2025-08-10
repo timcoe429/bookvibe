@@ -188,6 +188,10 @@ CRITICAL: Analyze each title carefully and assign the most appropriate mood base
     const content = response.data.choices[0].message.content.trim();
     console.log('📖 GPT-4o full extraction response:', content);
     
+    // Log each individual mood assignment for debugging
+    console.log('🎭 MOOD DEBUG - Raw GPT-4o response content:');
+    console.log(content);
+    
     // Parse JSON response
     const jsonMatch = content.match(/\[[\s\S]*\]/);
     if (!jsonMatch) {
@@ -196,6 +200,11 @@ CRITICAL: Analyze each title carefully and assign the most appropriate mood base
     
     const books = JSON.parse(jsonMatch[0]);
     console.log(`📚 Parsed ${books.length} books from GPT-5 response`);
+    
+    // Debug each book's mood assignment
+    books.forEach((book, index) => {
+      console.log(`🎭 Book ${index + 1}: "${book.title}" = mood: "${book.mood}"`);
+    });
     
     return books;
   }
