@@ -8,8 +8,9 @@ const BookPickerApp = () => {
   const [currentBook, setCurrentBook] = useState(0);
   const [showPhotoUpload, setShowPhotoUpload] = useState(false);
   const [userBooks, setUserBooks] = useState([]);
+  const [currentlyReading, setCurrentlyReading] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [userStats, setUserStats] = useState({ inQueue: 0, totalBooks: 0 });
+  const [userStats, setUserStats] = useState({ inQueue: 0, totalBooks: 0, currentlyReading: 0 });
 
   const moods = [
     { icon: Coffee, label: "Cozy", color: "bg-amber-100 text-amber-800" },
@@ -28,16 +29,19 @@ const BookPickerApp = () => {
   const loadUserData = async () => {
     try {
       setLoading(true);
-      const [books, stats] = await Promise.all([
+      const [toReadBooks, readingBooks, stats] = await Promise.all([
         userAPI.getBooks({ status: 'to-read' }), // Get only books in TBR pile
+        userAPI.getBooks({ status: 'reading' }), // Get currently reading books
         userAPI.getStats()
       ]);
-      setUserBooks(books);
+      setUserBooks(toReadBooks);
+      setCurrentlyReading(readingBooks.length > 0 ? readingBooks[0] : null);
       setUserStats(stats);
     } catch (error) {
       console.error('Error loading user data:', error);
       setUserBooks([]);
-      setUserStats({ inQueue: 0, totalBooks: 0 });
+      setCurrentlyReading(null);
+      setUserStats({ inQueue: 0, totalBooks: 0, currentlyReading: 0 });
     } finally {
       setLoading(false);
     }
@@ -60,6 +64,59 @@ const BookPickerApp = () => {
     setShowPhotoUpload(false);
   };
 
+  // Handle selecting a book to start reading
+  const handleStartReading = async (book) => {
+    try {
+      await userAPI.updateBookStatus(book.id, 'reading');
+      setCurrentlyReading(book);
+      // Remove from TBR list
+      setUserBooks(prev => prev.filter(b => b.id !== book.id));
+      setCurrentView('home'); // Go back to home to show currently reading
+    } catch (error) {
+      console.error('Error starting book:', error);
+    }
+  };
+
+  // Handle marking current book as finished
+  const handleFinishBook = async (removeFromLibrary = false) => {
+    if (!currentlyReading) return;
+    
+    try {
+      if (removeFromLibrary) {
+        // Completely remove from library
+        await userAPI.removeBook(currentlyReading.id);
+      } else {
+        // Mark as read
+        await userAPI.updateBookStatus(currentlyReading.id, 'read');
+      }
+      
+      setCurrentlyReading(null);
+      // Refresh data to update stats
+      await loadUserData();
+    } catch (error) {
+      console.error('Error finishing book:', error);
+    }
+  };
+
+  // Handle moving current book back to TBR
+  const handleBackToTBR = async () => {
+    if (!currentlyReading) return;
+    
+    try {
+      await userAPI.updateBookStatus(currentlyReading.id, 'to-read');
+      // Add back to TBR list
+      setUserBooks(prev => [...prev, currentlyReading]);
+      setCurrentlyReading(null);
+    } catch (error) {
+      console.error('Error moving book back to TBR:', error);
+    }
+  };
+
+  // Handle skipping a book (remove from current view but keep in TBR)
+  const handleSkipBook = () => {
+    setCurrentBook((prev) => (prev + 1) % userBooks.length);
+  };
+
   const HomeScreen = () => (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 to-pink-50 p-4">
       {/* Header */}
@@ -77,6 +134,47 @@ const BookPickerApp = () => {
           </div>
         </div>
       </div>
+
+      {/* Currently Reading Section */}
+      {currentlyReading && (
+        <div className="mb-8 bg-white rounded-2xl p-6 shadow-lg border border-purple-100">
+          <div className="flex items-center mb-4">
+            <Clock size={20} className="text-purple-500 mr-2" />
+            <h3 className="text-lg font-semibold text-gray-800">Currently Reading</h3>
+          </div>
+          
+          <div className="bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl p-4 text-white mb-4">
+            <h4 className="text-xl font-bold mb-1">{currentlyReading.title}</h4>
+            <p className="text-purple-100">by {currentlyReading.author}</p>
+            {currentlyReading.pages && (
+              <p className="text-sm text-purple-100 mt-2">{currentlyReading.pages} pages</p>
+            )}
+          </div>
+          
+          <div className="space-y-2">
+            <div className="flex space-x-3">
+              <button
+                onClick={() => handleFinishBook(false)}
+                className="flex-1 bg-green-500 text-white py-2 px-4 rounded-lg font-medium hover:bg-green-600 transition-colors"
+              >
+                ✅ Mark as Read
+              </button>
+              <button
+                onClick={() => handleFinishBook(true)}
+                className="flex-1 bg-red-500 text-white py-2 px-4 rounded-lg font-medium hover:bg-red-600 transition-colors"
+              >
+                🗑️ Remove from Library
+              </button>
+            </div>
+            <button
+              onClick={handleBackToTBR}
+              className="w-full bg-gray-500 text-white py-2 px-4 rounded-lg font-medium hover:bg-gray-600 transition-colors text-sm"
+            >
+              ↩️ Back to TBR Pile
+            </button>
+          </div>
+        </div>
+      )}
 
         <div className="mb-8">
         <h3 className="text-lg font-semibold text-gray-800 mb-4">What matches your mood?</h3>
@@ -97,12 +195,24 @@ const BookPickerApp = () => {
 
       {/* Quick Actions */}
       <div className="space-y-3">
-        <button 
-          onClick={() => setCurrentView('swipe')}
-          className="w-full bg-gradient-to-r from-purple-500 to-pink-500 text-white p-4 rounded-xl font-semibold text-lg shadow-lg hover:shadow-xl transition-all"
-        >
-          🎲 Pick My Next Read!
-        </button>
+        {!currentlyReading && userBooks.length > 0 && (
+          <button 
+            onClick={() => setCurrentView('swipe')}
+            className="w-full bg-gradient-to-r from-purple-500 to-pink-500 text-white p-4 rounded-xl font-semibold text-lg shadow-lg hover:shadow-xl transition-all"
+          >
+            🎲 Pick My Next Read!
+          </button>
+        )}
+        
+        {currentlyReading && (
+          <button 
+            onClick={() => setCurrentView('swipe')}
+            className="w-full bg-gray-400 text-white p-4 rounded-xl font-semibold text-lg shadow-lg"
+            disabled
+          >
+            📖 Finish current book first
+          </button>
+        )}
         <button 
           onClick={() => setCurrentView('library')}
           className="w-full bg-white text-gray-700 p-4 rounded-xl font-medium border-2 border-gray-200 hover:border-purple-300 transition-all"
@@ -136,14 +246,29 @@ const BookPickerApp = () => {
         <div className="min-h-screen bg-gradient-to-br from-purple-50 to-pink-50 p-4 flex items-center justify-center">
           <div className="text-center">
             <BookOpen size={48} className="mx-auto mb-4 text-gray-400" />
-            <h3 className="text-xl font-semibold text-gray-800 mb-2">No books in your TBR pile!</h3>
-            <p className="text-gray-600 mb-6">Add some books by taking a photo of your bookshelf</p>
-            <button
-              onClick={() => setShowPhotoUpload(true)}
-              className="bg-purple-600 text-white px-6 py-3 rounded-xl font-medium hover:bg-purple-700 transition-colors"
-            >
-              📸 Add Books from Photo
-            </button>
+            <h3 className="text-xl font-semibold text-gray-800 mb-2">
+              {currentlyReading ? "All caught up!" : "No books in your TBR pile!"}
+            </h3>
+            <p className="text-gray-600 mb-6">
+              {currentlyReading 
+                ? "Finish your current book, then add more to your TBR pile" 
+                : "Add some books by taking a photo of your bookshelf"
+              }
+            </p>
+            <div className="space-y-3">
+              <button
+                onClick={() => setShowPhotoUpload(true)}
+                className="bg-purple-600 text-white px-6 py-3 rounded-xl font-medium hover:bg-purple-700 transition-colors"
+              >
+                📸 Add Books from Photo
+              </button>
+              <button
+                onClick={() => setCurrentView('home')}
+                className="block mx-auto text-purple-600 hover:text-purple-800"
+              >
+                ← Back to Home
+              </button>
+            </div>
           </div>
         </div>
       );
@@ -167,7 +292,13 @@ const BookPickerApp = () => {
     }
     
     const handleSwipe = (direction) => {
-      setCurrentBook((prev) => (prev + 1) % userBooks.length);
+      if (direction === 'right') {
+        // Heart = start reading this book
+        handleStartReading(book);
+      } else {
+        // X = skip to next book
+        handleSkipBook();
+      }
     };
 
     return (
@@ -245,10 +376,10 @@ const BookPickerApp = () => {
 
         <div className="text-center mt-6">
           <p className="text-gray-600 text-sm">
-            ❤️ to read next • ✕ to skip for now
+            ❤️ start reading • ✕ skip for now
           </p>
           <p className="text-gray-500 text-xs mt-1">
-            From your personal TBR library
+            Choose your next book to read
           </p>
         </div>
       </div>
