@@ -148,14 +148,14 @@ const BookPickerApp = () => {
       messageIndex = (messageIndex + 1) % thinkingMessages.length;
     }, 800);
 
-    // Show thinking animation for 3-4 seconds
+    // Show thinking animation for 6 seconds
     setTimeout(() => {
       clearInterval(messageInterval);
       setIsThinking(false);
       setCurrentView('swipe');
       // Randomize the starting book
       setCurrentBook(Math.floor(Math.random() * userBooks.length));
-    }, 3200);
+    }, 6000);
   };
 
   const HomeScreen = () => (
@@ -548,30 +548,33 @@ const BookPickerApp = () => {
   };
 
   const ThinkingScreen = () => (
-    <div className="min-h-screen bg-gradient-to-br from-purple-500 to-pink-500 p-4 flex items-center justify-center">
-      <div className="text-center text-white">
-        <div className="mb-8">
-          <div className="text-8xl mb-6 animate-bounce">🎲</div>
-          <h2 className="text-3xl font-bold mb-4">Finding Your Perfect Book...</h2>
+    <div className="min-h-screen bg-gradient-to-br from-purple-500 to-pink-500 p-6 flex flex-col justify-center">
+      <div className="text-center text-white space-y-8">
+        {/* Giant dice and title */}
+        <div className="space-y-6">
+          <div className="text-9xl animate-bounce">🎲</div>
+          <h2 className="text-4xl font-bold leading-tight">Finding Your Perfect Book...</h2>
         </div>
         
-        <div className="bg-white bg-opacity-20 rounded-2xl p-6 backdrop-blur-sm">
-          <div className="flex items-center justify-center mb-4">
-            <div className="w-6 h-6 border-3 border-white border-t-transparent rounded-full animate-spin mr-3"></div>
-            <span className="text-xl font-medium">Thinking...</span>
+        {/* Thinking status and message */}
+        <div className="bg-white bg-opacity-20 rounded-2xl p-8 backdrop-blur-sm max-w-md mx-auto">
+          <div className="flex items-center justify-center mb-6">
+            <div className="w-8 h-8 border-4 border-white border-t-transparent rounded-full animate-spin mr-4"></div>
+            <span className="text-2xl font-semibold">Thinking...</span>
           </div>
           
-          <p className="text-lg opacity-90 min-h-[2rem] transition-all duration-300">
+          <p className="text-xl opacity-90 min-h-[3rem] transition-all duration-300 leading-relaxed">
             {thinkingMessage}
           </p>
         </div>
         
-        <div className="mt-8 flex justify-center space-x-2">
+        {/* Animated dots */}
+        <div className="flex justify-center space-x-3">
           {[...Array(4)].map((_, i) => (
             <div
               key={i}
-              className="w-3 h-3 bg-white rounded-full animate-pulse"
-              style={{ animationDelay: `${i * 0.2}s` }}
+              className="w-4 h-4 bg-white rounded-full animate-pulse"
+              style={{ animationDelay: `${i * 0.3}s` }}
             />
           ))}
         </div>
