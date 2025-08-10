@@ -141,12 +141,20 @@ const BookPickerApp = () => {
     setIsThinking(true);
     setCurrentView('thinking');
     
-    // Cycle through thinking messages
+    // Pick 3 random messages to show
+    const shuffledMessages = [...thinkingMessages].sort(() => Math.random() - 0.5);
+    const selectedMessages = shuffledMessages.slice(0, 3);
+    
+    // Show each message for 2 seconds
     let messageIndex = 0;
+    setThinkingMessage(selectedMessages[0]);
+    
     const messageInterval = setInterval(() => {
-      setThinkingMessage(thinkingMessages[messageIndex]);
-      messageIndex = (messageIndex + 1) % thinkingMessages.length;
-    }, 800);
+      messageIndex++;
+      if (messageIndex < selectedMessages.length) {
+        setThinkingMessage(selectedMessages[messageIndex]);
+      }
+    }, 2000);
 
     // Show thinking animation for 6 seconds
     setTimeout(() => {
