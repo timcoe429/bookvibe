@@ -278,7 +278,10 @@ router.post('/upload', upload.single('photo'), async (req, res) => {
       description: null,
       coverUrl: null, // No cover images needed
       genre: null,
-      mood: detectedBook.mood, // Use GPT-4o mood - no fallback, it should always provide one
+      mood: detectedBook.mood || (() => {
+        console.error(`🚨 GPT-4o failed to provide mood for "${detectedBook.title}" - using fallback`);
+        return 'escapist';
+      })(), // Use GPT-4o mood, but fallback with error logging if missing
       averageRating: null,
       publicationYear: null,
       isbn: null,
