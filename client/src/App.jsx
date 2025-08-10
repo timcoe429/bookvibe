@@ -11,6 +11,8 @@ const BookPickerApp = () => {
   const [currentlyReading, setCurrentlyReading] = useState(null);
   const [loading, setLoading] = useState(true);
   const [userStats, setUserStats] = useState({ inQueue: 0, totalBooks: 0, currentlyReading: 0 });
+  const [isThinking, setIsThinking] = useState(false);
+  const [thinkingMessage, setThinkingMessage] = useState('');
 
   const moods = [
     { icon: Coffee, label: "Cozy", color: "bg-amber-100 text-amber-800" },
@@ -19,6 +21,29 @@ const BookPickerApp = () => {
     { icon: Moon, label: "Dark", color: "bg-purple-100 text-purple-800" },
     { icon: Sun, label: "Uplifting", color: "bg-yellow-100 text-yellow-800" },
     { icon: BookOpen, label: "Literary", color: "bg-blue-100 text-blue-800" }
+  ];
+
+  const thinkingMessages = [
+    "🏰 Exploring the halls of Hogwarts...",
+    "🧙‍♂️ Consulting with Gandalf about your next adventure...",
+    "🌙 Searching through moonlit libraries...",
+    "🐉 Crawling through dungeons with Donut and Carl...",
+    "📚 Whispering to ancient tomes...",
+    "✨ Casting a perfect book selection spell...",
+    "🔮 Gazing into the crystal ball of stories...",
+    "🗝️ Unlocking secret literary chambers...",
+    "🌟 Following shooting stars to hidden tales...",
+    "🦋 Chasing book fairies through enchanted shelves...",
+    "🎭 Consulting the dramatic spirits of great authors...",
+    "🌊 Diving deep into oceans of prose...",
+    "🍄 Discovering books in magical mushroom circles...",
+    "🦉 Getting recommendations from wise old owls...",
+    "🎪 Asking the circus of characters for advice...",
+    "🌈 Following rainbows to pots of golden stories...",
+    "🗿 Deciphering ancient reading runes...",
+    "🎨 Painting the perfect literary landscape...",
+    "🎭 Interviewing fictional characters about their favorites...",
+    "🔥 Warming up by the fireplace of great literature..."
   ];
 
   // Load user data on component mount
@@ -111,6 +136,28 @@ const BookPickerApp = () => {
     setCurrentBook((prev) => (prev + 1) % userBooks.length);
   };
 
+  // Handle the magical dice roll with fun thinking animation
+  const handleDiceRoll = async () => {
+    setIsThinking(true);
+    setCurrentView('thinking');
+    
+    // Cycle through thinking messages
+    let messageIndex = 0;
+    const messageInterval = setInterval(() => {
+      setThinkingMessage(thinkingMessages[messageIndex]);
+      messageIndex = (messageIndex + 1) % thinkingMessages.length;
+    }, 800);
+
+    // Show thinking animation for 3-4 seconds
+    setTimeout(() => {
+      clearInterval(messageInterval);
+      setIsThinking(false);
+      setCurrentView('swipe');
+      // Randomize the starting book
+      setCurrentBook(Math.floor(Math.random() * userBooks.length));
+    }, 3200);
+  };
+
   const HomeScreen = () => (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 to-pink-50 p-4">
       {/* Header */}
@@ -179,7 +226,7 @@ const BookPickerApp = () => {
           {moods.map((mood, idx) => (
             <button
               key={idx}
-              onClick={() => setCurrentView('swipe')}
+              onClick={handleDiceRoll}
               className={`${mood.color} p-4 rounded-xl flex flex-col items-center space-y-2 transition-all hover:scale-105 active:scale-95`}
             >
               <mood.icon size={24} />
@@ -194,8 +241,8 @@ const BookPickerApp = () => {
       <div className="space-y-3">
         {!currentlyReading && userBooks.length > 0 && (
           <button 
-            onClick={() => setCurrentView('swipe')}
-            className="w-full bg-gradient-to-r from-purple-500 to-pink-500 text-white p-4 rounded-xl font-semibold text-lg shadow-lg hover:shadow-xl transition-all"
+            onClick={handleDiceRoll}
+            className="w-full bg-gradient-to-r from-purple-500 to-pink-500 text-white p-4 rounded-xl font-semibold text-lg shadow-lg hover:shadow-xl transition-all active:scale-95"
           >
             🎲 Pick My Next Read!
           </button>
@@ -500,10 +547,44 @@ const BookPickerApp = () => {
     );
   };
 
+  const ThinkingScreen = () => (
+    <div className="min-h-screen bg-gradient-to-br from-purple-500 to-pink-500 p-4 flex items-center justify-center">
+      <div className="text-center text-white">
+        <div className="mb-8">
+          <div className="text-8xl mb-6 animate-bounce">🎲</div>
+          <h2 className="text-3xl font-bold mb-4">Finding Your Perfect Book...</h2>
+        </div>
+        
+        <div className="bg-white bg-opacity-20 rounded-2xl p-6 backdrop-blur-sm">
+          <div className="flex items-center justify-center mb-4">
+            <div className="w-6 h-6 border-3 border-white border-t-transparent rounded-full animate-spin mr-3"></div>
+            <span className="text-xl font-medium">Thinking...</span>
+          </div>
+          
+          <p className="text-lg opacity-90 min-h-[2rem] transition-all duration-300">
+            {thinkingMessage}
+          </p>
+        </div>
+        
+        <div className="mt-8 flex justify-center space-x-2">
+          {[...Array(4)].map((_, i) => (
+            <div
+              key={i}
+              className="w-3 h-3 bg-white rounded-full animate-pulse"
+              style={{ animationDelay: `${i * 0.2}s` }}
+            />
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+
   const renderCurrentView = () => {
     switch(currentView) {
       case 'home':
         return <HomeScreen />;
+      case 'thinking':
+        return <ThinkingScreen />;
       case 'swipe':
         return <SwipeScreen />;
       case 'library':
