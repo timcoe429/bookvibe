@@ -166,7 +166,7 @@ router.post('/bulk-import', async (req, res) => {
           console.log(`📚 Book "${bookData.title}" already exists, updating mood from "${existingBook.mood}" to "${bookData.mood}"`);
           // Update the existing book with new mood from AI
           await existingBook.update({
-            mood: bookData.mood || 'escapist'
+            mood: bookData.mood // GPT-4o should always provide mood
           });
           book = existingBook;
           console.log(`✅ Updated existing book: "${book.title}" with new mood: ${book.mood}`);
@@ -177,7 +177,10 @@ router.post('/bulk-import', async (req, res) => {
             author: bookData.author || 'Unknown Author',
             pages: bookData.pages || null,
             description: bookData.description || null,
-            mood: bookData.mood || 'escapist' // Default to escapist instead of thoughtful
+            mood: bookData.mood || (() => {
+              console.error(`🚨 GPT-4o failed to provide mood for "${bookData.title}" - using fallback`);
+              return 'escapist';
+            })() // Use GPT-4o mood, but fallback with error logging if missing
           };
           
           book = await Book.create(bookCreateData);
