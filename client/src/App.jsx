@@ -173,14 +173,31 @@ const BookPickerApp = () => {
     const shuffledMessages = [...thinkingMessages].sort(() => Math.random() - 0.5);
     const selectedMessages = shuffledMessages.slice(0, 3);
     
-    // Show each message for 2 seconds
+    // Show each message for 2 seconds with smooth transitions
     let messageIndex = 0;
     setThinkingMessage(selectedMessages[0]);
     
     const messageInterval = setInterval(() => {
       messageIndex++;
       if (messageIndex < selectedMessages.length) {
-        setThinkingMessage(selectedMessages[messageIndex]);
+        // Fade out current message
+        const messageElement = document.querySelector('.thinking-message');
+        if (messageElement) {
+          messageElement.style.opacity = '0';
+          messageElement.style.transform = 'translateY(10px)';
+          
+          // Fade in new message after short delay
+          setTimeout(() => {
+            setThinkingMessage(selectedMessages[messageIndex]);
+            setTimeout(() => {
+              const newMessageElement = document.querySelector('.thinking-message');
+              if (newMessageElement) {
+                newMessageElement.style.opacity = '1';
+                newMessageElement.style.transform = 'translateY(0)';
+              }
+            }, 50);
+          }, 200);
+        }
       }
     }, 2000);
 
@@ -599,7 +616,7 @@ const BookPickerApp = () => {
             <span className="text-lg font-medium opacity-90">Thinking...</span>
           </div>
           
-          <p className="text-3xl font-bold min-h-[4rem] transition-all duration-500 leading-relaxed">
+          <p className="thinking-message text-3xl font-bold min-h-[4rem] transition-all duration-300 ease-in-out leading-relaxed">
             {thinkingMessage}
           </p>
         </div>
