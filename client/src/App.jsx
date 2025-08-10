@@ -24,6 +24,7 @@ const BookPickerApp = () => {
   ];
 
   const thinkingMessages = [
+    // Fantasy book character references
     "🏰 Consulting with Hermione in the Hogwarts library...",
     "🧙‍♂️ Asking Gandalf for his reading recommendations...",
     "🐉 Crawling through dungeons with Dungeon Crawler Carl...",
@@ -39,7 +40,38 @@ const BookPickerApp = () => {
     "🏔️ Climbing Mount Doom to find the ultimate story...",
     "🦉 Asking Hedwig to deliver the perfect book...",
     "🌙 Wandering the Forbidden Forest for magical tales...",
-    "🔮 Peering into Palantír for glimpses of great stories..."
+    "🔮 Peering into Palantír for glimpses of great stories...",
+    
+    // More fantasy references
+    "🦁 Consulting with Aslan in the Narnia library...",
+    "🐺 Running with Jon Snow through the Wall's archives...",
+    "🐉 Asking Daenerys about her favorite dragon tales...",
+    "🗺️ Following Bilbo's map to hidden book treasures...",
+    "⚔️ Training with Arya Stark in literary assassination...",
+    "🌊 Diving with Percy Jackson into oceanic stories...",
+    "🏛️ Exploring Camp Half-Blood's secret reading nook...",
+    "🔥 Warming up with Tyrion Lannister's book collection...",
+    "🦄 Galloping with unicorns to enchanted libraries...",
+    "🐾 Following Greywind's scent to buried manuscripts...",
+    
+    // Magical generic ones
+    "🌙 Searching through moonlit libraries...",
+    "📚 Whispering to ancient tomes...",
+    "✨ Casting a perfect book selection spell...",
+    "🔮 Gazing into the crystal ball of stories...",
+    "🗝️ Unlocking secret literary chambers...",
+    "🌟 Following shooting stars to hidden tales...",
+    "🦋 Chasing book fairies through enchanted shelves...",
+    "🎭 Consulting the dramatic spirits of great authors...",
+    "🌊 Diving deep into oceans of prose...",
+    "🍄 Discovering books in magical mushroom circles...",
+    "🦉 Getting recommendations from wise old owls...",
+    "🎪 Asking the circus of characters for advice...",
+    "🌈 Following rainbows to pots of golden stories...",
+    "🗿 Deciphering ancient reading runes...",
+    "🎨 Painting the perfect literary landscape...",
+    "🎭 Interviewing fictional characters about their favorites...",
+    "🔥 Warming up by the fireplace of great literature..."
   ];
 
   // Load user data on component mount
