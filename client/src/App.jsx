@@ -24,26 +24,22 @@ const BookPickerApp = () => {
   ];
 
   const thinkingMessages = [
-    "🏰 Exploring the halls of Hogwarts...",
-    "🧙‍♂️ Consulting with Gandalf about your next adventure...",
-    "🌙 Searching through moonlit libraries...",
-    "🐉 Crawling through dungeons with Donut and Carl...",
-    "📚 Whispering to ancient tomes...",
-    "✨ Casting a perfect book selection spell...",
-    "🔮 Gazing into the crystal ball of stories...",
-    "🗝️ Unlocking secret literary chambers...",
-    "🌟 Following shooting stars to hidden tales...",
-    "🦋 Chasing book fairies through enchanted shelves...",
-    "🎭 Consulting the dramatic spirits of great authors...",
-    "🌊 Diving deep into oceans of prose...",
-    "🍄 Discovering books in magical mushroom circles...",
-    "🦉 Getting recommendations from wise old owls...",
-    "🎪 Asking the circus of characters for advice...",
-    "🌈 Following rainbows to pots of golden stories...",
-    "🗿 Deciphering ancient reading runes...",
-    "🎨 Painting the perfect literary landscape...",
-    "🎭 Interviewing fictional characters about their favorites...",
-    "🔥 Warming up by the fireplace of great literature..."
+    "🏰 Consulting with Hermione in the Hogwarts library...",
+    "🧙‍♂️ Asking Gandalf for his reading recommendations...",
+    "🐉 Crawling through dungeons with Dungeon Crawler Carl...",
+    "🚪 Opening magical doors with Cassie from The Book of Doors...",
+    "💍 Searching the libraries of Rivendell with Elrond...",
+    "⚡ Checking Harry's booklist for Defense Against Dark Arts...",
+    "🦅 Flying with Fawkes to find the perfect tale...",
+    "🗡️ Raiding Smaug's treasure hoard for hidden stories...",
+    "🧝‍♀️ Getting book suggestions from Galadriel's wisdom...",
+    "🐲 Following Carl and Princess Donut through the dungeon...",
+    "📖 Rifling through Tom Riddle's diary collection...",
+    "🚪 Stepping through mysterious doors to new worlds...",
+    "🏔️ Climbing Mount Doom to find the ultimate story...",
+    "🦉 Asking Hedwig to deliver the perfect book...",
+    "🌙 Wandering the Forbidden Forest for magical tales...",
+    "🔮 Peering into Palantír for glimpses of great stories..."
   ];
 
   // Load user data on component mount
@@ -557,31 +553,31 @@ const BookPickerApp = () => {
 
   const ThinkingScreen = () => (
     <div className="min-h-screen bg-gradient-to-br from-purple-500 to-pink-500 p-6 flex flex-col justify-center">
-      <div className="text-center text-white space-y-8">
-        {/* Giant dice and title */}
-        <div className="space-y-6">
-          <div className="text-9xl animate-bounce">🎲</div>
-          <h2 className="text-4xl font-bold leading-tight">Finding Your Perfect Book...</h2>
+      <div className="text-center text-white space-y-6">
+        {/* Smaller dice and title at top */}
+        <div className="space-y-3">
+          <div className="text-5xl animate-bounce">🎲</div>
+          <h2 className="text-xl font-medium opacity-80">Finding Your Perfect Book...</h2>
         </div>
         
-        {/* Thinking status and message */}
-        <div className="bg-white bg-opacity-20 rounded-2xl p-8 backdrop-blur-sm max-w-md mx-auto">
-          <div className="flex items-center justify-center mb-6">
-            <div className="w-8 h-8 border-4 border-white border-t-transparent rounded-full animate-spin mr-4"></div>
-            <span className="text-2xl font-semibold">Thinking...</span>
+        {/* BIG MAIN FOCUS: The thinking message */}
+        <div className="bg-white bg-opacity-25 rounded-3xl p-10 backdrop-blur-sm mx-auto shadow-2xl border border-white border-opacity-20">
+          <div className="flex items-center justify-center mb-8">
+            <div className="w-6 h-6 border-3 border-white border-t-transparent rounded-full animate-spin mr-3"></div>
+            <span className="text-lg font-medium opacity-90">Thinking...</span>
           </div>
           
-          <p className="text-xl opacity-90 min-h-[3rem] transition-all duration-300 leading-relaxed">
+          <p className="text-3xl font-bold min-h-[4rem] transition-all duration-500 leading-relaxed">
             {thinkingMessage}
           </p>
         </div>
         
-        {/* Animated dots */}
-        <div className="flex justify-center space-x-3">
+        {/* Smaller animated dots */}
+        <div className="flex justify-center space-x-2 mt-8">
           {[...Array(4)].map((_, i) => (
             <div
               key={i}
-              className="w-4 h-4 bg-white rounded-full animate-pulse"
+              className="w-3 h-3 bg-white bg-opacity-60 rounded-full animate-pulse"
               style={{ animationDelay: `${i * 0.3}s` }}
             />
           ))}
