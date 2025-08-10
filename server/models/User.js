@@ -23,7 +23,7 @@ const User = sequelize.define('User', {
     defaultValue: {
       favoriteGenres: [],
       readingGoal: 52,
-      preferredMoods: ['escapist']
+      preferredMoods: ['cozy']
     }
   },
   stats: {

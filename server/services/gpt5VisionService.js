@@ -129,11 +129,13 @@ TASK: Identify each of the ${expectedCount} book spines and extract:
 
 1. TITLE: Complete title as shown on spine (including subtitles)
 2. AUTHOR: Full author name if visible on spine
-3. MOOD: Classify based on title/content as: "escapist", "intense", "thoughtful", or "light"
-   - escapist: Fiction, romance, fantasy, adventure, mysteries, novels
-   - intense: Thrillers, horror, dark topics, serious drama, true crime
-   - thoughtful: Non-fiction, philosophy, memoirs, self-help, spirituality, psychology, personal development
-   - light: Comedy, humor, light romance, feel-good stories, entertainment
+3. MOOD: Classify based on title/content as: "cozy", "thrilling", "romantic", "dark", "uplifting", or "literary"
+   - cozy: Contemporary fiction, family stories, cozy mysteries, fantasy, everyday life
+   - thrilling: Thrillers, mysteries, suspense, crime, action, adventure
+   - romantic: Romance novels, love stories, relationship-focused books
+   - dark: Horror, psychological thrillers, dystopian, dark topics, true crime
+   - uplifting: Comedy, humor, inspirational, feel-good stories, self-help
+   - literary: Literary fiction, classics, philosophy, memoirs, serious literature
 
 CRITICAL REQUIREMENTS:
 - Return exactly ${expectedCount} books
@@ -143,31 +145,33 @@ CRITICAL REQUIREMENTS:
 - Work systematically to avoid missing books
 
 MOOD CLASSIFICATION EXAMPLES:
-- Business books like "Good to Great" = thoughtful
-- Self-help like "Soul without Shame" = thoughtful  
-- Psychology like "The Enneagram" = thoughtful
-- Spirituality like "Awake in the Wild" = thoughtful
-- Science books like "Chaos" = thoughtful
-- History like "Tutankhamun" = thoughtful
-- Fiction novels like "Waiting", "March", "A Week in December" = escapist
-- Thrillers/crime like "L.A. Dead" = intense
-- Humor/comedy like "You Suck", "A Spot of Bother", "Snow in May" = light
-- Travel stories like "Unsavory Elements", "A Time of Gifts" = light
-- Nature writing like "Landmarks", "A Year on the Wing" = escapist
+- Business books like "Good to Great" = literary
+- Self-help like "Soul without Shame" = uplifting  
+- Psychology like "The Enneagram" = literary
+- Spirituality like "Awake in the Wild" = uplifting
+- Science books like "Chaos" = literary
+- History like "Tutankhamun" = literary
+- Fiction novels like "Waiting", "March", "A Week in December" = cozy
+- Thrillers/crime like "L.A. Dead" = thrilling
+- Humor/comedy like "You Suck", "A Spot of Bother", "Snow in May" = uplifting
+- Travel stories like "Unsavory Elements", "A Time of Gifts" = uplifting
+- Nature writing like "Landmarks", "A Year on the Wing" = cozy
+- Romance like "Beach Read", "The Seven Husbands of Evelyn Hugo" = romantic
+- Horror like "Mexican Gothic" = dark
 
 CRITICAL MOOD ASSIGNMENTS:
-- "You Suck" by Christopher Moore = light (humor/comedy)
-- "A Spot of Bother" by Mark Haddon = light (comedy)
-- "Waiting" by Ha Jin = escapist (literary fiction)
-- "L.A. Dead" by Stuart Woods = intense (thriller)
-- "March" by Geraldine Brooks = escapist (historical fiction)
-- "Landmarks" by Robert Macfarlane = escapist (nature writing)
-- "Harvest" by Jim Crace = escapist (literary fiction)
+- "You Suck" by Christopher Moore = uplifting (humor/comedy)
+- "A Spot of Bother" by Mark Haddon = uplifting (comedy)
+- "Waiting" by Ha Jin = cozy (literary fiction)
+- "L.A. Dead" by Stuart Woods = thrilling (thriller)
+- "March" by Geraldine Brooks = cozy (historical fiction)
+- "Landmarks" by Robert Macfarlane = cozy (nature writing)
+- "Harvest" by Jim Crace = literary (literary fiction)
 
 Return JSON array in this exact format:
 [
-  {"title": "Complete Book Title", "author": "Full Author Name or null", "mood": "thoughtful"},
-  {"title": "Next Book Title", "author": "Author Name or null", "mood": "escapist"},
+  {"title": "Complete Book Title", "author": "Full Author Name or null", "mood": "literary"},
+  {"title": "Next Book Title", "author": "Author Name or null", "mood": "cozy"},
   ... (exactly ${expectedCount} books)
 ]
 

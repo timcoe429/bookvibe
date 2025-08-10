@@ -8,7 +8,7 @@ const bookService = require('../services/bookMatchingService');
 // Get book recommendations based on mood and user preferences
 router.get('/recommendations', async (req, res) => {
   try {
-    const { sessionId, mood = 'escapist', limit = 1 } = req.query;
+    const { sessionId, mood = 'cozy', limit = 1 } = req.query;
     
     if (!sessionId) {
       return res.status(400).json({ error: 'Session ID required' });

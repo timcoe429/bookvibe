@@ -143,11 +143,13 @@ TASK: Systematically identify each of the ${expectedCount} book spines. For each
 
 1. TITLE: The COMPLETE title including subtitles (e.g., "You Suck: A Love Story" not just "You Suck")
 2. AUTHOR: Full author name if clearly visible on the spine (first and last name when possible)
-3. MOOD: Based on the title and any visible content, classify as one of: "escapist", "intense", "thoughtful", "light"
-   - escapist: Fiction, romance, fantasy, adventure, mysteries
-   - intense: Thrillers, horror, dark topics, serious drama
-   - thoughtful: Non-fiction, philosophy, memoirs, literary fiction, self-help
-   - light: Comedy, humor, light romance, feel-good stories
+3. MOOD: Based on the title and any visible content, classify as one of: "cozy", "thrilling", "romantic", "dark", "uplifting", "literary"
+   - cozy: Contemporary fiction, family stories, cozy mysteries, fantasy, everyday life
+   - thrilling: Thrillers, mysteries, suspense, crime, action, adventure
+   - romantic: Romance novels, love stories, relationship-focused books
+   - dark: Horror, psychological thrillers, dystopian, dark topics, true crime
+   - uplifting: Comedy, humor, inspirational, feel-good stories, self-help
+   - literary: Literary fiction, classics, philosophy, memoirs, serious literature
 4. SPINE_TEXT: All readable text you can see on that particular spine
 
 Work systematically from top to bottom. Don't skip any layers/bands in the stack.
@@ -156,8 +158,8 @@ IMPORTANT: Only transcribe text that is ACTUALLY VISIBLE on each spine. Do not g
 
 Return exactly ${expectedCount} books in this JSON format:
 [
-  {"title": "Complete Title", "author": "Full Author Name or null", "mood": "thoughtful", "spine_text": "All visible text on this spine"},
-  {"title": "Next Book Title", "author": "Full Author Name or null", "mood": "escapist", "spine_text": "All visible text"},
+  {"title": "Complete Title", "author": "Full Author Name or null", "mood": "literary", "spine_text": "All visible text on this spine"},
+  {"title": "Next Book Title", "author": "Full Author Name or null", "mood": "cozy", "spine_text": "All visible text"},
   ... (continue for all ${expectedCount} books)
 ]
 

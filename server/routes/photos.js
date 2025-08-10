@@ -280,7 +280,7 @@ router.post('/upload', upload.single('photo'), async (req, res) => {
       genre: null,
       mood: detectedBook.mood || (() => {
         console.error(`🚨 GPT-4o failed to provide mood for "${detectedBook.title}" - using fallback`);
-        return 'escapist';
+        return 'cozy';
       })(), // Use GPT-4o mood, but fallback with error logging if missing
       averageRating: null,
       publicationYear: null,

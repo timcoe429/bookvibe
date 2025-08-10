@@ -532,52 +532,72 @@ class BookMatchingService {
 
   // Infer reading mood from genre
   inferMoodFromGenre(genre) {
-    if (!genre) return 'escapist';
+    if (!genre) return 'cozy';
     
     const genreLower = genre.toLowerCase();
     
-    if (genreLower.includes('romance') || genreLower.includes('contemporary fiction')) {
-      return 'light';
+    if (genreLower.includes('romance') || genreLower.includes('love')) {
+      return 'romantic';
     } else if (genreLower.includes('thriller') || genreLower.includes('mystery') || 
-               genreLower.includes('horror') || genreLower.includes('crime')) {
-      return 'intense';
+               genreLower.includes('suspense') || genreLower.includes('crime')) {
+      return 'thrilling';
+    } else if (genreLower.includes('horror') || genreLower.includes('dark') ||
+               genreLower.includes('psychological') || genreLower.includes('dystopian')) {
+      return 'dark';
     } else if (genreLower.includes('philosophy') || genreLower.includes('literary fiction') ||
-               genreLower.includes('biography') || genreLower.includes('history')) {
-      return 'thoughtful';
-    } else if (genreLower.includes('fantasy') || genreLower.includes('science fiction') ||
-               genreLower.includes('adventure') || genreLower.includes('young adult')) {
-      return 'escapist';
+               genreLower.includes('biography') || genreLower.includes('classic')) {
+      return 'literary';
+    } else if (genreLower.includes('comedy') || genreLower.includes('humor') ||
+               genreLower.includes('feel-good') || genreLower.includes('inspirational')) {
+      return 'uplifting';
+    } else if (genreLower.includes('fantasy') || genreLower.includes('cozy mystery') ||
+               genreLower.includes('contemporary fiction') || genreLower.includes('family')) {
+      return 'cozy';
     }
     
-    return 'escapist'; // Default mood
+    return 'cozy'; // Default mood
   }
 
   // Infer mood from title keywords
   inferMoodFromTitle(title) {
     const titleLower = title.toLowerCase();
     
-    // Intense mood keywords
+    // Dark mood keywords
     if (titleLower.includes('murder') || titleLower.includes('death') || 
-        titleLower.includes('blood') || titleLower.includes('war') ||
-        titleLower.includes('killer') || titleLower.includes('dark')) {
-      return 'intense';
+        titleLower.includes('blood') || titleLower.includes('killer') ||
+        titleLower.includes('shadow') || titleLower.includes('nightmare')) {
+      return 'dark';
     }
     
-    // Light mood keywords
-    if (titleLower.includes('love') || titleLower.includes('wedding') ||
-        titleLower.includes('summer') || titleLower.includes('beach') ||
-        titleLower.includes('romance') || titleLower.includes('happy')) {
-      return 'light';
+    // Thrilling mood keywords
+    if (titleLower.includes('thriller') || titleLower.includes('mystery') ||
+        titleLower.includes('hunt') || titleLower.includes('chase') ||
+        titleLower.includes('danger') || titleLower.includes('escape')) {
+      return 'thrilling';
     }
     
-    // Thoughtful mood keywords
+    // Romantic mood keywords
+    if (titleLower.includes('love') || titleLower.includes('heart') ||
+        titleLower.includes('wedding') || titleLower.includes('romance') ||
+        titleLower.includes('kiss') || titleLower.includes('bride')) {
+      return 'romantic';
+    }
+    
+    // Literary mood keywords
     if (titleLower.includes('life') || titleLower.includes('meaning') ||
         titleLower.includes('journey') || titleLower.includes('wisdom') ||
         titleLower.includes('truth') || titleLower.includes('soul')) {
-      return 'thoughtful';
+      return 'literary';
     }
     
-    return 'escapist'; // Default
+    // Uplifting mood keywords
+    if (titleLower.includes('happy') || titleLower.includes('joy') ||
+        titleLower.includes('hope') || titleLower.includes('summer') ||
+        titleLower.includes('sunshine') || titleLower.includes('dream')) {
+      return 'uplifting';
+    }
+    
+    return 'cozy'; // Default
   }
 
   // Batch process multiple titles

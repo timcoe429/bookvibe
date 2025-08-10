@@ -18,7 +18,7 @@ router.get('/session/:sessionId', async (req, res) => {
         preferences: {
           favoriteGenres: [],
           readingGoal: 52,
-          preferredMoods: ['escapist']
+          preferredMoods: ['cozy']
         },
         stats: {
           booksThisYear: 0,

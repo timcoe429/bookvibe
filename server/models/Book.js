@@ -38,8 +38,8 @@ const Book = sequelize.define('Book', {
     type: DataTypes.STRING
   },
   mood: {
-    type: DataTypes.ENUM('escapist', 'intense', 'thoughtful', 'light'),
-    defaultValue: 'escapist'
+    type: DataTypes.ENUM('cozy', 'thrilling', 'romantic', 'dark', 'uplifting', 'literary'),
+    defaultValue: 'cozy'
   },
   averageRating: {
     type: DataTypes.DECIMAL(3, 2),
