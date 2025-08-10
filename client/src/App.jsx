@@ -131,30 +131,41 @@ const BookPickerApp = () => {
 
       {/* Currently Reading Section */}
       {currentlyReading && (
-        <div className="mb-8 bg-white rounded-2xl p-6 shadow-lg border border-purple-100">
+        <div className="mb-8">
           <div className="flex items-center mb-4">
             <Clock size={20} className="text-purple-500 mr-2" />
             <h3 className="text-lg font-semibold text-gray-800">Currently Reading</h3>
           </div>
           
-          <div className="bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl p-4 text-white mb-4">
-            <h4 className="text-xl font-bold mb-1">{currentlyReading.title}</h4>
-            <p className="text-purple-100">by {currentlyReading.author}</p>
-            {currentlyReading.pages && (
-              <p className="text-sm text-purple-100 mt-2">{currentlyReading.pages} pages</p>
-            )}
+          <div className="bg-gradient-to-br from-purple-500 to-pink-500 rounded-2xl p-6 text-white shadow-2xl mb-4">
+            <h4 className="text-2xl font-bold mb-1 leading-tight">{currentlyReading.title}</h4>
+            <p className="text-lg opacity-90">by {currentlyReading.author}</p>
+            
+            <div className="flex items-center space-x-4 text-sm mt-4">
+              {currentlyReading.pages && (
+                <div className="flex items-center space-x-1">
+                  <BookOpen size={16} />
+                  <span>{currentlyReading.pages} pages</span>
+                </div>
+              )}
+              {currentlyReading.mood && (
+                <span className="bg-white bg-opacity-20 px-2 py-1 rounded-full text-xs">
+                  {currentlyReading.mood}
+                </span>
+              )}
+            </div>
           </div>
           
-          <div className="space-y-2">
+          <div className="space-y-3">
             <button
               onClick={handleFinishBook}
-              className="w-full bg-green-500 text-white py-3 px-4 rounded-lg font-medium hover:bg-green-600 transition-colors"
+              className="w-full bg-green-500 text-white p-4 rounded-xl font-semibold text-lg shadow-lg hover:shadow-xl transition-all hover:bg-green-600 active:scale-95"
             >
               ✅ Finished Reading
             </button>
             <button
               onClick={handleBackToTBR}
-              className="w-full bg-gray-500 text-white py-2 px-4 rounded-lg font-medium hover:bg-gray-600 transition-colors text-sm"
+              className="w-full bg-white text-gray-700 p-3 rounded-xl font-medium border-2 border-gray-200 hover:border-purple-300 transition-all"
             >
               ↩️ Back to TBR Pile
             </button>
