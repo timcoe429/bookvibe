@@ -166,7 +166,10 @@ router.post('/bulk-import', async (req, res) => {
           console.log(`📚 Book "${bookData.title}" already exists, updating mood from "${existingBook.mood}" to "${bookData.mood}"`);
           // Update the existing book with new mood from AI
           await existingBook.update({
-            mood: bookData.mood // GPT-4o should always provide mood
+            mood: bookData.mood || (() => {
+              console.error(`🚨 GPT-4o failed to provide mood for "${bookData.title}" - keeping existing mood`);
+              return existingBook.mood;
+            })() // Use GPT-4o mood, or keep existing if missing
           });
           book = existingBook;
           console.log(`✅ Updated existing book: "${book.title}" with new mood: ${book.mood}`);
