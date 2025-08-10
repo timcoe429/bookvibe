@@ -77,19 +77,13 @@ const BookPickerApp = () => {
     }
   };
 
-  // Handle marking current book as finished
-  const handleFinishBook = async (removeFromLibrary = false) => {
+  // Handle marking current book as finished - always removes from library
+  const handleFinishBook = async () => {
     if (!currentlyReading) return;
     
     try {
-      if (removeFromLibrary) {
-        // Completely remove from library
-        await userAPI.removeBook(currentlyReading.id);
-      } else {
-        // Mark as read
-        await userAPI.updateBookStatus(currentlyReading.id, 'read');
-      }
-      
+      // Remove from library entirely - this is a TBR picker, not a permanent library
+      await userAPI.removeBook(currentlyReading.id);
       setCurrentlyReading(null);
       // Refresh data to update stats
       await loadUserData();
@@ -152,20 +146,12 @@ const BookPickerApp = () => {
           </div>
           
           <div className="space-y-2">
-            <div className="flex space-x-3">
-              <button
-                onClick={() => handleFinishBook(false)}
-                className="flex-1 bg-green-500 text-white py-2 px-4 rounded-lg font-medium hover:bg-green-600 transition-colors"
-              >
-                ✅ Mark as Read
-              </button>
-              <button
-                onClick={() => handleFinishBook(true)}
-                className="flex-1 bg-red-500 text-white py-2 px-4 rounded-lg font-medium hover:bg-red-600 transition-colors"
-              >
-                🗑️ Remove from Library
-              </button>
-            </div>
+            <button
+              onClick={handleFinishBook}
+              className="w-full bg-green-500 text-white py-3 px-4 rounded-lg font-medium hover:bg-green-600 transition-colors"
+            >
+              ✅ Finished Reading
+            </button>
             <button
               onClick={handleBackToTBR}
               className="w-full bg-gray-500 text-white py-2 px-4 rounded-lg font-medium hover:bg-gray-600 transition-colors text-sm"
