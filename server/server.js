@@ -83,6 +83,76 @@ app.get('/health', (req, res) => {
   res.status(200).json({ status: 'OK', message: 'Server running' });
 });
 
+// Simple password setter page
+app.get('/set-password', (req, res) => {
+  res.send(`
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>Set Password - TBR Roulette</title>
+        <style>
+            body { font-family: Arial, sans-serif; max-width: 500px; margin: 50px auto; padding: 20px; }
+            .form-group { margin-bottom: 15px; }
+            label { display: block; margin-bottom: 5px; font-weight: bold; }
+            input { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; }
+            button { background: linear-gradient(to right, #8b5cf6, #ec4899); color: white; padding: 12px 24px; border: none; border-radius: 5px; cursor: pointer; width: 100%; }
+            .result { margin-top: 15px; padding: 10px; border-radius: 5px; }
+            .success { background: #d4edda; border: 1px solid #c3e6cb; color: #155724; }
+            .error { background: #f8d7da; border: 1px solid #f5c6cb; color: #721c24; }
+        </style>
+    </head>
+    <body>
+        <h1>🔐 Set User Password</h1>
+        <p>Admin tool to set passwords for existing users</p>
+        
+        <form id="passwordForm">
+            <div class="form-group">
+                <label>Login ID:</label>
+                <input type="text" id="loginId" value="CarlyFries" required>
+            </div>
+            
+            <div class="form-group">
+                <label>Password:</label>
+                <input type="text" id="password" value="SamGusLegos" required>
+            </div>
+            
+            <button type="submit">Set Password</button>
+        </form>
+        
+        <div id="result"></div>
+
+        <script>
+            document.getElementById('passwordForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                
+                const loginId = document.getElementById('loginId').value;
+                const password = document.getElementById('password').value;
+                const resultDiv = document.getElementById('result');
+                
+                try {
+                    const response = await fetch('/api/users/debug/set-password', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ loginId, password })
+                    });
+                    
+                    const data = await response.json();
+                    
+                    if (data.success) {
+                        resultDiv.innerHTML = '<div class="success">✅ Success! Password set for ' + loginId + '. Book count: ' + (data.user.bookCount || 'unknown') + '</div>';
+                    } else {
+                        resultDiv.innerHTML = '<div class="error">❌ Error: ' + (data.error || 'Unknown error') + '</div>';
+                    }
+                } catch (error) {
+                    resultDiv.innerHTML = '<div class="error">❌ Error: ' + error.message + '</div>';
+                }
+            });
+        </script>
+    </body>
+    </html>
+  `);
+});
+
 // Health check alias under /api to match client base URL
 app.get('/api/health', (req, res) => {
   console.log('🏥 API HEALTH CHECK HIT!');

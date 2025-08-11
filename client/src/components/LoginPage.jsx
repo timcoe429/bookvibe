@@ -63,7 +63,7 @@ const LoginPage = ({ onLoginSuccess }) => {
         <div className="text-center mb-8">
           <div className="text-6xl mb-4">📚</div>
           <h1 className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-            BookVibe
+            TBR Roulette
           </h1>
           <p className="text-gray-600 mt-2">
             {isCreatingAccount ? 'Create your personal library!' : 'Welcome back to your library!'}
