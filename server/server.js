@@ -89,6 +89,7 @@ app.get('/set-password', (req, res) => {
     <!DOCTYPE html>
     <html>
     <head>
+        <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; connect-src 'self';" />
         <title>Set Password - TBR Roulette</title>
         <style>
             body { font-family: Arial, sans-serif; max-width: 500px; margin: 50px auto; padding: 20px; }

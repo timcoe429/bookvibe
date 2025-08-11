@@ -455,10 +455,40 @@ router.post('/debug/set-password', async (req, res) => {
       return res.status(400).json({ error: 'loginId and password required' });
     }
     
-    // Find user by loginId (stored in goodreads_user_id field)
-    const user = await User.findOne({ where: { goodreadsUserId: loginId } });
+    // Find user by loginId (check both goodreads_user_id field and exact match)
+    let user = await User.findOne({ where: { goodreadsUserId: loginId } });
+    
+    // If not found, also try to find user where goodreads_user_id contains the loginId
     if (!user) {
-      return res.status(404).json({ error: `User not found with loginId: ${loginId}` });
+      user = await User.findOne({ 
+        where: { 
+          goodreadsUserId: { [require('sequelize').Op.iLike]: `%${loginId}%` } 
+        } 
+      });
+    }
+    
+    if (!user) {
+      // Let's also check if there's a user with this sessionId pattern or created recently
+      console.log(`🔍 Looking for user with loginId: ${loginId}`);
+      const allUsers = await User.findAll({ 
+        limit: 10, 
+        order: [['createdAt', 'DESC']],
+        attributes: ['id', 'sessionId', 'goodreadsUserId', 'createdAt']
+      });
+      console.log('📋 Recent users found:', JSON.stringify(allUsers, null, 2));
+      
+      return res.status(404).json({ 
+        error: `User not found with loginId: ${loginId}`,
+        debug: {
+          searchedFor: loginId,
+          recentUsers: allUsers.map(u => ({
+            id: u.id,
+            sessionId: u.sessionId,
+            goodreadsUserId: u.goodreadsUserId,
+            createdAt: u.createdAt
+          }))
+        }
+      });
     }
     
     // Hash password (simple for now)
