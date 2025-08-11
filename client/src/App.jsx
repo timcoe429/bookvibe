@@ -161,7 +161,7 @@ const BookPickerApp = () => {
 
   // Handle deleting a book from the library
   const handleDeleteBook = async (bookId, bookTitle) => {
-    if (!confirm(`Are you sure you want to remove "${bookTitle}" from your library?`)) {
+    if (!window.confirm(`Are you sure you want to remove "${bookTitle}" from your library?`)) {
       return;
     }
     
