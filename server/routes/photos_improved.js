@@ -288,24 +288,4 @@ router.post('/confirm-books', async (req, res) => {
   }
 });
 
-// Get supported image formats and limits
-router.get('/upload-info', (req, res) => {
-  res.json({
-    supportedFormats: ['image/jpeg', 'image/png', 'image/webp', 'image/gif'],
-    maxFileSize: '10MB',
-    recommendations: [
-      'Take photos in good lighting',
-      'Ensure book spines are clearly visible',
-      'Keep the camera steady',
-      'Avoid shadows and glare',
-      'Position books so titles are readable'
-    ],
-    tips: [
-      'Horizontal book spines work best',
-      'Multiple books in one photo is fine',
-      'Close-up shots give better results than wide shots'
-    ]
-  });
-});
-
 module.exports = router;
