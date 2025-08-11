@@ -1,7 +1,8 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { Heart, X, BookOpen, Clock, Star, Zap, Moon, Sun, Coffee, Trash2 } from 'lucide-react';
 import PhotoUpload from './components/PhotoUpload';
 import LoginPage from './components/LoginPage';
+import SearchInput from './components/SearchInput';
 import { userAPI } from './services/api';
 
 const BookPickerApp = () => {
@@ -30,6 +31,12 @@ const BookPickerApp = () => {
       book.author.toLowerCase().includes(searchQuery.toLowerCase())
     );
   }, [userBooks, searchQuery]);
+
+  // Memoized search handler to prevent input re-rendering
+  const handleSearchChange = useCallback((searchValue) => {
+    console.log('Search input changed:', searchValue);
+    setSearchQuery(searchValue);
+  }, []);
 
   const moods = [
     { icon: Coffee, label: "Cozy", color: "bg-amber-100 text-amber-800" },
@@ -636,12 +643,9 @@ const BookPickerApp = () => {
           
           {/* Search bar */}
           <div className="mt-4 max-w-md mx-auto">
-            <input
-              type="text"
+            <SearchInput 
+              onSearchChange={handleSearchChange}
               placeholder="Search books by title or author..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
             />
           </div>
         </div>
