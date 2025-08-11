@@ -69,11 +69,11 @@ const PhotoCapture = ({ onNavigate, onBooksDetected }) => {
 
     setUploadState('confirming');
     try {
-      const booksToConfirm = detectedBooks.filter(book => selectedBooks.has(book.id));
-      const result = await photoAPI.confirmBooks(booksToConfirm);
+      const selectedBookIds = Array.from(selectedBooks);
+      const result = await photoAPI.confirmBooks(detectedBooks, selectedBookIds);
       
       if (onBooksDetected) {
-        onBooksDetected(result.importedBooks || booksToConfirm);
+        onBooksDetected(result.importedBooks || detectedBooks.filter(book => selectedBooks.has(book.id)));
       }
       
       // Success! Navigate back with success message

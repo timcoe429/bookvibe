@@ -173,6 +173,16 @@ export const photoAPI = {
     return response.data;
   },
 
+  // Confirm and import selected books from photo detection
+  confirmBooks: async (allBooks, selectedBookIds) => {
+    const response = await api.post('/photos/confirm-books', {
+      books: allBooks,
+      selectedBooks: selectedBookIds,
+      sessionId: getSessionId()
+    });
+    return response.data;
+  },
+
 
 
   // Get upload information and guidelines

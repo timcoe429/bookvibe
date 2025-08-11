@@ -132,26 +132,39 @@ router.post('/bulk-import', async (req, res) => {
   try {
     const { books, sessionId } = req.body;
     
+    console.log('📥 BULK IMPORT: Starting with data:', { 
+      sessionId, 
+      bookCount: books?.length,
+      requestBody: JSON.stringify(req.body, null, 2)
+    });
+    
     if (!sessionId) {
+      console.error('❌ BULK IMPORT: No sessionId provided');
       return res.status(400).json({ error: 'Session ID required' });
     }
 
     if (!Array.isArray(books) || books.length === 0) {
+      console.error('❌ BULK IMPORT: Invalid books array:', { books, isArray: Array.isArray(books), length: books?.length });
       return res.status(400).json({ error: 'Books array required' });
     }
 
     // Find or create user
     let user = await User.findOne({ where: { sessionId } });
     if (!user) {
+      console.log('👤 Creating new user for sessionId:', sessionId);
       user = await User.create({ sessionId });
+    } else {
+      console.log('👤 Found existing user:', user.id);
     }
 
     const createdBooks = [];
     const userBooks = [];
+    let processedCount = 0;
 
     for (const bookData of books) {
       try {
-        console.log(`📖 Processing book: "${bookData.title}" with mood: ${bookData.mood}`);
+        processedCount++;
+        console.log(`📖 Processing book ${processedCount}/${books.length}: "${bookData.title}" with mood: ${bookData.mood}`);
         
         // Check if book already exists (deduplication by title and author)
         const existingBook = await Book.findOne({
@@ -166,13 +179,10 @@ router.post('/bulk-import', async (req, res) => {
           console.log(`📚 Book "${bookData.title}" already exists, updating mood from "${existingBook.mood}" to "${bookData.mood}"`);
           // Update the existing book with new mood from AI
           await existingBook.update({
-            mood: bookData.mood || (() => {
-              console.error(`🚨 GPT-4o failed to provide mood for "${bookData.title}" - keeping existing mood`);
-              return existingBook.mood;
-            })() // Use GPT-4o mood, or keep existing if missing
+            mood: bookData.mood || existingBook.mood // Keep existing mood if new one is missing
           });
           book = existingBook;
-          console.log(`✅ Updated existing book: "${book.title}" with new mood: ${book.mood}`);
+          console.log(`✅ Updated existing book: "${book.title}" with mood: ${book.mood}`);
         } else {
           // Create book directly from AI detection (no external API lookup)
           const bookCreateData = {
@@ -180,12 +190,10 @@ router.post('/bulk-import', async (req, res) => {
             author: bookData.author || 'Unknown Author',
             pages: bookData.pages || null,
             description: bookData.description || null,
-            mood: bookData.mood || (() => {
-              console.error(`🚨 GPT-4o failed to provide mood for "${bookData.title}" - using fallback`);
-              return 'escapist';
-            })() // Use GPT-4o mood, but fallback with error logging if missing
+            mood: bookData.mood || 'cozy' // FIXED: Use 'cozy' instead of 'escapist'
           };
           
+          console.log('🆕 Creating new book with data:', bookCreateData);
           book = await Book.create(bookCreateData);
           console.log(`✅ Created new book: "${book.title}" with mood: ${book.mood}`);
         }
@@ -196,14 +204,20 @@ router.post('/bulk-import', async (req, res) => {
         });
 
         if (!existingUserBook) {
-          // Use 'photo' instead of 'claude_vision' if the enum doesn't support it yet
-          const source = bookData.source === 'claude_vision' ? 'photo' : (bookData.source || 'photo');
+          // Map source properly - handle new source from photos
+          const sourceMapping = {
+            'ai_vision': 'photo',
+            'claude_vision': 'photo',
+            'gpt_vision': 'photo'
+          };
+          const mappedSource = sourceMapping[bookData.source] || bookData.source || 'photo';
           
+          console.log(`📚 Adding book to user library with source: ${mappedSource}`);
           const userBook = await UserBook.create({
             userId: user.id,
             bookId: book.id,
             status: 'to-read',
-            source: source
+            source: mappedSource
           });
           
           // Only add to response arrays if it's actually new to the user
@@ -214,19 +228,25 @@ router.post('/bulk-import', async (req, res) => {
           console.log(`🔄 Skipped "${book.title}" - already in your library`);
         }
       } catch (bookError) {
-        console.error(`Error processing book ${bookData.title}:`, bookError.message);
+        console.error(`❌ Error processing book ${bookData.title}:`, bookError);
         // Continue with other books
       }
     }
 
+    console.log(`🎉 BULK IMPORT COMPLETE: ${userBooks.length} books added to library, ${createdBooks.length} new books created`);
+
     res.json({
-      message: `Successfully imported ${createdBooks.length} books`,
+      message: `Successfully imported ${userBooks.length} books`,
       books: createdBooks,
-      addedToLibrary: userBooks.length
+      addedToLibrary: userBooks.length,
+      totalProcessed: processedCount
     });
   } catch (error) {
-    console.error('Error bulk importing books:', error.message);
-    res.status(500).json({ error: 'Failed to import books' });
+    console.error('❌ BULK IMPORT ERROR:', error);
+    res.status(500).json({ 
+      error: 'Failed to import books',
+      details: process.env.NODE_ENV === 'development' ? error.message : undefined
+    });
   }
 });
 
