@@ -19,8 +19,7 @@ const BookPickerApp = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [currentUser, setCurrentUser] = useState(null);
   
-  // Library search state
-  const [searchQuery, setSearchQuery] = useState('');
+  // Library search state - moved inside component to prevent re-renders
 
 
 
@@ -574,6 +573,8 @@ const BookPickerApp = () => {
   }
 
   const LibraryScreen = () => {
+    // Search state lives here to prevent parent re-renders
+    const [searchQuery, setSearchQuery] = useState('');
     console.log('📚 LibraryScreen rendering, searchQuery:', searchQuery, 'userBooks length:', userBooks.length);
     
     if (loading) {
