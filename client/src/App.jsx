@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Heart, X, BookOpen, Clock, Star, Zap, Moon, Sun, Coffee, Trash2 } from 'lucide-react';
 import PhotoUpload from './components/PhotoUpload';
 import LoginPage from './components/LoginPage';
@@ -21,6 +21,15 @@ const BookPickerApp = () => {
   
   // Library search state
   const [searchQuery, setSearchQuery] = useState('');
+
+  // Memoized filtered books to prevent focus loss
+  const filteredBooks = useMemo(() => {
+    if (!searchQuery.trim()) return userBooks;
+    return userBooks.filter(book => 
+      book.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      book.author.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+  }, [userBooks, searchQuery]);
 
   const moods = [
     { icon: Coffee, label: "Cozy", color: "bg-amber-100 text-amber-800" },
@@ -612,12 +621,6 @@ const BookPickerApp = () => {
         </div>
       );
     }
-
-    // Filter books based on search query
-    const filteredBooks = userBooks.filter(book => 
-      book.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      book.author.toLowerCase().includes(searchQuery.toLowerCase())
-    );
 
     return (
       <div className="min-h-screen bg-gradient-to-br from-purple-50 to-pink-50 p-4">
