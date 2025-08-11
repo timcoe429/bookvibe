@@ -235,7 +235,7 @@ const BookPickerApp = () => {
       {/* Header */}
       <div className="text-center mb-8 pt-8">
         <h1 className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent mb-2">
-          BookVibe
+          TBR Roulette
         </h1>
         <p className="text-gray-600">Pick from your TBR pile ✨</p>
         <div className="flex items-center justify-center mt-4 text-sm">
