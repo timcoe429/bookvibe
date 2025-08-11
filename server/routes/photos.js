@@ -259,18 +259,93 @@ router.post('/confirm-books', async (req, res) => {
       return res.status(400).json({ error: 'Selected books not found in original list' });
     }
 
-    // Import books using the bulk import endpoint
-    const axios = require('axios');
-    const importResponse = await axios.post(`${req.protocol}://${req.get('host')}/api/books/bulk-import`, {
-      books: booksToImport,
-      sessionId
-    });
+    // Import books directly (avoid internal HTTP call)
+    const Book = require('../models/Book');
+    const UserBook = require('../models/UserBook');
+    const User = require('../models/User');
 
-    if (importResponse.status !== 200) {
-      throw new Error('Failed to import books');
+    // Find or create user
+    let user = await User.findOne({ where: { sessionId } });
+    if (!user) {
+      user = await User.create({ sessionId });
     }
 
-    const importResult = importResponse.data;
+    const createdBooks = [];
+    const userBooks = [];
+    let processedCount = 0;
+
+    for (const bookData of booksToImport) {
+      try {
+        processedCount++;
+        console.log(`📖 Processing book ${processedCount}/${booksToImport.length}: "${bookData.title}"`);
+        
+        // Check if book already exists
+        const existingBook = await Book.findOne({
+          where: {
+            title: { [require('sequelize').Op.iLike]: bookData.title.trim() },
+            author: { [require('sequelize').Op.iLike]: (bookData.author || '').trim() || '%' }
+          }
+        });
+
+        let book;
+        if (existingBook) {
+          console.log(`📚 Book "${bookData.title}" already exists, updating mood`);
+          await existingBook.update({
+            mood: bookData.mood || existingBook.mood
+          });
+          book = existingBook;
+        } else {
+          // Create new book
+          const bookCreateData = {
+            title: bookData.title || 'Unknown Title',
+            author: bookData.author || 'Unknown Author',
+            pages: bookData.pages || null,
+            description: bookData.description || null,
+            mood: bookData.mood || 'cozy'
+          };
+          
+          console.log('🆕 Creating new book:', bookCreateData.title);
+          book = await Book.create(bookCreateData);
+        }
+
+        // Check if book is already in user's library
+        const existingUserBook = await UserBook.findOne({
+          where: { userId: user.id, bookId: book.id }
+        });
+
+        if (!existingUserBook) {
+          // Map source properly
+          const sourceMapping = {
+            'ai_vision': 'photo',
+            'claude_vision': 'photo', 
+            'gpt_vision': 'photo'
+          };
+          const mappedSource = sourceMapping[bookData.source] || bookData.source || 'photo';
+          
+          const userBook = await UserBook.create({
+            userId: user.id,
+            bookId: book.id,
+            status: 'to-read',
+            source: mappedSource
+          });
+          
+          createdBooks.push(book);
+          userBooks.push(userBook);
+          console.log(`✅ Added "${book.title}" to user library`);
+        } else {
+          console.log(`🔄 Skipped "${book.title}" - already in library`);
+        }
+      } catch (bookError) {
+        console.error(`❌ Error processing book ${bookData.title}:`, bookError);
+      }
+    }
+
+    const importResult = {
+      message: `Successfully imported ${userBooks.length} books`,
+      books: createdBooks,
+      addedToLibrary: userBooks.length,
+      totalProcessed: processedCount
+    };
 
     res.json({
       success: true,
