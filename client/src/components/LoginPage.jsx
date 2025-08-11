@@ -139,7 +139,6 @@ const LoginPage = ({ onLoginSuccess }) => {
             }
           </button>
         </div>
-        </form>
 
         {/* Fun footer */}
         <div className="text-center mt-8 text-gray-500 text-sm">
