@@ -166,16 +166,7 @@ const BookPickerApp = () => {
     setShowPhotoUpload(false);
   };
 
-  const handleDeleteBook = async (bookId) => {
-    try {
-      // Make API call to remove book from library
-      await userAPI.removeBook(bookId);
-      // Reload data
-      loadUserData();
-    } catch (error) {
-      console.error('Error removing book:', error);
-    }
-  };
+
 
   // Handle selecting a book to start reading
   const handleStartReading = async (book) => {
