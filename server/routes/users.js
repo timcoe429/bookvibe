@@ -331,4 +331,35 @@ router.delete('/:sessionId/books/:bookId', async (req, res) => {
   }
 });
 
+// DEBUG: Show all users with book counts to find her session
+router.get('/debug/user-summary', async (req, res) => {
+  try {
+    const users = await User.findAll({
+      attributes: ['id', 'sessionId', 'createdAt'],
+      order: [['id', 'ASC']]
+    });
+    
+    const summary = [];
+    
+    for (const user of users) {
+      const bookCount = await UserBook.count({ where: { userId: user.id } });
+      summary.push({
+        id: user.id,
+        sessionId: user.sessionId,
+        bookCount: bookCount,
+        createdAt: user.createdAt
+      });
+    }
+    
+    res.json({
+      message: 'All users with book counts',
+      users: summary,
+      tip: 'Look for the user with ~107 books - that\'s her sessionId!'
+    });
+  } catch (error) {
+    console.error('Debug user summary error:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
 module.exports = router;
