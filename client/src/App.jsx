@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Heart, X, BookOpen, Clock, Star, Zap, Moon, Sun, Coffee, Trash2 } from 'lucide-react';
 import PhotoUpload from './components/PhotoUpload';
+import LoginPage from './components/LoginPage';
 import { userAPI } from './services/api';
 
 const BookPickerApp = () => {
@@ -13,6 +14,10 @@ const BookPickerApp = () => {
   const [userStats, setUserStats] = useState({ inQueue: 0, totalBooks: 0, currentlyReading: 0 });
   const [isThinking, setIsThinking] = useState(false);
   const [thinkingMessage, setThinkingMessage] = useState('');
+  
+  // Login state
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [currentUser, setCurrentUser] = useState(null);
 
   const moods = [
     { icon: Coffee, label: "Cozy", color: "bg-amber-100 text-amber-800" },
@@ -74,10 +79,50 @@ const BookPickerApp = () => {
     "🔥 Warming up by the fireplace of great literature..."
   ];
 
-  // Load user data on component mount
+  // Check for existing login on component mount
   useEffect(() => {
-    loadUserData();
+    checkExistingLogin();
   }, []);
+
+  // Load user data when logged in
+  useEffect(() => {
+    if (isLoggedIn) {
+      loadUserData();
+    }
+  }, [isLoggedIn]);
+
+  const checkExistingLogin = () => {
+    try {
+      const token = localStorage.getItem('bookVibeToken');
+      const user = localStorage.getItem('bookVibeUser');
+      
+      if (token && user) {
+        const userData = JSON.parse(user);
+        setCurrentUser(userData);
+        setIsLoggedIn(true);
+      } else {
+        setLoading(false);
+      }
+    } catch (error) {
+      console.error('Error checking existing login:', error);
+      setLoading(false);
+    }
+  };
+
+  const handleLoginSuccess = (user) => {
+    setCurrentUser(user);
+    setIsLoggedIn(true);
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('bookVibeToken');
+    localStorage.removeItem('bookVibeUser');
+    setCurrentUser(null);
+    setIsLoggedIn(false);
+    setUserBooks([]);
+    setCurrentlyReading(null);
+    setUserStats({ inQueue: 0, totalBooks: 0, currentlyReading: 0 });
+  };
 
   const loadUserData = async () => {
     try {
@@ -673,6 +718,11 @@ const BookPickerApp = () => {
         return <HomeScreen />;
     }
   };
+
+  // Show login page if not logged in
+  if (!isLoggedIn) {
+    return <LoginPage onLoginSuccess={handleLoginSuccess} />;
+  }
 
   return (
     <div className="max-w-sm mx-auto bg-white min-h-screen">

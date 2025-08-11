@@ -89,6 +89,38 @@ app.get('/api/health', (req, res) => {
   res.status(200).json({ status: 'OK', message: 'Server running' });
 });
 
+// Robots.txt to block ALL crawlers from ENTIRE site
+app.get('/robots.txt', (req, res) => {
+  res.type('text/plain');
+  res.send(`User-agent: *
+Disallow: /
+
+# Block AI crawlers specifically  
+User-agent: ChatGPT-User
+Disallow: /
+
+User-agent: GPTBot
+Disallow: /
+
+User-agent: Google-Extended
+Disallow: /
+
+User-agent: CCBot
+Disallow: /
+
+User-agent: anthropic-ai
+Disallow: /
+
+User-agent: Claude-Web
+Disallow: /
+
+User-agent: Bingbot
+Disallow: /
+
+User-agent: Slurp
+Disallow: /`);
+});
+
 // Add a catch-all logger to see ALL requests (before static/SPA serving)
 app.use('*', (req, res, next) => {
   console.log(`📋 INCOMING: ${req.method} ${req.originalUrl}`);

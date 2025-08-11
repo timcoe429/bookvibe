@@ -331,9 +331,179 @@ router.delete('/:sessionId/books/:bookId', async (req, res) => {
   }
 });
 
+// Create new account endpoint
+router.post('/create-account', async (req, res) => {
+  try {
+    const { loginId, password } = req.body;
+    
+    if (!loginId || !password) {
+      return res.status(400).json({ error: 'Login ID and password required' });
+    }
+    
+    // Check if loginId already exists
+    const existingUser = await User.findOne({ where: { goodreadsUserId: loginId } });
+    if (existingUser) {
+      return res.status(400).json({ error: 'This login ID is already taken. Please choose a different one.' });
+    }
+    
+    // Create new user with a session ID for backward compatibility
+    const sessionId = 'session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+    const bcrypt = require('bcryptjs');
+    const passwordHash = await bcrypt.hash(password, 10);
+    
+    const user = await User.create({
+      sessionId: sessionId,
+      goodreadsUserId: loginId, // Store loginId here
+      stats: {
+        booksThisYear: 0,
+        totalBooks: 0,
+        currentStreak: 0,
+        longestStreak: 0,
+        passwordHash: passwordHash,
+        loginId: loginId,
+        hasPassword: true
+      },
+      preferences: {
+        favoriteGenres: [],
+        readingGoal: 52,
+        preferredMoods: ['cozy']
+      }
+    });
+    
+    // Create simple token
+    const token = Buffer.from(JSON.stringify({
+      userId: user.id,
+      loginId: loginId,
+      sessionId: user.sessionId,
+      loginTime: Date.now()
+    })).toString('base64');
+    
+    res.json({
+      success: true,
+      message: `Welcome to BookVibe, ${loginId}! Your library is ready.`,
+      token: token,
+      user: {
+        id: user.id,
+        loginId: loginId,
+        sessionId: user.sessionId
+      }
+    });
+  } catch (error) {
+    console.error('Create account error:', error);
+    res.status(500).json({ error: 'Failed to create account' });
+  }
+});
+
+// Simple login endpoint 
+router.post('/login', async (req, res) => {
+  try {
+    const { loginId, password } = req.body;
+    
+    if (!loginId || !password) {
+      return res.status(400).json({ error: 'Login ID and password required' });
+    }
+    
+    // Find user by loginId
+    const user = await User.findOne({ where: { goodreadsUserId: loginId } });
+    if (!user) {
+      return res.status(401).json({ error: 'Invalid login credentials' });
+    }
+    
+    // Check if user has a password set
+    const stats = user.stats || {};
+    if (!stats.passwordHash) {
+      return res.status(401).json({ error: 'No password set for this user' });
+    }
+    
+    // Verify password
+    const bcrypt = require('bcryptjs');
+    const validPassword = await bcrypt.compare(password, stats.passwordHash);
+    if (!validPassword) {
+      return res.status(401).json({ error: 'Invalid login credentials' });
+    }
+    
+    // Create simple token (just user info, no JWT complexity for now)
+    const token = Buffer.from(JSON.stringify({
+      userId: user.id,
+      loginId: loginId,
+      sessionId: user.sessionId,
+      loginTime: Date.now()
+    })).toString('base64');
+    
+    res.json({
+      success: true,
+      message: `Welcome back, ${loginId}!`,
+      token: token,
+      user: {
+        id: user.id,
+        loginId: loginId,
+        sessionId: user.sessionId
+      }
+    });
+  } catch (error) {
+    console.error('Login error:', error);
+    res.status(500).json({ error: 'Login failed' });
+  }
+});
+
+// DEBUG: Set password for a user (add this before the user-summary route)
+router.post('/debug/set-password', async (req, res) => {
+  try {
+    const { loginId, password } = req.body;
+    
+    if (!loginId || !password) {
+      return res.status(400).json({ error: 'loginId and password required' });
+    }
+    
+    // Find user by loginId (stored in goodreads_user_id field)
+    const user = await User.findOne({ where: { goodreadsUserId: loginId } });
+    if (!user) {
+      return res.status(404).json({ error: `User not found with loginId: ${loginId}` });
+    }
+    
+    // Hash password (simple for now)
+    const bcrypt = require('bcryptjs');
+    const passwordHash = await bcrypt.hash(password, 10);
+    
+    // Store password hash in stats field
+    const currentStats = user.stats || {};
+    await user.update({
+      stats: {
+        ...currentStats,
+        passwordHash: passwordHash,
+        loginId: loginId,
+        hasPassword: true
+      }
+    });
+    
+    res.json({
+      success: true,
+      message: `Password set for ${loginId}`,
+      user: {
+        id: user.id,
+        loginId: loginId,
+        sessionId: user.sessionId,
+        hasPassword: true
+      }
+    });
+  } catch (error) {
+    console.error('Set password error:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
 // DEBUG: Show all users with book counts to find her session
+// Protected from crawlers and indexing
 router.get('/debug/user-summary', async (req, res) => {
   try {
+    // Prevent caching and indexing
+    res.set({
+      'Cache-Control': 'no-store, no-cache, must-revalidate, private',
+      'Pragma': 'no-cache',
+      'Expires': '0',
+      'X-Robots-Tag': 'noindex, nofollow, noarchive, nosnippet, noimageindex',
+      'Robots': 'noindex, nofollow'
+    });
     const users = await User.findAll({
       attributes: ['id', 'sessionId', 'createdAt'],
       order: [['id', 'ASC']]
