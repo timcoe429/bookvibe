@@ -574,6 +574,8 @@ const BookPickerApp = () => {
   }
 
   const LibraryScreen = () => {
+    console.log('📚 LibraryScreen rendering, searchQuery:', searchQuery, 'userBooks length:', userBooks.length);
+    
     if (loading) {
       return (
         <div className="min-h-screen bg-gradient-to-br from-purple-50 to-pink-50 p-4 flex items-center justify-center">
@@ -633,7 +635,13 @@ const BookPickerApp = () => {
               type="text"
               placeholder="Search books by title or author..."
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              onChange={(e) => {
+                console.log('🔍 Input changed, value:', e.target.value);
+                console.log('🔍 Current focus element:', document.activeElement);
+                setSearchQuery(e.target.value);
+              }}
+              onFocus={() => console.log('🎯 Input focused')}
+              onBlur={() => console.log('😵 Input lost focus')}
               className="w-full px-4 py-3 text-lg border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent"
             />
           </div>
