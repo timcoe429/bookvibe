@@ -640,13 +640,22 @@ const BookPickerApp = () => {
         </div>
 
         <div className="grid gap-4 max-w-2xl mx-auto">
-          {userBooks
-            .filter(book => 
+          {(() => {
+            const filteredBooks = userBooks.filter(book => 
               !searchQuery || 
               book.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
               book.author.toLowerCase().includes(searchQuery.toLowerCase())
-            )
-            .map((book, index) => (
+            );
+            
+            if (filteredBooks.length === 0 && searchQuery) {
+              return (
+                <div className="text-center py-8">
+                  <p className="text-gray-600">No books found matching "{searchQuery}"</p>
+                </div>
+              );
+            }
+            
+            return filteredBooks.map((book, index) => (
             <div
               key={book.id}
               className="bg-white rounded-xl p-4 shadow-sm border border-gray-200 hover:shadow-md transition-shadow relative"
@@ -687,7 +696,8 @@ const BookPickerApp = () => {
                 </div>
               </div>
             </div>
-          ))
+          ));
+          })()}
         </div>
 
         <div className="mt-8 text-center">
