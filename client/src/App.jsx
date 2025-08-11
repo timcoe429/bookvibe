@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Heart, X, BookOpen, Clock, Star, Zap, Moon, Sun, Coffee } from 'lucide-react';
+import { Heart, X, BookOpen, Clock, Star, Zap, Moon, Sun, Coffee, Trash2 } from 'lucide-react';
 import PhotoUpload from './components/PhotoUpload';
 import { userAPI } from './services/api';
 
@@ -156,6 +156,29 @@ const BookPickerApp = () => {
       setCurrentlyReading(null);
     } catch (error) {
       console.error('Error moving book back to TBR:', error);
+    }
+  };
+
+  // Handle deleting a book from the library
+  const handleDeleteBook = async (bookId, bookTitle) => {
+    if (!confirm(`Are you sure you want to remove "${bookTitle}" from your library?`)) {
+      return;
+    }
+    
+    try {
+      await userAPI.removeBook(bookId);
+      // Remove from local state immediately for better UX
+      setUserBooks(prev => prev.filter(book => book.id !== bookId));
+      // Update stats
+      setUserStats(prev => ({
+        ...prev,
+        inQueue: prev.inQueue - 1,
+        totalBooks: prev.totalBooks - 1
+      }));
+    } catch (error) {
+      console.error('Error deleting book:', error);
+      // Optionally reload data if deletion failed
+      loadUserData();
     }
   };
 
@@ -582,6 +605,13 @@ const BookPickerApp = () => {
                   <span className="bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-medium">
                     To Read
                   </span>
+                  <button
+                    onClick={() => handleDeleteBook(book.id, book.title)}
+                    className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+                    title="Remove from library"
+                  >
+                    <Trash2 size={16} />
+                  </button>
                 </div>
               </div>
             </div>
