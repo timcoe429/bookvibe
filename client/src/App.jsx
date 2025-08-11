@@ -18,6 +18,9 @@ const BookPickerApp = () => {
   // Login state
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [currentUser, setCurrentUser] = useState(null);
+  
+  // Library search state
+  const [searchQuery, setSearchQuery] = useState('');
 
   const moods = [
     { icon: Coffee, label: "Cozy", color: "bg-amber-100 text-amber-800" },
@@ -122,6 +125,7 @@ const BookPickerApp = () => {
     setUserBooks([]);
     setCurrentlyReading(null);
     setUserStats({ inQueue: 0, totalBooks: 0, currentlyReading: 0 });
+    setCurrentView('home'); // Reset to home view
   };
 
   const loadUserData = async () => {
@@ -160,6 +164,17 @@ const BookPickerApp = () => {
 
   const handlePhotoUploadClose = () => {
     setShowPhotoUpload(false);
+  };
+
+  const handleDeleteBook = async (bookId) => {
+    try {
+      // Make API call to remove book from library
+      await userAPI.removeBook(bookId);
+      // Reload data
+      loadUserData();
+    } catch (error) {
+      console.error('Error removing book:', error);
+    }
   };
 
   // Handle selecting a book to start reading
@@ -278,7 +293,15 @@ const BookPickerApp = () => {
   const HomeScreen = () => (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 to-pink-50 p-4">
       {/* Header */}
-      <div className="text-center mb-8 pt-8">
+      <div className="text-center mb-8 pt-8 relative">
+        {/* Logout button in top right */}
+        <button
+          onClick={handleLogout}
+          className="absolute top-0 right-0 text-gray-500 hover:text-gray-700 text-sm px-3 py-1 rounded-lg hover:bg-white/50 transition-colors"
+        >
+          Logout
+        </button>
+        
         <h1 className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent mb-2">
           TBR Roulette
         </h1>
@@ -599,6 +622,12 @@ const BookPickerApp = () => {
       );
     }
 
+    // Filter books based on search query
+    const filteredBooks = userBooks.filter(book => 
+      book.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      book.author.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+
     return (
       <div className="min-h-screen bg-gradient-to-br from-purple-50 to-pink-50 p-4">
         <div className="pt-8 pb-6">
@@ -610,10 +639,26 @@ const BookPickerApp = () => {
           </button>
           <h2 className="text-2xl font-semibold text-gray-800 text-center">Your Library</h2>
           <p className="text-center text-gray-600 mt-2">{userBooks.length} books in your TBR pile</p>
+          
+          {/* Search bar */}
+          <div className="mt-4 max-w-md mx-auto">
+            <input
+              type="text"
+              placeholder="Search books by title or author..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+            />
+          </div>
         </div>
 
         <div className="grid gap-4 max-w-2xl mx-auto">
-          {userBooks.map((book, index) => (
+          {filteredBooks.length === 0 && searchQuery ? (
+            <div className="text-center py-8">
+              <p className="text-gray-600">No books found matching "{searchQuery}"</p>
+            </div>
+          ) : (
+            filteredBooks.map((book, index) => (
             <div
               key={book.id}
               className="bg-white rounded-xl p-4 shadow-sm border border-gray-200 hover:shadow-md transition-shadow relative"
@@ -654,7 +699,8 @@ const BookPickerApp = () => {
                 </div>
               </div>
             </div>
-          ))}
+          ))
+          )}
         </div>
 
         <div className="mt-8 text-center">
