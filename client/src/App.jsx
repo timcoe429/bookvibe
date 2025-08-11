@@ -160,11 +160,7 @@ const BookPickerApp = () => {
   };
 
   // Handle deleting a book from the library
-  const handleDeleteBook = async (bookId, bookTitle) => {
-    if (!window.confirm(`Are you sure you want to remove "${bookTitle}" from your library?`)) {
-      return;
-    }
-    
+  const handleDeleteBook = async (bookId) => {
     try {
       await userAPI.removeBook(bookId);
       // Remove from local state immediately for better UX
@@ -575,14 +571,23 @@ const BookPickerApp = () => {
           {userBooks.map((book, index) => (
             <div
               key={book.id}
-              className="bg-white rounded-xl p-4 shadow-sm border border-gray-200 hover:shadow-md transition-shadow"
+              className="bg-white rounded-xl p-4 shadow-sm border border-gray-200 hover:shadow-md transition-shadow relative"
             >
+              {/* Delete button - always visible for mobile */}
+              <button
+                onClick={() => handleDeleteBook(book.id)}
+                className="absolute top-3 right-3 p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-full transition-colors"
+                title="Remove from library"
+              >
+                <Trash2 size={16} />
+              </button>
+              
               <div className="flex items-start gap-4">
                 <div className="w-12 h-16 bg-gradient-to-br from-purple-400 to-pink-400 rounded-lg flex items-center justify-center text-white text-xs font-medium flex-shrink-0">
                   📚
                 </div>
                 
-                <div className="flex-1 min-w-0">
+                <div className="flex-1 min-w-0 pr-8">
                   <h3 className="font-semibold text-gray-800 text-lg leading-tight mb-1">
                     {book.title}
                   </h3>
@@ -597,21 +602,10 @@ const BookPickerApp = () => {
                         {book.mood}
                       </span>
                     )}
-
+                    <span className="bg-green-100 text-green-700 px-2 py-1 rounded-full text-xs font-medium">
+                      To Read
+                    </span>
                   </div>
-                </div>
-                
-                <div className="flex flex-col gap-2">
-                  <span className="bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-medium">
-                    To Read
-                  </span>
-                  <button
-                    onClick={() => handleDeleteBook(book.id, book.title)}
-                    className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
-                    title="Remove from library"
-                  >
-                    <Trash2 size={16} />
-                  </button>
                 </div>
               </div>
             </div>
