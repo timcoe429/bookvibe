@@ -1,8 +1,7 @@
-import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Heart, X, BookOpen, Clock, Star, Zap, Moon, Sun, Coffee, Trash2 } from 'lucide-react';
 import PhotoUpload from './components/PhotoUpload';
 import LoginPage from './components/LoginPage';
-import SearchInput from './components/SearchInput';
 import { userAPI } from './services/api';
 
 const BookPickerApp = () => {
@@ -23,20 +22,7 @@ const BookPickerApp = () => {
   // Library search state
   const [searchQuery, setSearchQuery] = useState('');
 
-  // Memoized filtered books to prevent focus loss
-  const filteredBooks = useMemo(() => {
-    if (!searchQuery.trim()) return userBooks;
-    return userBooks.filter(book => 
-      book.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      book.author.toLowerCase().includes(searchQuery.toLowerCase())
-    );
-  }, [userBooks, searchQuery]);
 
-  // Memoized search handler to prevent input re-rendering
-  const handleSearchChange = useCallback((searchValue) => {
-    console.log('Search input changed:', searchValue);
-    setSearchQuery(searchValue);
-  }, []);
 
   const moods = [
     { icon: Coffee, label: "Cozy", color: "bg-amber-100 text-amber-800" },
@@ -643,20 +629,24 @@ const BookPickerApp = () => {
           
           {/* Search bar */}
           <div className="mt-4 max-w-md mx-auto">
-            <SearchInput 
-              onSearchChange={handleSearchChange}
+            <input
+              type="text"
               placeholder="Search books by title or author..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full px-4 py-3 text-lg border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent"
             />
           </div>
         </div>
 
         <div className="grid gap-4 max-w-2xl mx-auto">
-          {filteredBooks.length === 0 && searchQuery ? (
-            <div className="text-center py-8">
-              <p className="text-gray-600">No books found matching "{searchQuery}"</p>
-            </div>
-          ) : (
-            filteredBooks.map((book, index) => (
+          {userBooks
+            .filter(book => 
+              !searchQuery || 
+              book.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+              book.author.toLowerCase().includes(searchQuery.toLowerCase())
+            )
+            .map((book, index) => (
             <div
               key={book.id}
               className="bg-white rounded-xl p-4 shadow-sm border border-gray-200 hover:shadow-md transition-shadow relative"
@@ -698,7 +688,6 @@ const BookPickerApp = () => {
               </div>
             </div>
           ))
-          )}
         </div>
 
         <div className="mt-8 text-center">
