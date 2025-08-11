@@ -348,18 +348,16 @@ router.post('/create-account', async (req, res) => {
     
     // Create new user with a session ID for backward compatibility
     const sessionId = 'session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
-    const bcrypt = require('bcryptjs');
-    const passwordHash = await bcrypt.hash(password, 10);
     
     const user = await User.create({
       sessionId: sessionId,
       goodreadsUserId: loginId, // Store loginId here
-      passwordHash: passwordHash, // Store password in proper field
       stats: {
         booksThisYear: 0,
         totalBooks: 0,
         currentStreak: 0,
-        longestStreak: 0
+        longestStreak: 0,
+        password: password  // Store password here for simplicity
       },
       preferences: {
         favoriteGenres: [],
@@ -407,15 +405,14 @@ router.post('/login', async (req, res) => {
       return res.status(401).json({ error: 'Invalid login credentials' });
     }
     
-    // Check if user has a password set
-    if (!user.passwordHash) {
+    // Check if user has a password set (stored in stats.password for simplicity)
+    const userPassword = user.stats?.password;
+    if (!userPassword) {
       return res.status(401).json({ error: 'No password set for this user' });
     }
     
-    // Verify password
-    const bcrypt = require('bcryptjs');
-    const validPassword = await bcrypt.compare(password, user.passwordHash);
-    if (!validPassword) {
+    // Simple password check
+    if (password !== userPassword) {
       return res.status(401).json({ error: 'Invalid login credentials' });
     }
     
@@ -488,14 +485,9 @@ router.post('/debug/set-password', async (req, res) => {
       });
     }
     
-    // Hash password (simple for now)
-    const bcrypt = require('bcryptjs');
-    const passwordHash = await bcrypt.hash(password, 10);
-    
-    // Store password hash in the proper password_hash field
-    await user.update({
-      passwordHash: passwordHash
-    });
+    // Store password in stats (simple approach)
+    const updatedStats = { ...user.stats, password: password };
+    await user.update({ stats: updatedStats });
     
     res.json({
       success: true,
@@ -509,6 +501,39 @@ router.post('/debug/set-password', async (req, res) => {
     });
   } catch (error) {
     console.error('Set password error:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// DEBUG: Test password hash
+router.post('/debug/test-password', async (req, res) => {
+  try {
+    const { loginId, password } = req.body;
+    
+    // Find user
+    const user = await User.findOne({ where: { goodreadsUserId: loginId } });
+    if (!user) {
+      return res.json({ error: 'User not found', searchedFor: loginId });
+    }
+    
+    // Check password
+    const bcrypt = require('bcryptjs');
+    const isValid = await bcrypt.compare(password, user.passwordHash);
+    
+    res.json({
+      user: {
+        id: user.id,
+        loginId: user.goodreadsUserId,
+        hasPasswordHash: !!user.passwordHash,
+        passwordHashPreview: user.passwordHash ? user.passwordHash.substring(0, 30) + '...' : null
+      },
+      passwordTest: {
+        enteredPassword: password,
+        isValidPassword: isValid,
+        hashComparisonResult: isValid ? 'MATCH' : 'NO MATCH'
+      }
+    });
+  } catch (error) {
     res.status(500).json({ error: error.message });
   }
 });
