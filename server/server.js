@@ -83,6 +83,42 @@ app.get('/health', (req, res) => {
   res.status(200).json({ status: 'OK', message: 'Server running' });
 });
 
+// Run password field migration
+app.get('/run-migration', async (req, res) => {
+  try {
+    const fs = require('fs');
+    const path = require('path');
+    
+    // Check if password_hash column already exists
+    try {
+      await sequelize.query("SELECT password_hash FROM users LIMIT 1");
+      return res.json({ message: 'Migration already run - password_hash column exists' });
+    } catch (error) {
+      // Column doesn't exist, run migration
+    }
+    
+    const migrationPath = path.join(__dirname, 'migrations/004_add_password_field.sql');
+    
+    if (!fs.existsSync(migrationPath)) {
+      return res.status(404).json({ error: 'Migration file not found' });
+    }
+    
+    const migrationSQL = fs.readFileSync(migrationPath, 'utf8');
+    await sequelize.query(migrationSQL);
+    
+    res.json({ 
+      success: true, 
+      message: 'Password field migration completed! CarlyFries password has been set.' 
+    });
+  } catch (error) {
+    console.error('Migration error:', error);
+    res.status(500).json({ 
+      error: 'Migration failed', 
+      details: error.message 
+    });
+  }
+});
+
 // Simple password setter page
 app.get('/set-password', (req, res) => {
   res.send(`

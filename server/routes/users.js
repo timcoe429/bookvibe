@@ -354,14 +354,12 @@ router.post('/create-account', async (req, res) => {
     const user = await User.create({
       sessionId: sessionId,
       goodreadsUserId: loginId, // Store loginId here
+      passwordHash: passwordHash, // Store password in proper field
       stats: {
         booksThisYear: 0,
         totalBooks: 0,
         currentStreak: 0,
-        longestStreak: 0,
-        passwordHash: passwordHash,
-        loginId: loginId,
-        hasPassword: true
+        longestStreak: 0
       },
       preferences: {
         favoriteGenres: [],
@@ -410,14 +408,13 @@ router.post('/login', async (req, res) => {
     }
     
     // Check if user has a password set
-    const stats = user.stats || {};
-    if (!stats.passwordHash) {
+    if (!user.passwordHash) {
       return res.status(401).json({ error: 'No password set for this user' });
     }
     
     // Verify password
     const bcrypt = require('bcryptjs');
-    const validPassword = await bcrypt.compare(password, stats.passwordHash);
+    const validPassword = await bcrypt.compare(password, user.passwordHash);
     if (!validPassword) {
       return res.status(401).json({ error: 'Invalid login credentials' });
     }
@@ -495,15 +492,9 @@ router.post('/debug/set-password', async (req, res) => {
     const bcrypt = require('bcryptjs');
     const passwordHash = await bcrypt.hash(password, 10);
     
-    // Store password hash in stats field
-    const currentStats = user.stats || {};
+    // Store password hash in the proper password_hash field
     await user.update({
-      stats: {
-        ...currentStats,
-        passwordHash: passwordHash,
-        loginId: loginId,
-        hasPassword: true
-      }
+      passwordHash: passwordHash
     });
     
     res.json({

@@ -18,6 +18,11 @@ const User = sequelize.define('User', {
     unique: true,
     field: 'goodreads_user_id'
   },
+  passwordHash: {
+    type: DataTypes.STRING,
+    allowNull: true,
+    field: 'password_hash'
+  },
   preferences: {
     type: DataTypes.JSONB,
     defaultValue: {
