@@ -513,6 +513,40 @@ router.post('/debug/set-password', async (req, res) => {
   }
 });
 
+// DEBUG: Show detailed user info including passwords
+router.get('/debug/user-details', async (req, res) => {
+  try {
+    const users = await User.findAll({
+      attributes: ['id', 'sessionId', 'goodreadsUserId', 'passwordHash', 'createdAt'],
+      order: [['id', 'ASC']]
+    });
+    
+    const userDetails = [];
+    
+    for (const user of users) {
+      const bookCount = await UserBook.count({ where: { userId: user.id } });
+      userDetails.push({
+        id: user.id,
+        sessionId: user.sessionId,
+        goodreadsUserId: user.goodreadsUserId,
+        hasPassword: !!user.passwordHash,
+        passwordHashPreview: user.passwordHash ? user.passwordHash.substring(0, 20) + '...' : null,
+        bookCount: bookCount,
+        createdAt: user.createdAt
+      });
+    }
+    
+    res.json({
+      message: 'Detailed user info for debugging',
+      users: userDetails,
+      tip: 'Check which user has goodreadsUserId = CarlyFries and if they have a password'
+    });
+  } catch (error) {
+    console.error('Debug user details error:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
 // DEBUG: Show all users with book counts to find her session
 // Protected from crawlers and indexing
 router.get('/debug/user-summary', async (req, res) => {
